@@ -43,7 +43,7 @@ jobs:
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
+          name: DailyQuizAPI
           path: ./publish
 
   deploy:
@@ -58,7 +58,8 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
+          name: DailyQuizAPI
+          path: ./publish
       
       - name: Login to Azure
         uses: azure/login@v2
