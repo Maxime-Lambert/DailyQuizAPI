@@ -1,6 +1,0 @@
-@DailyQuizAPI_HostAddress = http://localhost:5296
-
-GET {{DailyQuizAPI_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
