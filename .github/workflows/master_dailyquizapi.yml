@@ -33,10 +33,9 @@ jobs:
           
       - name: Build with dotnet
         run: dotnet build ./src/DailyQuizAPI/DailyQuizAPI.csproj --configuration Release
-      
       - name: Run tests
-        run: dotnet test ./tests/DailyQuizAPI.IntegrationTests/DailyQuizAPI.IntegrationTests.csproj --configuration Release --no-build --logger trx
-      
+        run: dotnet test ./tests/DailyQuizAPI.IntegrationTests/DailyQuizAPI.IntegrationTests.csproj --configuration Release --no-build
+
       - name: dotnet publish
         run: dotnet publish ./src/DailyQuizAPI/DailyQuizAPI.csproj -c Release -o ./publish
       
