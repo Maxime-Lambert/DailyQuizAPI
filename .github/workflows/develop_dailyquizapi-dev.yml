@@ -25,7 +25,6 @@ jobs:
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
           restore-keys: nuget-${{ runner.os }}-
 
-
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
@@ -64,9 +63,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_90475C7B029A433E873ACE831073FC9F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_072F69A9DAE24FFFAA04C36D35C46426 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_17E0BA67204048F2B6F67CBCB490B52F }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_528102A5BD54411C91D6B82BBA9F4CF3 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1E3F2912E8EA4424B3752D9D16ECA63B }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3D8B59107A814AFF8E71154064466E67 }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
