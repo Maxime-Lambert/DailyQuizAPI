@@ -1,0 +1,16 @@
+﻿services:
+  postgres:
+    image: postgres:17.5-alpine3.22
+    container_name: dailyquiz-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: quizuser
+      POSTGRES_PASSWORD: quizpass
+      POSTGRES_DB: dailyquizdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
