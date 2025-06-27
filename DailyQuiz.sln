@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EA0E7915-9451-442B-96F6-6306ABF263F5}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Directory.Packages.props = tests\Directory.Packages.props
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyQuizAPI.IntegrationTests", "tests\DailyQuizAPI.IntegrationTests\DailyQuizAPI.IntegrationTests.csproj", "{B5D0FA9E-E37C-4B90-A637-0F18FE1C3835}"
 EndProject
@@ -13,6 +16,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyQuizAPI", "src\DailyQu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{9C8CB701-102D-CF49-A3E0-89AC09D42C2C}"
 	ProjectSection(SolutionItems) = preProject
+		sonar-project.properties = sonar-project.properties
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B69E1660-0A93-4F26-8E51-282E619FB136}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		sonar-project.properties = sonar-project.properties
 	EndProjectSection
 EndProject

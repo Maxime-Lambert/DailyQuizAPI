@@ -1,5 +1,7 @@
+using DailyQuizAPI.AppSettings.CreateAppSetting;
 using DailyQuizAPI.Persistence;
 using DailyQuizAPI.Sumots;
+using DailyQuizAPI.Sumots.GetSumots;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +38,9 @@ builder.Services.AddDbContext<QuizContext>((serviceProvider, dbContextOptionsBui
 
 builder.Services.AddHealthChecks();
 
+builder.Services.AddScoped<GetSumotsQueryHandler>();
+builder.Services.AddScoped<CreateAppSettingCommandHandler>();
+
 var app = builder.Build();
 
 app.UseSwagger();
@@ -61,13 +66,8 @@ app.MapGet("/FiveLettersFrenchWords", async (QuizContext quizContext) =>
 .WithName("FiveLettersFrenchWords")
 .WithOpenApi();
 
-app.MapGet("/Sumots", async (QuizContext quizContext) =>
-{
-    var sumots = await quizContext.Sumots.ToListAsync().ConfigureAwait(false);
-    return Results.Ok(sumots);
-})
-.WithName("GetSumots")
-.WithOpenApi();
+app.MapGetSumotsEndpoint();
+app.MapPostAppSettingEndpoint();
 
 app.MapHealthChecks("health", new HealthCheckOptions
 {
@@ -77,4 +77,12 @@ app.MapHealthChecks("health", new HealthCheckOptions
 .WithOpenApi()
 .WithTags("System");
 
-app.Run();
+await app.ApplyMigrationsAsync().ConfigureAwait(false);
+
+await app.RunAsync().ConfigureAwait(false);
+
+public partial class Program
+{
+    private Program() { }
+}
+
