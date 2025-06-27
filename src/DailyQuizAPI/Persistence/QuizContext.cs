@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DailyQuizAPI.Persistence;
 
-public class QuizContext(DbContextOptions<QuizContext> options) : DbContext(options)
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Used by dependency injection")]
+internal sealed class QuizContext(DbContextOptions<QuizContext> options) : DbContext(options)
 {
     public DbSet<Sumot> Sumots { get; set; }
 

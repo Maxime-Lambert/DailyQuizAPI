@@ -2,7 +2,8 @@
 
 namespace DailyQuizAPI.Persistence
 {
-    public sealed class DatabaseOptionsSetup(IConfiguration configuration) : IConfigureOptions<DatabaseOptions>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Used by dependency injection")]
+    internal sealed class DatabaseOptionsSetup(IConfiguration configuration) : IConfigureOptions<DatabaseOptions>
     {
         private const string _configurationSection = "DatabaseOptions";
         private readonly IConfiguration _configuration = configuration;

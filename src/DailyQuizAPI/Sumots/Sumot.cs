@@ -1,6 +1,6 @@
 ﻿namespace DailyQuizAPI.Sumots;
 
-public sealed class Sumot
+internal sealed class Sumot
 {
     public int Id { get; set; }
 

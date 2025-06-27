@@ -1,4 +1,5 @@
 using DailyQuizAPI.Persistence;
+using DailyQuizAPI.Sumots;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -44,22 +45,24 @@ app.UseHttpsRedirection();
 
 app.UseSerilogRequestLogging();
 
-/*app.MapGet("/FiveLettersFrenchWords", async (QuizContext quizContext) =>
+var sumotsFilePath = Path.Combine(AppContext.BaseDirectory, "ods6.txt");
+
+app.MapGet("/FiveLettersFrenchWords", async (QuizContext quizContext) =>
 {
     using var http = new HttpClient();
-    var sumots = File.ReadAllLines("D:\\Development\\source\\Maxime-Lambert\\DailyQuiz\\src\\DailyQuizAPI\\ods6.txt")
-                     .Where(w => w.Length == 5)
+    var words = await File.ReadAllLinesAsync(sumotsFilePath).ConfigureAwait(false);
+    var sumots = words.Where(w => w.Length == 5)
                      .Distinct()
-                     .Select(w => new Sumot { Word = w.Trim().ToLowerInvariant(), Day = null });
+                     .Select(w => new Sumot { Word = w.Trim().ToUpperInvariant(), Day = null });
     quizContext.Sumots.AddRange(sumots);
-    await quizContext.SaveChangesAsync();
+    await quizContext.SaveChangesAsync().ConfigureAwait(false);
 })
 .WithName("FiveLettersFrenchWords")
-.WithOpenApi();*/
+.WithOpenApi();
 
 app.MapGet("/Sumots", async (QuizContext quizContext) =>
 {
-    var sumots = await quizContext.Sumots.ToListAsync();
+    var sumots = await quizContext.Sumots.ToListAsync().ConfigureAwait(false);
     return Results.Ok(sumots);
 })
 .WithName("GetSumots")

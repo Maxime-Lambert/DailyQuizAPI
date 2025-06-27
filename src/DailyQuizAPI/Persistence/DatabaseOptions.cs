@@ -1,6 +1,7 @@
 ﻿namespace DailyQuizAPI.Persistence
 {
-    public sealed class DatabaseOptions
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Used by dependency injection")]
+    internal sealed class DatabaseOptions
     {
         public string? ConnectionString { get; set; }
 
