@@ -53,6 +53,7 @@ app.MapGet("/FiveLettersFrenchWords", async (QuizContext quizContext) =>
     var words = await File.ReadAllLinesAsync(sumotsFilePath).ConfigureAwait(false);
     var sumots = words.Where(w => w.Length == 5)
                      .Distinct()
+                     .Where(w => !quizContext.Sumots.Any(s => s.Word! == w))
                      .Select(w => new Sumot { Word = w.Trim().ToUpperInvariant(), Day = null });
     quizContext.Sumots.AddRange(sumots);
     await quizContext.SaveChangesAsync().ConfigureAwait(false);
