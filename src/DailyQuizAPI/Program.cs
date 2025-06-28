@@ -1,6 +1,6 @@
 using DailyQuizAPI.AppSettings.CreateAppSetting;
 using DailyQuizAPI.Persistence;
-using DailyQuizAPI.Sumots;
+using DailyQuizAPI.Sumots.ExtractSumots;
 using DailyQuizAPI.Sumots.GetSumots;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -11,11 +11,7 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.EnableAnnotations();
-});
-
+builder.Services.AddSwaggerGen();
 
 builder.Services.ConfigureOptions<DatabaseOptionsSetup>();
 
@@ -50,26 +46,10 @@ app.UseHttpsRedirection();
 
 app.UseSerilogRequestLogging();
 
-var sumotsFilePath = Path.Combine(AppContext.BaseDirectory, "ods6.txt");
-
-app.MapGet("/FiveLettersFrenchWords", async (QuizContext quizContext) =>
-{
-    using var http = new HttpClient();
-    var words = await File.ReadAllLinesAsync(sumotsFilePath).ConfigureAwait(false);
-    var sumots = words.Where(w => w.Length == 5)
-                     .Distinct()
-                     .Where(w => !quizContext.Sumots.Any(s => s.Word! == w))
-                     .Select(w => new Sumot { Word = w.Trim().ToUpperInvariant(), Day = null });
-    quizContext.Sumots.AddRange(sumots);
-    await quizContext.SaveChangesAsync().ConfigureAwait(false);
-})
-.WithName("FiveLettersFrenchWords")
-.WithOpenApi();
-
 app.MapGetSumotsEndpoint();
 app.MapPostAppSettingEndpoint();
-
-app.MapHealthChecks("health", new HealthCheckOptions
+app.MapExtractSumotsEndpoint();
+app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 })
