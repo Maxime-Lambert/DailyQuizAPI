@@ -4,11 +4,11 @@ namespace DailyQuizAPI.Sumots.GetSumots;
 
 public static class GetSumotsEndpoint
 {
-    private const string SumotsResourceName = "/sumots";
+    private const string SUMOTS_RESOURCE_NAME = "/sumots";
 
     public static void MapGetSumotsEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet(SumotsResourceName,
+        app.MapGet(SUMOTS_RESOURCE_NAME,
             async ([FromServices] GetSumotsQueryHandler handler,
                    [AsParameters] GetSumotsQuery query,
                    CancellationToken ct) =>
@@ -18,9 +18,8 @@ public static class GetSumotsEndpoint
             })
         .WithName("GetSumots")
         .Produces<IEnumerable<GetSumotsResponse>>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status400BadRequest)
         .WithTags("Sumots")
         .WithOpenApi();
     }
-
 }
