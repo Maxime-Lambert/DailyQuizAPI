@@ -3,6 +3,7 @@ using System;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DailyQuizAPI.Migrations
 {
     [DbContext(typeof(QuizContext))]
-    partial class QuizContextModelSnapshot : ModelSnapshot
+    [Migration("20250629002424_Authentication")]
+    partial class AuthenticationAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,11 +80,6 @@ namespace DailyQuizAPI.Migrations
                     b.Property<string>("Word")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<string>("_tries")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("Tries");
 
                     b.HasKey("Id");
 
@@ -289,7 +287,7 @@ namespace DailyQuizAPI.Migrations
             modelBuilder.Entity("DailyQuizAPI.Users.SumotHistory", b =>
                 {
                     b.HasOne("DailyQuizAPI.Users.User", "User")
-                        .WithMany("_sumotHistories")
+                        .WithMany("SumotHistories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -350,7 +348,7 @@ namespace DailyQuizAPI.Migrations
 
             modelBuilder.Entity("DailyQuizAPI.Users.User", b =>
                 {
-                    b.Navigation("_sumotHistories");
+                    b.Navigation("SumotHistories");
                 });
 #pragma warning restore 612, 618
         }

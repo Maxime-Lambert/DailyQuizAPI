@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace DailyQuizAPI.Persistence
+namespace DailyQuizAPI.Persistence.Options
 {
     public sealed class DatabaseOptionsSetup(IConfiguration configuration) : IConfigureOptions<DatabaseOptions>
     {
@@ -9,14 +9,11 @@ namespace DailyQuizAPI.Persistence
 
         public void Configure(DatabaseOptions options)
         {
-            if (options is not null)
-            {
-                var connectionString = _configuration.GetConnectionString("Database");
+            var connectionString = _configuration.GetConnectionString("Database");
 
-                options.ConnectionString = connectionString!;
+            options.ConnectionString = connectionString!;
 
-                _configuration.GetSection(_configurationSection).Bind(options);
-            }
+            _configuration.GetSection(_configurationSection).Bind(options);
         }
     }
 }

@@ -1,3 +1,3 @@
-﻿namespace DailyQuizAPI.Sumots.ExtractSumots;
+﻿namespace DailyQuizAPI.Sumots.Extract;
 
 public sealed record ExtractSumotsCommand(int WordLength);

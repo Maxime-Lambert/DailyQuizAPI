@@ -1,6 +1,6 @@
 ﻿using DailyQuizAPI.Persistence;
 
-namespace DailyQuizAPI.AppSettings.CreateAppSetting;
+namespace DailyQuizAPI.AppSettings.Create;
 
 public sealed class CreateAppSettingCommandHandler(QuizContext quizContext)
 {

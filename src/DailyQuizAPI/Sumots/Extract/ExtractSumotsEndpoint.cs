@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace DailyQuizAPI.Sumots.ExtractSumots;
+namespace DailyQuizAPI.Sumots.Extract;
 
 public static class ExtractSumotsEndpoint
 {
