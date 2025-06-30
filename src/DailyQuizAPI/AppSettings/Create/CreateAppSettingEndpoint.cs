@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace DailyQuizAPI.AppSettings.CreateAppSetting;
+namespace DailyQuizAPI.AppSettings.Create;
 
 public static class CreateAppSettingEndpoint
 {

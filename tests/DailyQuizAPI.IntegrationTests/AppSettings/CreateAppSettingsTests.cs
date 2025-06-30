@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.AppSettings.CreateAppSetting;
+﻿using DailyQuizAPI.AppSettings.Create;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;

@@ -1,4 +1,4 @@
-﻿namespace DailyQuizAPI.Persistence
+﻿namespace DailyQuizAPI.Persistence.Options
 {
     public sealed class DatabaseOptions
     {

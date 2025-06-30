@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace DailyQuizAPI.Sumots.GetSumots;
+namespace DailyQuizAPI.Sumots.GetAll;
 
 public static class GetSumotsEndpoint
 {
@@ -17,7 +17,7 @@ public static class GetSumotsEndpoint
                 return Results.Ok(result);
             })
         .WithName("GetSumots")
-        .Produces<IEnumerable<GetSumotsResponse>>(StatusCodes.Status200OK)
+        .Produces<GetSumotsResponseList>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
         .WithTags("Sumots")
         .WithOpenApi();
