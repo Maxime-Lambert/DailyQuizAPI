@@ -26,7 +26,10 @@ public class ApiTestFixture : IAsyncLifetime
                     {
                         ["ConnectionStrings:Database"] = DbContainer.GetConnectionString()
                     };
-                    config.AddJsonFile("appsettings.Test.json", optional: false);
+                    if (File.Exists("appsettings.Test.json"))
+                    {
+                        config.AddJsonFile("appsettings.Test.json", optional: false);
+                    }
                     config.AddInMemoryCollection(settings!);
                 });
             });
