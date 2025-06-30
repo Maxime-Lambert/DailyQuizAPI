@@ -9,6 +9,11 @@ on:
       - develop
   workflow_dispatch:
 
+env:
+  Jwt__Secret: ${{ secrets.AUTH_SECRET }}
+  Jwt__Issuer: ${{ secrets.AUTH_ISSUER }}
+  Jwt__Audience: ${{ secrets.AUTH_AUDIENCE }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
