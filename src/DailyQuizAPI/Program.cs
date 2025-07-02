@@ -76,7 +76,9 @@ builder.Services.AddDbContext<QuizContext>((serviceProvider, dbContextOptionsBui
     dbContextOptionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
-builder.Services.AddHealthChecks().AddNpgSql(builder.Configuration.GetConnectionString("Database")!);
+builder.Services.AddHealthChecks().AddNpgSql(
+    sp => sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString!
+);
 
 RegisterCommandHandlers(builder);
 
