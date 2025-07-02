@@ -1,7 +1,6 @@
-﻿using DailyQuizAPI.AppSettings.Create;
+﻿using DailyQuizAPI.Features.Sumots.Extract;
+using DailyQuizAPI.Features.Sumots.GetAll;
 using DailyQuizAPI.IntegrationTests.Fixtures;
-using DailyQuizAPI.Sumots.Extract;
-using DailyQuizAPI.Sumots.GetAll;
 using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
@@ -17,12 +16,8 @@ public class GetSumotsTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixtu
     public async Task GetSumots_ReturnsOk_WithExpectedShape()
     {
         ExtractSumotsCommand extractSumotsCommand = new(5);
-        var response = await _client.PostAsJsonAsync("/extractSumots", extractSumotsCommand);
+        var response = await _client.PostAsJsonAsync("/sumots/extract", extractSumotsCommand);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        CreateAppSettingCommand body = new("DatabaseVersion", "5");
-        response = await _client.PostAsJsonAsync("/appsettings", body);
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
 
         response = await _client.GetAsync("/sumots");
         response.StatusCode.Should().Be(HttpStatusCode.OK);

@@ -12,7 +12,7 @@ public class GetHealthcheckTests(ApiTestFixture fixture) : IClassFixture<ApiTest
     [Fact]
     public async Task HealthCheck_ReturnsHealthy()
     {
-        var response = await _client.GetAsync("/health");
+        var response = await _client.GetAsync("/healthchecks");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var json = await response.Content.ReadAsStringAsync();
         json.Should().Contain("Healthy");

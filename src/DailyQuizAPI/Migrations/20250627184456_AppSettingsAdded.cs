@@ -21,6 +21,12 @@ namespace DailyQuizAPI.Migrations
                 {
                     table.PrimaryKey("PK_AppSettings", x => x.Key);
                 });
+
+            migrationBuilder.Sql("""
+                INSERT INTO "AppSettings" ("Key", "Value")
+                VALUES ('DatabaseVersion', '1');
+            """);
+
         }
 
         /// <inheritdoc />

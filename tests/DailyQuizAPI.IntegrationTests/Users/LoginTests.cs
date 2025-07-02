@@ -1,6 +1,6 @@
-﻿using DailyQuizAPI.IntegrationTests.Fixtures;
-using DailyQuizAPI.Users.Create;
-using DailyQuizAPI.Users.Login;
+﻿using DailyQuizAPI.Features.Users.Create;
+using DailyQuizAPI.Features.Users.Login;
+using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
@@ -20,7 +20,7 @@ public class LoginTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
         var createResponse = await _client.PostAsJsonAsync("/users", user);
         createResponse.EnsureSuccessStatusCode();
 
-        LoginCommand loginCommand = new(user.UserName, user.Password);
+        LoginCommand loginCommand = new(user.UserName, user.Password, "127.0.0.1");
 
         var loginResponse = await _client.PostAsJsonAsync("/users/login", loginCommand);
         loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);

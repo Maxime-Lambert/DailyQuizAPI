@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.AppSettings.Create;
+﻿using DailyQuizAPI.Features.AppSettings.Create;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
@@ -7,16 +7,14 @@ using Xunit;
 
 namespace DailyQuizAPI.IntegrationTests.AppSettings;
 
-public class AppSettingEndpointTests : IClassFixture<ApiTestFixture>
+public class AppSettingEndpointTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client;
-
-    public AppSettingEndpointTests(ApiTestFixture fixture) => _client = fixture.Client;
+    private readonly HttpClient _client = fixture.Client;
 
     [Fact]
     public async Task CreateAppSetting_ReturnsCreated()
     {
-        CreateAppSettingCommand body = new("DatabaseVersion", "5");
+        CreateAppSettingCommand body = new("AppSetting Test", "15");
 
         var response = await _client.PostAsJsonAsync("/appsettings", body);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
