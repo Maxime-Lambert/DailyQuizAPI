@@ -1,5 +1,5 @@
-﻿using DailyQuizAPI.IntegrationTests.Fixtures;
-using DailyQuizAPI.Users.Create;
+﻿using DailyQuizAPI.Features.Users.Create;
+using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
