@@ -1,5 +1,5 @@
-﻿using DailyQuizAPI.Features.Sumots.Extract;
-using DailyQuizAPI.Features.Sumots.GetAll;
+﻿using DailyQuizAPI.Features.SumotApp.Sumots.Extract;
+using DailyQuizAPI.Features.SumotApp.Sumots.GetAll;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
@@ -15,6 +15,7 @@ public class GetSumotsTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixtu
     [Fact]
     public async Task GetSumots_ReturnsOk_WithExpectedShape()
     {
+        fixture.AuthenticateAsSystem();
         ExtractSumotsCommand extractSumotsCommand = new(5);
         var response = await _client.PostAsJsonAsync("/sumots/extract", extractSumotsCommand);
         response.StatusCode.Should().Be(HttpStatusCode.OK);

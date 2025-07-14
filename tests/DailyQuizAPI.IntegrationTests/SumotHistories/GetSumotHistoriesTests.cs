@@ -1,0 +1,37 @@
+﻿using DailyQuizAPI.Features.SumotApp.SumotHistories.Add;
+using DailyQuizAPI.Features.SumotApp.SumotHistories.GetAll;
+using DailyQuizAPI.IntegrationTests.Fixtures;
+using FluentAssertions;
+using System.Net;
+using System.Net.Http.Json;
+using Xunit;
+
+namespace DailyQuizAPI.IntegrationTests.SumotHistories;
+
+public sealed class GetSumotHistoriesTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
+{
+    private readonly HttpClient _client = fixture.Client;
+
+    [Fact]
+    public async Task GetSumotHistories_ReturnsOk()
+    {
+        var tokens = await fixture.RegisterAndLoginAsync("gethistoryuser", "gethistory@example.com", "Test123!");
+        _client.DefaultRequestHeaders.Authorization = new("Bearer", tokens.accessToken);
+
+        AddSumotHistoriesCommand addSumotHistoriesCommand = new(
+            [new("bleue", ["bleue", "verte"])]
+        );
+        await _client.PostAsJsonAsync("/sumothistories/addrange", addSumotHistoriesCommand);
+
+        var query = new GetSumotHistoriesQuery(1, 10);
+        var uri = $"/sumothistories?page={query.Page}&pageSize={query.PageSize}";
+
+        var response = await _client.GetAsync(uri);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Content.ReadFromJsonAsync<List<GetSumotHistoriesResponse>>();
+        result.Should().NotBeNull().And.HaveCountGreaterThan(0);
+    }
+}
+
