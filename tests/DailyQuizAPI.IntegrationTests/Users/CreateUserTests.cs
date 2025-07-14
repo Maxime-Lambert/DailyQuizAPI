@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.Features.Users.Create;
+﻿using DailyQuizAPI.Features.Crosscutting.Users.Create;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
@@ -14,6 +14,7 @@ public class CreateUserTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixt
     [Fact]
     public async Task CreateUser_Returns201_WhenUserIsValid()
     {
+        fixture.AuthenticateAsSystem();
         CreateUserCommand user = new("testuser", "test@example.com", "StrongPassword123!");
 
         var response = await _client.PostAsJsonAsync("/users", user);

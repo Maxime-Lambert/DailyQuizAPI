@@ -1,8 +1,8 @@
-﻿using DailyQuizAPI.Features.AppSettings;
-using DailyQuizAPI.Features.FriendRequests;
-using DailyQuizAPI.Features.SumotHistories;
-using DailyQuizAPI.Features.Sumots;
-using DailyQuizAPI.Features.Users;
+﻿using DailyQuizAPI.Features.Crosscutting.AppSettings;
+using DailyQuizAPI.Features.Crosscutting.FriendRequests;
+using DailyQuizAPI.Features.Crosscutting.Users;
+using DailyQuizAPI.Features.SumotApp.SumotHistories;
+using DailyQuizAPI.Features.SumotApp.Sumots;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;

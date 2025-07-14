@@ -1,5 +1,5 @@
-﻿using DailyQuizAPI.Features.Users.Create;
-using DailyQuizAPI.Features.Users.Login;
+﻿using DailyQuizAPI.Features.Crosscutting.Users.Create;
+using DailyQuizAPI.Features.Crosscutting.Users.Login;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
@@ -15,18 +15,17 @@ public class LoginTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
     [Fact]
     public async Task Login_ReturnsJwtToken_WhenCredentialsAreValid()
     {
-        // Créer un utilisateur d’abord
-        CreateUserCommand user = new("loginuser", "login@example.com", "LoginTest123!");
-        var createResponse = await _client.PostAsJsonAsync("/users", user);
-        createResponse.EnsureSuccessStatusCode();
+        fixture.AuthenticateAsSystem();
+        CreateUserCommand createUserCommand = new("loginuser", "login@example.com", "LoginTest123!");
+        var createUserResponse = await _client.PostAsJsonAsync("/users", createUserCommand);
+        createUserResponse.EnsureSuccessStatusCode();
 
-        LoginCommand loginCommand = new(user.UserName, user.Password, "127.0.0.1");
-
+        LoginCommand loginCommand = new(createUserCommand.UserName, createUserCommand.Password, "127.0.0.1");
         var loginResponse = await _client.PostAsJsonAsync("/users/login", loginCommand);
         loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var token = await loginResponse.Content.ReadAsStringAsync();
-        token.Should().NotBeNullOrWhiteSpace();
-        token.Should().Contain(".");
+        var result = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
+        result!.Token.Should().NotBeNullOrWhiteSpace();
+        result.RefreshToken.Should().NotBeNullOrWhiteSpace();
     }
 }

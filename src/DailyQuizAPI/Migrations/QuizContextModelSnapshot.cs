@@ -22,7 +22,7 @@ namespace DailyQuizAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DailyQuizAPI.AppSettings.AppSetting", b =>
+            modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.AppSettings.AppSetting", b =>
                 {
                     b.Property<string>("Key")
                         .HasColumnType("text");
@@ -36,7 +36,7 @@ namespace DailyQuizAPI.Migrations
                     b.ToTable("AppSettings");
                 });
 
-            modelBuilder.Entity("DailyQuizAPI.FriendRequests.FriendRequest", b =>
+            modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.FriendRequests.FriendRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -71,61 +71,7 @@ namespace DailyQuizAPI.Migrations
                     b.ToTable("FriendRequests");
                 });
 
-            modelBuilder.Entity("DailyQuizAPI.SumotHistories.SumotHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly>("Day")
-                        .HasColumnType("date");
-
-                    b.Property<int?>("Ranking")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Word")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("_tries")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("Tries");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("SumotHistories");
-                });
-
-            modelBuilder.Entity("DailyQuizAPI.Sumots.Sumot", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly?>("Day")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Word")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Sumots");
-                });
-
-            modelBuilder.Entity("DailyQuizAPI.Users.RefreshToken", b =>
+            modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.Users.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -166,7 +112,7 @@ namespace DailyQuizAPI.Migrations
                     b.ToTable("RefreshToken");
                 });
 
-            modelBuilder.Entity("DailyQuizAPI.Users.User", b =>
+            modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.Users.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -234,6 +180,57 @@ namespace DailyQuizAPI.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.SumotHistories.SumotHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("Ranking")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Word")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("_tries")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("Tries");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SumotHistories");
+                });
+
+            modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.Sumots.Sumot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly?>("Day")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Word")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sumots");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -368,15 +365,15 @@ namespace DailyQuizAPI.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("DailyQuizAPI.FriendRequests.FriendRequest", b =>
+            modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.FriendRequests.FriendRequest", b =>
                 {
-                    b.HasOne("DailyQuizAPI.Users.User", "Receiver")
+                    b.HasOne("DailyQuizAPI.Features.Crosscutting.Users.User", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DailyQuizAPI.Users.User", "Requester")
+                    b.HasOne("DailyQuizAPI.Features.Crosscutting.Users.User", "Requester")
                         .WithMany()
                         .HasForeignKey("RequesterId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -387,10 +384,10 @@ namespace DailyQuizAPI.Migrations
                     b.Navigation("Requester");
                 });
 
-            modelBuilder.Entity("DailyQuizAPI.SumotHistories.SumotHistory", b =>
+            modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.Users.RefreshToken", b =>
                 {
-                    b.HasOne("DailyQuizAPI.Users.User", "User")
-                        .WithMany("_sumotHistories")
+                    b.HasOne("DailyQuizAPI.Features.Crosscutting.Users.User", "User")
+                        .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -398,10 +395,10 @@ namespace DailyQuizAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DailyQuizAPI.Users.RefreshToken", b =>
+            modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.SumotHistories.SumotHistory", b =>
                 {
-                    b.HasOne("DailyQuizAPI.Users.User", "User")
-                        .WithMany("RefreshTokens")
+                    b.HasOne("DailyQuizAPI.Features.Crosscutting.Users.User", "User")
+                        .WithMany("_sumotHistories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -420,7 +417,7 @@ namespace DailyQuizAPI.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("DailyQuizAPI.Users.User", null)
+                    b.HasOne("DailyQuizAPI.Features.Crosscutting.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -429,7 +426,7 @@ namespace DailyQuizAPI.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("DailyQuizAPI.Users.User", null)
+                    b.HasOne("DailyQuizAPI.Features.Crosscutting.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -444,7 +441,7 @@ namespace DailyQuizAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DailyQuizAPI.Users.User", null)
+                    b.HasOne("DailyQuizAPI.Features.Crosscutting.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -453,14 +450,14 @@ namespace DailyQuizAPI.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("DailyQuizAPI.Users.User", null)
+                    b.HasOne("DailyQuizAPI.Features.Crosscutting.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DailyQuizAPI.Users.User", b =>
+            modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.Users.User", b =>
                 {
                     b.Navigation("RefreshTokens");
 

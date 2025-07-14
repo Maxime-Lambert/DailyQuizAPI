@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.Features.AppSettings.Create;
+﻿using DailyQuizAPI.Features.Crosscutting.AppSettings.Create;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
@@ -14,6 +14,7 @@ public class AppSettingEndpointTests(ApiTestFixture fixture) : IClassFixture<Api
     [Fact]
     public async Task CreateAppSetting_ReturnsCreated()
     {
+        fixture.AuthenticateAsSystem();
         CreateAppSettingCommand body = new("AppSetting Test", "15");
 
         var response = await _client.PostAsJsonAsync("/appsettings", body);
