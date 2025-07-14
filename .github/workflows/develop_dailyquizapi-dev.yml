@@ -10,9 +10,8 @@ on:
   workflow_dispatch:
 
 env:
-  Jwt__Secret: ${{ secrets.AUTH_SECRET }}
-  Jwt__Issuer: ${{ secrets.AUTH_ISSUER }}
-  Jwt__Audience: ${{ secrets.AUTH_AUDIENCE }}
+  Authentication__Secret: ${{ secrets.AUTH_SECRET }}
+  Authentication__ApiKey: ${{ secrets.AUTH_API_KEY }}
 
 jobs:
   build:
