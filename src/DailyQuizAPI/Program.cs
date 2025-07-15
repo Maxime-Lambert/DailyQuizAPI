@@ -1,80 +1,58 @@
+using DailyQuizAPI.Features;
+using DailyQuizAPI.Features.Crosscutting.Caching;
+using DailyQuizAPI.Features.Crosscutting.Healthchecks;
+using DailyQuizAPI.Features.SumotApp.Ranking;
+using DailyQuizAPI.Jobs;
+using DailyQuizAPI.Logger;
+using DailyQuizAPI.Middlewares;
+using DailyQuizAPI.Middlewares.Authentication;
+using DailyQuizAPI.OpenApi;
 using DailyQuizAPI.Persistence;
-using DailyQuizAPI.Sumots;
-using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.EnableAnnotations();
-});
+builder.UseSerilog();
 
-
-builder.Services.ConfigureOptions<DatabaseOptionsSetup>();
-
-builder.Host.UseSerilog((context, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration));
-
-builder.Services.AddDbContext<QuizContext>((serviceProvider, dbContextOptionsBuilder) =>
-{
-    var databaseOptions = serviceProvider.GetService<IOptions<DatabaseOptions>>()!.Value;
-
-    dbContextOptionsBuilder.UseNpgsql(databaseOptions.ConnectionString, npgsqlOptionsAction =>
-    {
-        npgsqlOptionsAction.CommandTimeout(databaseOptions.CommandTimeout);
-        npgsqlOptionsAction.EnableRetryOnFailure(databaseOptions.MaxRetryCount);
-    });
-    dbContextOptionsBuilder.EnableDetailedErrors(databaseOptions.EnableDetailedErrors);
-    dbContextOptionsBuilder.EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
-    dbContextOptionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-});
-
-builder.Services.AddHealthChecks();
+builder.Services
+    .AddCustomHealthchecks()
+    .AddCommandHandlers()
+    .AddCustomHangfire(builder.Configuration)
+    .AddCustomAuthentication(builder.Configuration)
+    .AddAuthorizationPolicies()
+    .AddCustomCors()
+    .AddCustomRateLimiter()
+    .AddCustomSwagger()
+    .AddPersistence()
+    .AddScoped<IRankingService, RankingService>()
+    .AddSingleton<ICacheService, MemoryCacheService>()
+    .AddProblemDetails()
+    .AddMemoryCache()
+    .AddCustomMiddlewares();
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
 app.UseHttpsRedirection();
+app.UseCustomMiddlewares();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseRateLimiter();
+app.UseCustomCors();
 
-app.UseSerilogRequestLogging();
+app.RegisterRecurringJobs()
+    .UseCustomCors()
+    .UseSwaggerDark()
+    .MapEndpoints()
+    .UseSerilogRequestLogging();
 
-var sumotsFilePath = Path.Combine(AppContext.BaseDirectory, "ods6.txt");
+await app.ApplyMigrationsAsync().ConfigureAwait(false);
 
-app.MapGet("/FiveLettersFrenchWords", async (QuizContext quizContext) =>
+await app.RunAsync().ConfigureAwait(false);
+
+public partial class Program
 {
-    using var http = new HttpClient();
-    var words = await File.ReadAllLinesAsync(sumotsFilePath).ConfigureAwait(false);
-    var sumots = words.Where(w => w.Length == 5)
-                     .Distinct()
-                     .Where(w => !quizContext.Sumots.Any(s => s.Word! == w))
-                     .Select(w => new Sumot { Word = w.Trim().ToUpperInvariant(), Day = null });
-    quizContext.Sumots.AddRange(sumots);
-    await quizContext.SaveChangesAsync().ConfigureAwait(false);
-})
-.WithName("FiveLettersFrenchWords")
-.WithOpenApi();
+    private Program() { }
+}
 
-app.MapGet("/Sumots", async (QuizContext quizContext) =>
-{
-    var sumots = await quizContext.Sumots.ToListAsync().ConfigureAwait(false);
-    return Results.Ok(sumots);
-})
-.WithName("GetSumots")
-.WithOpenApi();
-
-app.MapHealthChecks("health", new HealthCheckOptions
-{
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-})
-.WithName("Health")
-.WithOpenApi()
-.WithTags("System");
-
-app.Run();

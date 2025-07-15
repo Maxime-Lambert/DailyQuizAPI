@@ -1,17 +1,93 @@
-﻿using DailyQuizAPI.Sumots;
+﻿using DailyQuizAPI.Features.Crosscutting.AppSettings;
+using DailyQuizAPI.Features.Crosscutting.FriendRequests;
+using DailyQuizAPI.Features.Crosscutting.Users;
+using DailyQuizAPI.Features.SumotApp.SumotHistories;
+using DailyQuizAPI.Features.SumotApp.Sumots;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace DailyQuizAPI.Persistence;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Used by dependency injection")]
-internal sealed class QuizContext(DbContextOptions<QuizContext> options) : DbContext(options)
+public sealed class QuizContext(DbContextOptions<QuizContext> options) : IdentityDbContext<User>(options)
 {
     public DbSet<Sumot> Sumots { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public DbSet<AppSetting> AppSettings { get; set; }
+
+    public DbSet<FriendRequest> FriendRequests { get; set; }
+
+    public DbSet<SumotHistory> SumotHistories { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.Entity<Sumot>().HasKey(s => s.Id);
-        modelBuilder.Entity<Sumot>().Property(s => s.Word).IsRequired();
-        modelBuilder.Entity<Sumot>().Property(s => s.Day);
+        base.OnModelCreating(builder);
+
+        builder.Entity<Sumot>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+            entity.Property(s => s.Word).IsRequired();
+        });
+
+
+        builder.Entity<AppSetting>(entity =>
+        {
+            entity.HasKey(appS => appS.Key);
+            entity.Property(appS => appS.Value).IsRequired();
+        });
+
+        builder.Entity<User>(entity =>
+        {
+            entity.HasMany<SumotHistory>("_sumotHistories")
+                .WithOne(sh => sh.User)
+                .HasForeignKey(sh => sh.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Ignore(h => h.SumotHistories);
+        });
+
+        builder.Entity<RefreshToken>(b =>
+        {
+            b.HasKey(rt => rt.Id);
+
+            b.HasOne(rt => rt.User)
+             .WithMany(u => u.RefreshTokens)
+             .HasForeignKey(rt => rt.UserId)
+             .IsRequired()
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<SumotHistory>(entity =>
+        {
+            entity.HasKey(sh => sh.Id);
+
+            entity.Ignore(sh => sh.Tries);
+
+            entity.Property<List<string>>("_tries")
+                .HasColumnName("Tries")
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null)!)
+                .HasColumnType("jsonb");
+        });
+
+        builder.Entity<FriendRequest>(entity =>
+        {
+            entity.HasKey(fr => fr.Id);
+
+            entity.HasOne(fr => fr.Requester)
+                .WithMany()
+                .HasForeignKey(fr => fr.RequesterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(fr => fr.Receiver)
+                .WithMany()
+                .HasForeignKey(fr => fr.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(fr => new { fr.RequesterId, fr.ReceiverId }).IsUnique();
+        });
+
     }
 }
