@@ -3,30 +3,29 @@ using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
-namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
+namespace DailyQuizAPI.Features.Crosscutting.Users.GetOne;
 
-public static class UserPartialUpdateEndpoint
+public static class GetUserEndpoint
 {
     private const string ROUTE = "/users/{id}";
-    private const string NAME = "PartialUpdateUser";
+    private const string NAME = "GetUser";
     private const string TAG = "Users";
-    private const string SUMMARY = "Mettre à jour partiellement un utilisateur";
-    private const string DESCRIPTION = "Permet de modifier le mot de passe, le pseudo, le mode daltonien ou le type de clavier.";
-    private const string OPERATION_ID = "Users_PartialUpdate";
-    private const string SUCCESS_DESCRIPTION = "Mise à jour effectuée.";
+    private const string SUMMARY = "Récupérer un utilisateur";
+    private const string DESCRIPTION = "Permet de récupérer le mot de passe, le pseudo, le mode daltonien, le type de clavier et l'id d'un utilisateur.";
+    private const string OPERATION_ID = "Users_Get";
+    private const string SUCCESS_DESCRIPTION = "Informations acquises.";
 
-    public static void MapUserPartialUpdateEndpoint(this IEndpointRouteBuilder app)
+    public static void MapUserGetEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPatch(ROUTE, async (string id,
-            [FromBody] UserPartialUpdateCommand command,
-            [FromServices] UserPartialUpdateCommandHandler handler) =>
+        app.MapGet(ROUTE, async (string id,
+            [FromServices] GetUserQueryHandler handler) =>
         {
-            await handler.Handle(command, id).ConfigureAwait(false);
-            return Results.NoContent();
+            var result = await handler.Handle(id).ConfigureAwait(false);
+            return Results.Ok(result);
         })
         .RequireAuthorization(SecurityPolicies.SYSTEM)
         .WithName(NAME)
-        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status429TooManyRequests)
@@ -37,7 +36,7 @@ public static class UserPartialUpdateEndpoint
             operation.Summary = SUMMARY;
             operation.Description = DESCRIPTION;
             operation.OperationId = OPERATION_ID;
-            operation.Responses[StatusCodes.Status204NoContent.ToString(CultureInfo.InvariantCulture)].Description = SUCCESS_DESCRIPTION;
+            operation.Responses[StatusCodes.Status200OK.ToString(CultureInfo.InvariantCulture)].Description = SUCCESS_DESCRIPTION;
             operation.Responses[StatusCodes.Status400BadRequest.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.BADREQUEST;
             operation.Responses[StatusCodes.Status401Unauthorized.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.UNAUTHORIZED;
             operation.Responses[StatusCodes.Status429TooManyRequests.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.TOOMANYREQUESTS;

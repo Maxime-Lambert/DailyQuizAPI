@@ -1,6 +1,4 @@
-﻿using DailyQuizAPI.Features.Crosscutting.Users;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 
@@ -8,7 +6,7 @@ public sealed class UserPartialUpdateCommandHandler(UserManager<User> userManage
 {
     private readonly UserManager<User> _userManager = userManager;
 
-    public async Task Handle(UserPartialUpdateCommand command, string userId, ClaimsPrincipal userPrincipal)
+    public async Task Handle(UserPartialUpdateCommand command, string userId)
     {
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
             ?? throw new InvalidOperationException("User not found");
@@ -19,11 +17,14 @@ public sealed class UserPartialUpdateCommandHandler(UserManager<User> userManage
         if (!string.IsNullOrWhiteSpace(command.Email))
             user.Email = command.Email;
 
-        if (command.ModeDaltonien is not null)
-            user.ModeDaltonien = command.ModeDaltonien.Value;
+        if (command.ColorblindMode is not null)
+            user.ColorblindMode = command.ColorblindMode.Value;
 
-        if (command.TypeClavier is not null)
-            user.TypeClavier = command.TypeClavier.Value;
+        if (command.KeyboardLayout is not null)
+            user.KeyboardLayout = command.KeyboardLayout.Value;
+
+        if (command.SmartKeyboardType is not null)
+            user.SmartKeyboardType = command.SmartKeyboardType.Value;
 
         if (!string.IsNullOrWhiteSpace(command.Password))
         {
