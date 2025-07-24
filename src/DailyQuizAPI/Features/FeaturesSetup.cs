@@ -6,6 +6,7 @@ using DailyQuizAPI.Features.Crosscutting.FriendRequests.RemoveFriend;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Send;
 using DailyQuizAPI.Features.Crosscutting.Healthchecks.GetAll;
 using DailyQuizAPI.Features.Crosscutting.Users.Create;
+using DailyQuizAPI.Features.Crosscutting.Users.GetOne;
 using DailyQuizAPI.Features.Crosscutting.Users.Login;
 using DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 using DailyQuizAPI.Features.Crosscutting.Users.Refresh;
@@ -36,6 +37,7 @@ public static class FeaturesSetup
 
         services.AddScoped<CreateUserCommandHandler>();
         services.AddScoped<LoginCommandHandler>();
+        services.AddScoped<GetUserQueryHandler>();
         services.AddScoped<UserPartialUpdateCommandHandler>();
         services.AddScoped<RefreshCommandHandler>();
 
@@ -62,6 +64,7 @@ public static class FeaturesSetup
 
         app.MapCreateUserEndpoint();
         app.MapLoginEndpoint();
+        app.MapUserGetEndpoint();
         app.MapUserPartialUpdateEndpoint();
         app.MapRefreshEndpoint();
 
