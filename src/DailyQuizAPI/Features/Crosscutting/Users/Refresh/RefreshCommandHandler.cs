@@ -45,8 +45,6 @@ public sealed class RefreshCommandHandler(UserManager<User> userManager, IOption
         claims.Add(new Claim(JwtRegisteredClaimNames.NameId, user.Id));
         claims.Add(new Claim(JwtRegisteredClaimNames.Name, user.UserName ?? ""));
         claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-        claims.Add(new Claim("type_clavier", user.TypeClavier.ToString()));
-        claims.Add(new Claim("mode_daltonien", user.ModeDaltonien.ToString()));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

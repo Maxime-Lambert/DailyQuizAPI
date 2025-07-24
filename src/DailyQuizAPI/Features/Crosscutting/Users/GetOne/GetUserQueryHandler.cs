@@ -11,6 +11,11 @@ public sealed class GetUserQueryHandler(UserManager<User> userManager)
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
             ?? throw new InvalidOperationException("User not found");
 
-        return new GetUserResponse(user.Id, user.UserName!, user.Email, user.TypeClavier, user.ModeDaltonien);
+        return new GetUserResponse(user.Id,
+            user.UserName!,
+            user.Email,
+            Enum.GetName(user.KeyboardLayout)!,
+            Enum.GetName(user.ColorblindMode)!,
+            Enum.GetName(user.SmartKeyboardType)!);
     }
 }

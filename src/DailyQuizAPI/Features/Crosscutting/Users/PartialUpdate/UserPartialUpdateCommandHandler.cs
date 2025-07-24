@@ -17,11 +17,14 @@ public sealed class UserPartialUpdateCommandHandler(UserManager<User> userManage
         if (!string.IsNullOrWhiteSpace(command.Email))
             user.Email = command.Email;
 
-        if (command.ModeDaltonien is not null)
-            user.ModeDaltonien = command.ModeDaltonien.Value;
+        if (command.ColorblindMode is not null)
+            user.ColorblindMode = command.ColorblindMode.Value;
 
-        if (command.TypeClavier is not null)
-            user.TypeClavier = command.TypeClavier.Value;
+        if (command.KeyboardLayout is not null)
+            user.KeyboardLayout = command.KeyboardLayout.Value;
+
+        if (command.SmartKeyboardType is not null)
+            user.SmartKeyboardType = command.SmartKeyboardType.Value;
 
         if (!string.IsNullOrWhiteSpace(command.Password))
         {

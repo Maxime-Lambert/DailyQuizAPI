@@ -1,6 +1,6 @@
 ﻿namespace DailyQuizAPI.Features.Crosscutting.Users;
 
-public enum TypeClavier
+public enum KeyboardLayout
 {
     AZERTY = 0,
     QWERTY = 1,
