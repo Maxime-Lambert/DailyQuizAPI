@@ -22,7 +22,8 @@ public sealed class UserPartialUpdateTests(ApiTestFixture fixture) : IClassFixtu
         UserPartialUpdateCommand updateCommand = new(
             UserName: "newname",
             Email: "newemail@example.com",
-            Password: null,
+            LastPassword: "Test123!",
+            NewPassword: "NewPassword123!",
             KeyboardLayout: null,
             ColorblindMode: null,
             SmartKeyboardType: null

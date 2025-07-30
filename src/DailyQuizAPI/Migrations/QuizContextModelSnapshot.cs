@@ -137,6 +137,9 @@ namespace DailyQuizAPI.Migrations
                     b.Property<int>("KeyboardLayout")
                         .HasColumnType("integer");
 
+                    b.Property<DateOnly?>("LastLogin")
+                        .HasColumnType("date");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 

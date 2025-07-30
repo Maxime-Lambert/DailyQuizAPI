@@ -13,7 +13,6 @@ public static class GetHealthchecksEndpoint
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         })
-        .RequireAuthorization("System")
         .WithName("GetHealth")
         .WithTags("Healthchecks");
     }

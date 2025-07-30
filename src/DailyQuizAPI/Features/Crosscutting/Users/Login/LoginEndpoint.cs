@@ -18,10 +18,9 @@ public static class LoginEndpoint
     {
         app.MapPost(ROUTE,
             async ([FromServices] LoginCommandHandler handler,
-                   [FromBody] LoginCommand request,
-                   CancellationToken ct) =>
+                   [FromBody] LoginCommand request) =>
             {
-                var result = await handler.Handle(request, ct).ConfigureAwait(false);
+                var result = await handler.Handle(request).ConfigureAwait(false);
                 return Results.Ok(result);
             })
         .WithName(NAME)

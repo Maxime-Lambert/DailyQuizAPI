@@ -17,6 +17,8 @@ public sealed class User : IdentityUser
 
     public IReadOnlyCollection<SumotHistory> SumotHistories => _sumotHistories.AsReadOnly();
 
+    public DateOnly? LastLogin { get; set; }
+
     public void AddHistory(SumotHistory attempt) => _sumotHistories.Add(attempt);
 
     public void ClearHistory() => _sumotHistories.Clear();

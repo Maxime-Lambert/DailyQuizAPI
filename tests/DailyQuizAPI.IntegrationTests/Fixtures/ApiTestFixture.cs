@@ -52,7 +52,6 @@ public class ApiTestFixture : IAsyncLifetime
 
     public async Task<(string accessToken, string refreshToken)> RegisterAndLoginAsync(string userName, string email, string password)
     {
-        AuthenticateAsSystem();
         CreateUserCommand createUserCommand = new(userName, email, password);
 
         var response = await Client.PostAsJsonAsync("/users", createUserCommand);
@@ -66,16 +65,6 @@ public class ApiTestFixture : IAsyncLifetime
         var body = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
 
         return (body!.Token, body.RefreshToken);
-    }
-
-    public void AuthenticateAsSystem()
-    {
-        var apiKey = Configuration["Authentication:ApiKey"];
-        if (string.IsNullOrWhiteSpace(apiKey))
-            throw new InvalidOperationException("API Key is not configured for test.");
-
-        if (!Client.DefaultRequestHeaders.Contains("API-KEY"))
-            Client.DefaultRequestHeaders.Add("API-KEY", apiKey);
     }
 
     public async Task<string> GetUserIdByUsernameAsync(string username)

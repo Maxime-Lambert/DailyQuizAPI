@@ -13,18 +13,20 @@ public class LoginCommandHandler(IOptions<AuthenticationOptions> options, UserMa
     private readonly AuthenticationOptions _options = options.Value;
     private readonly UserManager<User> _userManager = userManager;
 
-    public async Task<LoginResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<LoginResponse> Handle(LoginCommand request)
     {
-        var user = await _userManager.FindByNameAsync(request.UserName).ConfigureAwait(false) ?? throw new InvalidOperationException("User not found.");
+        var user = await _userManager.FindByNameAsync(request.UserName).ConfigureAwait(false)
+            ?? throw new InvalidOperationException("User not found.");
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password).ConfigureAwait(false);
         if (!isPasswordValid)
             throw new InvalidOperationException("Invalid password.");
 
-        List<Claim> claims = [];
-        claims.Add(new Claim(JwtRegisteredClaimNames.NameId, user.Id));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Name, request.UserName));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+        List<Claim> claims = [
+            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+            new Claim(JwtRegisteredClaimNames.Name, request.UserName),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        ];
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -44,6 +46,8 @@ public class LoginCommandHandler(IOptions<AuthenticationOptions> options, UserMa
             CreatedByIp = request.IpAddress
         };
         user.RefreshTokens.Add(refreshToken);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        user.LastLogin = today;
         await _userManager.UpdateAsync(user).ConfigureAwait(false);
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
