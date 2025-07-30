@@ -11,7 +11,7 @@ on:
 
 env:
   Authentication__Secret: ${{ secrets.AUTH_SECRET }}
-  Authentication__ApiKey: ${{ secrets.AUTH_API_KEY }}
+  Smtp__Password: ${{ secrets.SMTP__PASSWORD }}
 
 jobs:
   build:
