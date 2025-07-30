@@ -15,7 +15,6 @@ public class GetSumotsTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixtu
     [Fact]
     public async Task GetSumots_ReturnsOk_WithExpectedShape()
     {
-        fixture.AuthenticateAsSystem();
         ExtractSumotsCommand extractSumotsCommand = new(5);
         var response = await _client.PostAsJsonAsync("/sumots/extract", extractSumotsCommand);
         response.StatusCode.Should().Be(HttpStatusCode.OK);

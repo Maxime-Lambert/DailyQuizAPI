@@ -10,10 +10,6 @@ public static class AuthorizationSetup
             .AddPolicy(SecurityPolicies.PLAYER, policy =>
             {
                 policy.RequireAuthenticatedUser().AddAuthenticationSchemes(AuthSchemes.JWT);
-            })
-            .AddPolicy(SecurityPolicies.SYSTEM, policy =>
-            {
-                policy.RequireAuthenticatedUser().AddAuthenticationSchemes(AuthSchemes.APIKEY);
             });
 
         return services;

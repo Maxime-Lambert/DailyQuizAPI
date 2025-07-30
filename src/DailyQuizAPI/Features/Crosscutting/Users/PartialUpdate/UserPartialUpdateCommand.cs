@@ -3,7 +3,8 @@
 public sealed record UserPartialUpdateCommand(
     string? UserName,
     string? Email,
-    string? Password,
+    string? LastPassword,
+    string? NewPassword,
     ColorblindMode? ColorblindMode,
     KeyboardLayout? KeyboardLayout,
     SmartKeyboardType? SmartKeyboardType

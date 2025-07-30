@@ -12,21 +12,27 @@ public class SendFriendRequestCommandHandler(QuizContext quizContext)
     {
         var senderId = claims.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        if (senderId == command.TargetUserId)
+        if (senderId == command.TargetUsername)
             throw new InvalidOperationException("You cannot friend yourself.");
 
+        var targetUser = await _quizContext.Users
+            .FirstOrDefaultAsync(u => u.UserName == command.TargetUsername, ct)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException("Ce nom d'utilisateur n'existe pas.");
+
         var exists = await _quizContext.FriendRequests.AnyAsync(fr =>
-            fr.RequesterId == senderId && fr.ReceiverId == command.TargetUserId ||
-            fr.RequesterId == command.TargetUserId && fr.ReceiverId == senderId, ct)
+            fr.RequesterId == senderId && fr.ReceiverId == targetUser.Id ||
+            fr.RequesterId == targetUser.Id && fr.ReceiverId == senderId, ct)
             .ConfigureAwait(false);
 
         if (exists)
             throw new InvalidOperationException("Friend request already exists.");
 
+
         var request = new FriendRequest
         {
             RequesterId = senderId,
-            ReceiverId = command.TargetUserId,
+            ReceiverId = targetUser.Id,
             RequestedAt = DateTime.UtcNow
         };
 

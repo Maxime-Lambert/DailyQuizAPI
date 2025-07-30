@@ -4,6 +4,7 @@ using DailyQuizAPI.Features.Crosscutting.Healthchecks;
 using DailyQuizAPI.Features.SumotApp.Ranking;
 using DailyQuizAPI.Jobs;
 using DailyQuizAPI.Logger;
+using DailyQuizAPI.Mail;
 using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication;
 using DailyQuizAPI.OpenApi;
@@ -26,6 +27,7 @@ builder.Services
     .AddPersistence()
     .AddScoped<IRankingService, RankingService>()
     .AddSingleton<ICacheService, MemoryCacheService>()
+    .AddSmtpEmail(builder.Configuration)
     .AddProblemDetails()
     .AddMemoryCache()
     .AddCustomMiddlewares();

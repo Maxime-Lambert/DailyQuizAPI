@@ -19,11 +19,10 @@ public sealed class RemoveFriendTests(ApiTestFixture fixture) : IClassFixture<Ap
         var (tokenSender, _) = await fixture.RegisterAndLoginAsync("sender4", "sender4@example.com", "Test123!");
         var (tokenReceiver, _) = await fixture.RegisterAndLoginAsync("receiver4", "receiver4@example.com", "Test123!");
 
-        var receiverId = await fixture.GetUserIdByUsernameAsync("receiver4");
         var senderId = await fixture.GetUserIdByUsernameAsync("sender4");
 
         _client.DefaultRequestHeaders.Authorization = new("Bearer", tokenSender);
-        await _client.PostAsJsonAsync("/friendrequests/send", new SendFriendRequestCommand(receiverId));
+        await _client.PostAsJsonAsync("/friendrequests/send", new SendFriendRequestCommand("receiver4"));
 
         _client.DefaultRequestHeaders.Authorization = new("Bearer", tokenReceiver);
         await _client.PostAsJsonAsync("/friendrequests/accept", new AcceptFriendRequestCommand(senderId));

@@ -80,7 +80,7 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                 throw new InvalidOperationException("La date demandée est dans le futur.");
 
             var byDay = await _quizContext.Sumots
-                .Where(s => s.Day >= request.Day)
+                .Where(s => s.Day > request.Day)
                 .OrderBy(s => s.Day)
                 .Select(s => new GetSumotsResponse(
                     s.Id,
