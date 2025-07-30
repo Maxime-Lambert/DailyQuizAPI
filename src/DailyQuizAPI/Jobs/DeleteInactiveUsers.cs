@@ -28,8 +28,7 @@ public sealed class DeleteInactiveUsers(QuizContext db, ILogger<DeleteInactiveUs
 
         var usersToWarn = await db.Users
             .Where(u => u.LastLogin != null &&
-                        u.LastLogin <= eighteenMonthsAgo &&
-                        u.LastLogin > twoYearsAgo)
+                        u.LastLogin == eighteenMonthsAgo)
             .ToListAsync(ct)
             .ConfigureAwait(false);
 

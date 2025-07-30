@@ -23,13 +23,15 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
             Email = request.Email
         };
 
+        var result = await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
+        if (!result.Succeeded)
+            throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
+
         if (string.IsNullOrEmpty(request.Email))
         {
-            var result = await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
-            if (!result.Succeeded)
-                throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
             return;
         }
+
         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
 
         List<Claim> claims = [
