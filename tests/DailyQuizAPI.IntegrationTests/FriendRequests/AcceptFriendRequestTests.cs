@@ -19,8 +19,7 @@ public sealed class AcceptFriendRequestTests(ApiTestFixture fixture) : IClassFix
         var (tokenReceiver, _) = await fixture.RegisterAndLoginAsync("receiver2", "receiver2@example.com", "Test123!");
 
         _client.DefaultRequestHeaders.Authorization = new("Bearer", tokenSender);
-        var receiverId = await fixture.GetUserIdByUsernameAsync("receiver2");
-        await _client.PostAsJsonAsync("/friendrequests/send", new SendFriendRequestCommand(receiverId));
+        await _client.PostAsJsonAsync("/friendrequests/send", new SendFriendRequestCommand("receiver2"));
 
         _client.DefaultRequestHeaders.Authorization = new("Bearer", tokenReceiver);
         var senderId = await fixture.GetUserIdByUsernameAsync("sender2");

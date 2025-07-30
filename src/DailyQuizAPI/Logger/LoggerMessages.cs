@@ -35,4 +35,25 @@ public static partial class LoggerMessages
         this ILogger logger,
         string word,
         DateOnly day);
+
+    [LoggerMessage(EventId = 1005, Level = LogLevel.Information,
+        Message = "{Count} users deleted for inactivity : {Day}")]
+    public static partial void LogUsersDeleted(
+        this ILogger logger,
+        int count,
+        DateOnly day);
+
+    [LoggerMessage(EventId = 1006, Level = LogLevel.Information,
+        Message = "Avertissement envoyé à {Email} : {Day}")]
+    public static partial void LogInactivityUserWarning(
+        this ILogger logger,
+        string email,
+        DateOnly day);
+
+    [LoggerMessage(EventId = 1007, Level = LogLevel.Warning,
+        Message = "Erreur lors de l'envoi du mail à {Email} : {ExceptionMessage}")]
+    public static partial void LogEmailSendException(
+        this ILogger logger,
+        string email,
+        string exceptionMessage);
 }

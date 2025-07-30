@@ -1,8 +1,6 @@
-﻿using DailyQuizAPI.Middlewares;
-using DailyQuizAPI.OpenApi;
+﻿using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
-using System.Security.Claims;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 
@@ -12,25 +10,22 @@ public static class UserPartialUpdateEndpoint
     private const string NAME = "PartialUpdateUser";
     private const string TAG = "Users";
     private const string SUMMARY = "Mettre à jour partiellement un utilisateur";
-    private const string DESCRIPTION = "Permet de modifier le mot de passe, le pseudo, le mode daltonien ou le type de clavier.";
+    private const string DESCRIPTION = "Permet de modifier le mot de passe, le pseudo, l'email, le mode daltonien ou les paramètres de clavier.";
     private const string OPERATION_ID = "Users_PartialUpdate";
     private const string SUCCESS_DESCRIPTION = "Mise à jour effectuée.";
 
-    public static void MapUserPartialUpdateEndpoint(this IEndpointRouteBuilder app)
+    public static void MapPartialUpdateUserEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPatch(ROUTE, async (string id,
             [FromBody] UserPartialUpdateCommand command,
-            ClaimsPrincipal userPrincipal,
             [FromServices] UserPartialUpdateCommandHandler handler) =>
         {
-            await handler.Handle(command, id, userPrincipal).ConfigureAwait(false);
+            await handler.Handle(command, id).ConfigureAwait(false);
             return Results.NoContent();
         })
-        .RequireAuthorization(SecurityPolicies.SYSTEM)
         .WithName(NAME)
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest)
-        .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status429TooManyRequests)
         .Produces(StatusCodes.Status500InternalServerError)
         .WithTags(TAG)
@@ -41,7 +36,6 @@ public static class UserPartialUpdateEndpoint
             operation.OperationId = OPERATION_ID;
             operation.Responses[StatusCodes.Status204NoContent.ToString(CultureInfo.InvariantCulture)].Description = SUCCESS_DESCRIPTION;
             operation.Responses[StatusCodes.Status400BadRequest.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.BADREQUEST;
-            operation.Responses[StatusCodes.Status401Unauthorized.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.UNAUTHORIZED;
             operation.Responses[StatusCodes.Status429TooManyRequests.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.TOOMANYREQUESTS;
             operation.Responses[StatusCodes.Status500InternalServerError.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.SERVERERROR;
             return operation;

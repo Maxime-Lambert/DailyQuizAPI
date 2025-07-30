@@ -11,13 +11,14 @@ on:
 
 env:
   Authentication__Secret: ${{ secrets.AUTH_SECRET }}
-  Authentication__ApiKey: ${{ secrets.AUTH_API_KEY }}
+  Smtp__Password: ${{ secrets.SMTP__PASSWORD }}
+  
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -54,8 +55,8 @@ jobs:
     needs: build
     
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job

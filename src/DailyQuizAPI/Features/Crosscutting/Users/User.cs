@@ -7,13 +7,17 @@ public sealed class User : IdentityUser
 {
     private readonly List<SumotHistory> _sumotHistories = [];
 
-    public TypeClavier TypeClavier { get; set; } = TypeClavier.AZERTY;
+    public KeyboardLayout KeyboardLayout { get; set; } = KeyboardLayout.AZERTY;
 
-    public ModeDaltonien ModeDaltonien { get; set; } = ModeDaltonien.None;
+    public ColorblindMode ColorblindMode { get; set; } = ColorblindMode.None;
+
+    public SmartKeyboardType SmartKeyboardType { get; set; } = SmartKeyboardType.CORRECT;
 
     public ICollection<RefreshToken> RefreshTokens { get; } = [];
 
     public IReadOnlyCollection<SumotHistory> SumotHistories => _sumotHistories.AsReadOnly();
+
+    public DateOnly? LastLogin { get; set; }
 
     public void AddHistory(SumotHistory attempt) => _sumotHistories.Add(attempt);
 
