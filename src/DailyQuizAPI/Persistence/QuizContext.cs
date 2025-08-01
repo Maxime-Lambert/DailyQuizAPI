@@ -45,6 +45,9 @@ public sealed class QuizContext(DbContextOptions<QuizContext> options) : Identit
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.Ignore(h => h.SumotHistories);
+
+            entity.HasIndex(u => u.UserName)
+                .IsUnique();
         });
 
         builder.Entity<RefreshToken>(b =>

@@ -19,7 +19,7 @@ public static class DeleteUserEndpoint
     {
         app.MapDelete(ROUTE,
             async ([FromServices] DeleteUserCommandHandler handler,
-                    [FromBody] DeleteUserCommand command,
+                    [AsParameters] DeleteUserCommand command,
                    ClaimsPrincipal claims) =>
             {
                 await handler.Handle(command, claims).ConfigureAwait(false);

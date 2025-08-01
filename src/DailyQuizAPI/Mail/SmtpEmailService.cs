@@ -16,7 +16,7 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
         var plainText = $"""
             Bonjour {user.UserName},
 
-            Merci de t’être inscrit à DailyQuiz.
+            Merci d'avoir créé ton compte ALED.
             Pour activer ton compte, clique sur le lien suivant :
 
             {confirmationLink}
@@ -26,7 +26,7 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
 
         var html = $"""
             <p>Bonjour {user.UserName},</p>
-            <p>Merci de t’être inscrit à <strong>DailyQuiz</strong>.<br />
+            <p>Merci d'avoir créé ton compte <strong>ALED</strong>.<br />
             Pour activer ton compte, clique sur le lien suivant :</p>
             <p><a href="{confirmationLink}">{confirmationLink}</a></p>
             <p>Si tu n’as pas demandé cela, ignore simplement ce message.</p>
@@ -109,7 +109,7 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
         var plainText = $"""
         Bonjour {user.UserName},
 
-        Des modifications ont été effectuées sur ton compte le {now}.
+        Des modifications concernant ton e-mail ont été effectuées sur ton compte le {now}.
 
         Si tu n’es pas à l’origine de ces changements, tu peux les annuler en cliquant sur le lien suivant :
 
@@ -120,7 +120,7 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
 
         var html = $"""
         <p>Bonjour {user.UserName},</p>
-        <p>Des modifications ont été effectuées sur ton compte le <strong>{now}</strong>.</p>
+        <p>Des modifications concernant ton e-mail ont été effectuées sur ton compte le <strong>{now}</strong>.</p>
         <p>Si tu n’es pas à l’origine de ces changements, tu peux les annuler en cliquant sur le lien suivant :</p>
         <p><a href="{rollbackLink}">{rollbackLink}</a></p>
         <p>Si tu as bien effectué ces modifications, ignore simplement ce message.</p>
@@ -136,9 +136,9 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
         var plainText = $"""
         Bonjour {user.UserName},
 
-        Votre compte est inactif depuis plus de 18 mois (dernière connexion avant le {user.LastLogin?.ToString("d", CultureInfo.GetCultureInfo("fr-FR")) ?? "inconnue"}).
+        Votre compte est inactif depuis plus de 18 mois.
 
-        Conformément au Règlement Général sur la Protection des Données (RGPD), votre compte sera supprimé dans 6 mois s’aucune connexion n’est effectuée d’ici là.
+        Conformément au Règlement Général sur la Protection des Données (RGPD), votre compte sera supprimé dans 6 mois si aucune connexion n’est effectuée d’ici là.
 
         Si vous souhaitez conserver votre compte, connectez-vous simplement avant cette échéance.
 
@@ -147,8 +147,8 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
 
         var html = $"""
         <p>Bonjour {user.UserName},</p>
-        <p>Votre compte est inactif depuis plus de 18 mois (dernière connexion avant le <strong>{user.LastLogin?.ToString("d", CultureInfo.GetCultureInfo("fr-FR")) ?? "inconnue"}</strong>).</p>
-        <p>Conformément au <strong>RGPD</strong>, votre compte sera supprimé dans 6 mois s’aucune connexion n’est effectuée d’ici là.</p>
+        <p>Votre compte est inactif depuis plus de 18 mois.</p>
+        <p>Conformément au <strong>RGPD</strong>, votre compte sera supprimé dans 6 mois si aucune connexion n’est effectuée d’ici là.</p>
         <p>Si vous souhaitez conserver votre compte, connectez-vous simplement avant cette échéance.</p>
         <p><small>Ce message a été généré automatiquement le {now}.</small></p>
         """;
