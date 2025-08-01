@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Maintainability", "CA1515:Envisager de rendre les types publics internes", Justification = "<En attente>", Scope = "type", Target = "~T:DailyQuizAPI.Sumots.GetSumots.GetSumotsQueryHandler")]
+[assembly: SuppressMessage("Globalization", "CA1308:Normaliser les chaînes en majuscules", Justification = "<En attente>", Scope = "member", Target = "~M:DailyQuizAPI.Features.SumotApp.Sumots.Extract.ExtractSumotsCommandHandler.Handle(DailyQuizAPI.Features.SumotApp.Sumots.Extract.ExtractSumotsCommand,System.Threading.CancellationToken)~System.Threading.Tasks.Task")]

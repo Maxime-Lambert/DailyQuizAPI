@@ -8,7 +8,7 @@ namespace DailyQuizAPI.Features.Crosscutting.FriendRequests.Delete;
 
 public static class DeleteFriendRequestEndpoint
 {
-    private const string ROUTE = "/friendrequests/remove";
+    private const string ROUTE = "/friendrequests/{targetId}";
     private const string NAME = "DeleteFriendRequest";
     private const string TAG = "FriendRequests";
     private const string SUMMARY = "Supprimer une demande d’ami";
@@ -20,11 +20,11 @@ public static class DeleteFriendRequestEndpoint
     {
         app.MapDelete(ROUTE, async (
             [FromServices] DeleteFriendRequestCommandHandler handler,
-            [FromBody] DeleteFriendRequestCommand command,
+            [FromRoute] string targetId,
             ClaimsPrincipal currentUser,
             CancellationToken ct) =>
         {
-            await handler.Handle(command, currentUser, ct).ConfigureAwait(false);
+            await handler.Handle(targetId, currentUser, ct).ConfigureAwait(false);
             return Results.NoContent();
         })
         .WithName(NAME)

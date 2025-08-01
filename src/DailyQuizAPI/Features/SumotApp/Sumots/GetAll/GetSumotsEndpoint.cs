@@ -10,7 +10,7 @@ public static class GetSumotsEndpoint
     private const string NAME = "GetSumots";
     private const string TAG = "Sumots";
     private const string SUMMARY = "Récupérer les mots (sumots)";
-    private const string DESCRIPTION = "Retourne les mots disponibles depuis une version donnée ou une date.";
+    private const string DESCRIPTION = "Retourne les mots disponibles depuis une version donnée ou une date, fourni la version et le jour actuel.";
     private const string OPERATION_ID = "Sumots_Get";
     private const string SUCCESS_DESCRIPTION = "Liste des mots récupérée.";
 

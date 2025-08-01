@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Middlewares.Authentication.Options;
+﻿using DailyQuizAPI.Middlewares;
+using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -13,7 +14,6 @@ public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> option
     private readonly UserManager<User> _userManager = userManager;
     private readonly AuthenticationOptions _options = options.Value;
     private readonly IEmailSender<User> _emailSender = emailSender;
-    private const string FRONTEND_ORIGIN = "https://icy-bush-06f104403.2.azurestaticapps.net/";
 
     public async Task Handle(ForgotPasswordCommand command)
     {
@@ -44,7 +44,7 @@ public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> option
         );
 
         var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-        var resetLink = $"{FRONTEND_ORIGIN}/reset-Password?token={Uri.EscapeDataString(jwtToken)}";
+        var resetLink = $"{FrontEndOrigins.SUMOT}/reset-Password?token={Uri.EscapeDataString(jwtToken)}";
 
         await _emailSender.SendPasswordResetLinkAsync(user, command.Email, resetLink).ConfigureAwait(false);
     }

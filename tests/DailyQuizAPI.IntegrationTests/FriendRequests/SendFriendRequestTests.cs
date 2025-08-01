@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.Features.Crosscutting.FriendRequests.Send;
+﻿using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
@@ -19,7 +19,7 @@ public sealed class SendFriendRequestTests(ApiTestFixture fixture) : IClassFixtu
 
         _client.DefaultRequestHeaders.Authorization = new("Bearer", tokenSender);
 
-        SendFriendRequestCommand command = new("receiver");
+        CreateFriendRequestCommand command = new("receiver");
 
         var response = await _client.PostAsJsonAsync("/friendrequests/send", command);
 

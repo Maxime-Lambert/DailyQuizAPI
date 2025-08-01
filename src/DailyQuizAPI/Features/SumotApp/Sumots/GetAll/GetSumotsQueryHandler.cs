@@ -23,6 +23,8 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
 
         return await _cacheService.GetOrCreateAsync(cacheKey, async () =>
         {
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
             var databaseVersion = await _quizContext.AppSettings
                 .FirstOrDefaultAsync(a => a.Key == "DatabaseVersion", cancellationToken)
                 .ConfigureAwait(false);
@@ -38,11 +40,13 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                     .Select(s => new GetSumotsResponse(
                         s.Id,
                         s.Word ?? string.Empty,
-                        s.Day))
+                        s.Day,
+                        s.Definition,
+                        s.DefinitionWord))
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                return new GetSumotsResponseList(new ReadOnlyCollection<GetSumotsResponse>(all), version);
+                return new GetSumotsResponseList(new ReadOnlyCollection<GetSumotsResponse>(all), version, today);
             }
 
             if (request.DatabaseVersion < version)
@@ -52,11 +56,13 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                     .Select(s => new GetSumotsResponse(
                         s.Id,
                         s.Word ?? string.Empty,
-                        s.Day))
+                        s.Day,
+                        s.Definition,
+                        s.DefinitionWord))
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                return new GetSumotsResponseList(new ReadOnlyCollection<GetSumotsResponse>(all), version);
+                return new GetSumotsResponseList(new ReadOnlyCollection<GetSumotsResponse>(all), version, today);
             }
 
             if (request.DatabaseVersion > version)
@@ -68,14 +74,15 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                     .Select(s => new GetSumotsResponse(
                         s.Id,
                         s.Word ?? string.Empty,
-                        s.Day))
+                        s.Day,
+                        s.Definition,
+                        s.DefinitionWord))
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                return new GetSumotsResponseList(new ReadOnlyCollection<GetSumotsResponse>(all), version);
+                return new GetSumotsResponseList(new ReadOnlyCollection<GetSumotsResponse>(all), version, today);
             }
 
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
             if (request.Day > today)
                 throw new InvalidOperationException("La date demandée est dans le futur.");
 
@@ -85,11 +92,13 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                 .Select(s => new GetSumotsResponse(
                     s.Id,
                     s.Word ?? string.Empty,
-                    s.Day))
+                    s.Day,
+                        s.Definition,
+                        s.DefinitionWord))
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            return new GetSumotsResponseList(new ReadOnlyCollection<GetSumotsResponse>(byDay), version);
+            return new GetSumotsResponseList(new ReadOnlyCollection<GetSumotsResponse>(byDay), version, today);
         }, TimeSpan.FromMinutes(10)).ConfigureAwait(false);
     }
 }

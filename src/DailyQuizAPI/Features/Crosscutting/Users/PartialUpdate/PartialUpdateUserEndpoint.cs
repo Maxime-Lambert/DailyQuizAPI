@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 
-public static class UserPartialUpdateEndpoint
+public static class PartialUpdateUserEndpoint
 {
     private const string ROUTE = "/users/{id}";
     private const string NAME = "PartialUpdateUser";
@@ -17,8 +17,8 @@ public static class UserPartialUpdateEndpoint
     public static void MapPartialUpdateUserEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPatch(ROUTE, async (string id,
-            [FromBody] UserPartialUpdateCommand command,
-            [FromServices] UserPartialUpdateCommandHandler handler) =>
+            [FromBody] PartialUpdateUserCommand command,
+            [FromServices] PartialUpdateUserCommandHandler handler) =>
         {
             await handler.Handle(command, id).ConfigureAwait(false);
             return Results.NoContent();

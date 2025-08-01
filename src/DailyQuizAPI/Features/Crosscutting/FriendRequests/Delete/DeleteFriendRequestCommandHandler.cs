@@ -10,10 +10,10 @@ public sealed class DeleteFriendRequestCommandHandler(QuizContext quizContext, I
     private readonly QuizContext _quizContext = quizContext;
     private readonly ICacheService _cacheService = cacheService;
 
-    public async Task Handle(DeleteFriendRequestCommand command, ClaimsPrincipal claims, CancellationToken ct)
+    public async Task Handle(string targetId, ClaimsPrincipal claims, CancellationToken ct)
     {
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var friendId = command.FriendId;
+        var friendId = targetId;
 
         var request = await _quizContext.FriendRequests
             .FirstOrDefaultAsync(fr =>
@@ -27,6 +27,6 @@ public sealed class DeleteFriendRequestCommandHandler(QuizContext quizContext, I
         await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
 
         _cacheService.Remove($"friendRequests:{userId}");
-        _cacheService.Remove($"friendRequests:{command.FriendId}");
+        _cacheService.Remove($"friendRequests:{targetId}");
     }
 }
