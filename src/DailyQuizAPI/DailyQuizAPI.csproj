@@ -23,6 +23,7 @@
     <PackageReference Include="Hangfire.AspNetCore" />
     <PackageReference Include="Hangfire.PostgreSql" />
     <PackageReference Include="MailKit" />
+    <PackageReference Include="HtmlAgilityPack" />
   </ItemGroup>
 
   <ItemGroup>

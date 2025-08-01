@@ -2,7 +2,6 @@
 
 public static class CorsSetup
 {
-    private const string FRONTEND_ORIGIN = "https://sumot.com";
     private const string CORS_POLICY_NAME = "AllowFrontend";
 
     public static IServiceCollection AddCustomCors(this IServiceCollection services)
@@ -12,7 +11,7 @@ public static class CorsSetup
         {
             options.AddPolicy(CORS_POLICY_NAME, policy =>
             {
-                policy.WithOrigins(FRONTEND_ORIGIN)
+                policy.WithOrigins(FrontEndOrigins.SUMOT)
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();

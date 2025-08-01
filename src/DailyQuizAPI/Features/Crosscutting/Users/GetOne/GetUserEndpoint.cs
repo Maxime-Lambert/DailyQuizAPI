@@ -16,7 +16,7 @@ public static class GetUserEndpoint
 
     public static void MapGetUserEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet(ROUTE, async (string id,
+        app.MapGet(ROUTE, async ([FromRoute] string id,
             [FromServices] GetUserQueryHandler handler) =>
         {
             var result = await handler.Handle(id).ConfigureAwait(false);

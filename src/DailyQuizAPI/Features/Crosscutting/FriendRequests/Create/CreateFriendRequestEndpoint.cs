@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Middlewares;
+﻿using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
+using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -6,9 +7,9 @@ using System.Security.Claims;
 
 namespace DailyQuizAPI.Features.Crosscutting.FriendRequests.Send;
 
-public static class SendFriendRequestEndpoint
+public static class CreateFriendRequestEndpoint
 {
-    private const string ROUTE = "/friendrequests/send";
+    private const string ROUTE = "/friendrequests/{targetUsername}";
     private const string NAME = "SendFriendRequest";
     private const string TAG = "FriendRequests";
     private const string SUMMARY = "Envoyer une demande d’ami";
@@ -19,8 +20,8 @@ public static class SendFriendRequestEndpoint
     public static void MapSendFriendRequestEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost(ROUTE, async (
-            [FromServices] SendFriendRequestCommandHandler handler,
-            [FromBody] SendFriendRequestCommand command,
+            [FromServices] CreateFriendRequestCommandHandler handler,
+            [FromBody] CreateFriendRequestCommand command,
             ClaimsPrincipal currentUser,
             CancellationToken ct) =>
         {

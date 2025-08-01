@@ -7,4 +7,8 @@ public sealed class Sumot
     public string Word { get; set; } = string.Empty;
 
     public DateOnly? Day { get; set; }
+
+    public string Definition { get; set; } = string.Empty;
+
+    public string DefinitionWord { get; set; } = string.Empty;
 }

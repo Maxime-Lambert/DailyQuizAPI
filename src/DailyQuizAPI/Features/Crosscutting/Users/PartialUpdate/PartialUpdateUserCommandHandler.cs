@@ -1,4 +1,5 @@
 ﻿using DailyQuizAPI.Mail;
+using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -9,15 +10,14 @@ using System.Text;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 
-public sealed class UserPartialUpdateCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager, IEmailService emailService)
+public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager, IEmailService emailService)
 {
     private readonly UserManager<User> _userManager = userManager;
     private readonly AuthenticationOptions _options = options.Value;
     private readonly IEmailService _emailService = emailService;
-    private const string FRONTEND_ORIGIN = "https://icy-bush-06f104403.2.azurestaticapps.net/";
     private const string ROLLBACK_TOKEN_NAME = "Rollback";
 
-    public async Task Handle(UserPartialUpdateCommand command, string userId)
+    public async Task Handle(PartialUpdateUserCommand command, string userId)
     {
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
             ?? throw new InvalidOperationException("User not found");
@@ -50,7 +50,7 @@ public sealed class UserPartialUpdateCommandHandler(IOptions<AuthenticationOptio
                 );
 
                 var rollbackjwtToken = new JwtSecurityTokenHandler().WriteToken(rollbacktoken);
-                var rollbackLink = $"{FRONTEND_ORIGIN}/rollback?token={Uri.EscapeDataString(rollbackjwtToken)}";
+                var rollbackLink = $"{FrontEndOrigins.SUMOT}/rollback?token={Uri.EscapeDataString(rollbackjwtToken)}";
                 await _emailService.SendRollbackAsync(user, user.Email, rollbackLink).ConfigureAwait(false);
             }
             user.Email = command.Email;
@@ -70,7 +70,7 @@ public sealed class UserPartialUpdateCommandHandler(IOptions<AuthenticationOptio
             );
 
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-            var confirmationLink = $"{FRONTEND_ORIGIN}/confirm-email?token={Uri.EscapeDataString(jwtToken)}";
+            var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirm-email?token={Uri.EscapeDataString(jwtToken)}";
             await _emailService.SendConfirmationLinkAsync(user, user.Email, confirmationLink).ConfigureAwait(false);
         }
 

@@ -32,7 +32,7 @@ public static class FeaturesSetup
         services.AddScoped<DeleteFriendRequestCommandHandler>();
         services.AddScoped<GetFriendRequestsQueryHandler>();
         services.AddScoped<RemoveFriendCommandHandler>();
-        services.AddScoped<SendFriendRequestCommandHandler>();
+        services.AddScoped<CreateFriendRequestCommandHandler>();
 
         services.AddScoped<AddSumotHistoriesCommandHandler>();
         services.AddScoped<GetSumotHistoriesQueryHandler>();
@@ -46,7 +46,7 @@ public static class FeaturesSetup
         services.AddScoped<ForgotPasswordCommandHandler>();
         services.AddScoped<GetUserQueryHandler>();
         services.AddScoped<LoginCommandHandler>();
-        services.AddScoped<UserPartialUpdateCommandHandler>();
+        services.AddScoped<PartialUpdateUserCommandHandler>();
         services.AddScoped<RefreshCommandHandler>();
         services.AddScoped<ResetPasswordCommandHandler>();
         services.AddScoped<RollbackCommandHandler>();
@@ -69,7 +69,6 @@ public static class FeaturesSetup
         app.MapAddSumotHistoriesEndpoint();
         app.MapGetSumotHistoriesEndpoint();
 
-        app.MapExtractSumotsEndpoint();
         app.MapGetSumotsEndpoint();
 
         app.MapConfirmEmailEndpoint();
