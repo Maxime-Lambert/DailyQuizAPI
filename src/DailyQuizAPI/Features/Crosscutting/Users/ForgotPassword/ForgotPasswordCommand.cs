@@ -1,3 +1,5 @@
-﻿namespace DailyQuizAPI.Features.Crosscutting.Users.ForgotPassword;
+﻿using DailyQuizAPI.Middlewares;
 
-public sealed record ForgotPasswordCommand(string Email);
+namespace DailyQuizAPI.Features.Crosscutting.Users.ForgotPassword;
+
+public sealed record ForgotPasswordCommand(string Email, FrontEndNames FrontEndName);

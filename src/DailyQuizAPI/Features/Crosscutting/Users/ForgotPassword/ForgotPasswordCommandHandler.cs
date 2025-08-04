@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Middlewares;
+﻿using DailyQuizAPI.Mail;
+using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -9,11 +10,11 @@ using System.Text;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.ForgotPassword;
 
-public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager, IEmailSender<User> emailSender)
+public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager, IEmailService emailService)
 {
     private readonly UserManager<User> _userManager = userManager;
     private readonly AuthenticationOptions _options = options.Value;
-    private readonly IEmailSender<User> _emailSender = emailSender;
+    private readonly IEmailService _emailService = emailService;
 
     public async Task Handle(ForgotPasswordCommand command)
     {
@@ -46,6 +47,6 @@ public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> option
         var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
         var resetLink = $"{FrontEndOrigins.SUMOT}/reset-Password?token={Uri.EscapeDataString(jwtToken)}";
 
-        await _emailSender.SendPasswordResetLinkAsync(user, command.Email, resetLink).ConfigureAwait(false);
+        await _emailService.SendPasswordResetLinkAsync(user, command.Email, resetLink, command.FrontEndName).ConfigureAwait(false);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
+﻿using DailyQuizAPI.Middlewares;
+
+namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 
 public sealed record PartialUpdateUserCommand(
     string? UserName,
@@ -7,5 +9,6 @@ public sealed record PartialUpdateUserCommand(
     string? NewPassword,
     ColorblindMode? ColorblindMode,
     KeyboardLayout? KeyboardLayout,
-    SmartKeyboardType? SmartKeyboardType
+    SmartKeyboardType? SmartKeyboardType,
+    FrontEndNames FrontEndName
 );

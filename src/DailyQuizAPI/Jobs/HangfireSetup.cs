@@ -26,7 +26,7 @@ public static class HangfireSetup
     public static WebApplication RegisterRecurringJobs(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-
+        TimeZoneInfo parisTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
         var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
 
         recurringJobs.AddOrUpdate<ChoseSumotOfTheDay>(
@@ -35,7 +35,7 @@ public static class HangfireSetup
             Cron.Daily(DAILY_SUMOT_JOB_HOUR),
             new RecurringJobOptions
             {
-                TimeZone = TimeZoneInfo.Local
+                TimeZone = parisTimeZone
             }
         );
 
@@ -45,7 +45,7 @@ public static class HangfireSetup
             Cron.Daily(DAILY_INACTIVE_JOB_HOUR),
             new RecurringJobOptions
             {
-                TimeZone = TimeZoneInfo.Local
+                TimeZone = parisTimeZone
             }
         );
 
