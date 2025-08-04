@@ -51,7 +51,6 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
 
             if (request.DatabaseVersion < version)
             {
-                // Calculer la différence entre les versions ?
                 var all = await _quizContext.Sumots
                     .Select(s => new GetSumotsResponse(
                         s.Id,

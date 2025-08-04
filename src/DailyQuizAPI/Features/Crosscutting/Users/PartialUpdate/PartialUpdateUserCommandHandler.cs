@@ -51,7 +51,7 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
 
                 var rollbackjwtToken = new JwtSecurityTokenHandler().WriteToken(rollbacktoken);
                 var rollbackLink = $"{FrontEndOrigins.SUMOT}/rollback?token={Uri.EscapeDataString(rollbackjwtToken)}";
-                await _emailService.SendRollbackAsync(user, user.Email, rollbackLink).ConfigureAwait(false);
+                await _emailService.SendRollbackAsync(user, user.Email, rollbackLink, command.FrontEndName).ConfigureAwait(false);
             }
             user.Email = command.Email;
             var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
@@ -71,7 +71,7 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
 
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
             var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirm-email?token={Uri.EscapeDataString(jwtToken)}";
-            await _emailService.SendConfirmationLinkAsync(user, user.Email, confirmationLink).ConfigureAwait(false);
+            await _emailService.SendConfirmationLinkAsync(user, user.Email, confirmationLink, command.FrontEndName).ConfigureAwait(false);
         }
 
         if (command.ColorblindMode is not null)

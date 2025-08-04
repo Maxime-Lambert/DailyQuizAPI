@@ -1,9 +1,11 @@
 ﻿using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Persistence;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 
 namespace DailyQuizAPI.Jobs;
 
+[AutomaticRetry(Attempts = 6, DelaysInSeconds = new[] { 600, 600, 600, 600, 600, 600 })]
 public sealed class ChoseSumotOfTheDay(QuizContext db, ILogger<ChoseSumotOfTheDay> logger)
 {
     public async Task RunAsync(CancellationToken ct = default)

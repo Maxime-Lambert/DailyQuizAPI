@@ -50,7 +50,14 @@ public static partial class LoggerMessages
         string email,
         DateOnly day);
 
-    [LoggerMessage(EventId = 1007, Level = LogLevel.Warning,
+    [LoggerMessage(EventId = 1007, Level = LogLevel.Information,
+        Message = "Utilisateur supprimé envoyé à {Email} : {Day}")]
+    public static partial void LogUserDeleted(
+        this ILogger logger,
+        string email,
+        DateOnly day);
+
+    [LoggerMessage(EventId = 1008, Level = LogLevel.Warning,
         Message = "Erreur lors de l'envoi du mail à {Email} : {ExceptionMessage}")]
     public static partial void LogEmailSendException(
         this ILogger logger,

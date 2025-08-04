@@ -9,6 +9,7 @@ using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication;
 using DailyQuizAPI.OpenApi;
 using DailyQuizAPI.Persistence;
+using Hangfire;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,12 +17,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.UseSerilog();
 
 builder.Services
+    .AddCustomCors()
     .AddCustomHealthchecks()
     .AddCommandHandlers()
     .AddCustomHangfire(builder.Configuration)
     .AddCustomAuthentication(builder.Configuration)
     .AddAuthorizationPolicies()
-    .AddCustomCors()
     .AddCustomRateLimiter()
     .AddCustomSwagger()
     .AddPersistence()
@@ -48,7 +49,7 @@ app.RegisterRecurringJobs()
     .UseSwaggerDark()
     .MapEndpoints()
     .UseSerilogRequestLogging();
-
+app.UseHangfireDashboard("/hangfire");
 await app.ApplyMigrationsAsync().ConfigureAwait(false);
 
 await app.RunAsync().ConfigureAwait(false);
