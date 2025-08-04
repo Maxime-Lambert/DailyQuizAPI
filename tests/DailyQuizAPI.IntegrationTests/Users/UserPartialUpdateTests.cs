@@ -24,9 +24,10 @@ public sealed class UserPartialUpdateTests(ApiTestFixture fixture) : IClassFixtu
             Email: "newemail@example.com",
             LastPassword: "Test123!",
             NewPassword: "NewPassword123!",
-            KeyboardLayout: null,
             ColorblindMode: null,
-            SmartKeyboardType: null
+            KeyboardLayout: null,
+            SmartKeyboardType: null,
+            0
         );
 
         var response = await _client.PatchAsJsonAsync($"/users/{userId}", updateCommand);

@@ -14,7 +14,7 @@ public class CreateUserTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixt
     [Fact]
     public async Task CreateUser_Returns201_WhenUserIsValid()
     {
-        CreateUserCommand user = new("testuser", "test@example.com", "StrongPassword123!");
+        CreateUserCommand user = new("testuser", "test@example.com", "StrongPassword123!", 0);
 
         var response = await _client.PostAsJsonAsync("/users", user);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
