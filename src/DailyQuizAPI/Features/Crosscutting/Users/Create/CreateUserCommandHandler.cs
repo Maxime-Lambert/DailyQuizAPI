@@ -1,5 +1,7 @@
 ﻿namespace DailyQuizAPI.Features.Crosscutting.Users.Create;
 
+using DailyQuizAPI.Mail;
+using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -8,20 +10,28 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager, IEmailSender<User> emailSender)
+public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager, IEmailService emailService)
 {
     private readonly AuthenticationOptions _options = options.Value;
     private readonly UserManager<User> _userManager = userManager;
-    private readonly IEmailSender<User> _emailSender = emailSender;
-    private const string FRONTEND_ORIGIN = "https://icy-bush-06f104403.2.azurestaticapps.net/";
+    private readonly IEmailService _emailService = emailService;
 
     public async Task Handle(CreateUserCommand request)
     {
         var user = new User
         {
-            UserName = request.UserName,
-            Email = request.Email
+            UserName = request.UserName
         };
+
+        if (!string.IsNullOrEmpty(request.Email))
+        {
+            var existingUser = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
+            if (existingUser != null)
+            {
+                throw new InvalidOperationException($"An account with email '{request.Email}' already exists.");
+            }
+            user.Email = request.Email;
+        }
 
         var result = await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
         if (!result.Succeeded)
@@ -51,7 +61,7 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
         );
 
         var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-        var confirmationLink = $"{FRONTEND_ORIGIN}/confirm-email?token={Uri.EscapeDataString(jwtToken)}";
-        await _emailSender.SendConfirmationLinkAsync(user, request.Email, confirmationLink).ConfigureAwait(false);
+        var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirm-email?token={Uri.EscapeDataString(jwtToken)}";
+        await _emailService.SendConfirmationLinkAsync(user, request.Email, confirmationLink, request.FrontEndName).ConfigureAwait(false);
     }
 }

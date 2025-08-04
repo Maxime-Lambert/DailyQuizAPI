@@ -1,7 +1,10 @@
-﻿namespace DailyQuizAPI.Features.Crosscutting.Users.Create;
+﻿using DailyQuizAPI.Middlewares;
+
+namespace DailyQuizAPI.Features.Crosscutting.Users.Create;
 
 public sealed record CreateUserCommand(
     string UserName,
     string? Email,
-    string Password
+    string Password,
+    FrontEndNames FrontEndName
 );

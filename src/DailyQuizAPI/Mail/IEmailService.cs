@@ -1,13 +1,17 @@
 ﻿using DailyQuizAPI.Features.Crosscutting.Users;
-using Microsoft.AspNetCore.Identity;
+using DailyQuizAPI.Middlewares;
 
 namespace DailyQuizAPI.Mail;
 
-public interface IEmailService : IEmailSender<User>
+public interface IEmailService
 {
-    Task SendEmailAsync(string target, string subject, string plainTextContent, string? htmlContent = null);
+    Task SendConfirmationLinkAsync(User user, string email, string confirmationLink, FrontEndNames frontEndName);
 
-    Task SendRollbackAsync(User user, string email, string rollbackLink);
+    Task SendPasswordResetLinkAsync(User user, string email, string resetLink, FrontEndNames frontEndName);
+
+    Task SendRollbackAsync(User user, string email, string rollbackLink, FrontEndNames frontEndName);
 
     Task SendInactivityWarningAsync(User user, string email);
+
+    Task SendUserDeletedAsync(User user, string email);
 }

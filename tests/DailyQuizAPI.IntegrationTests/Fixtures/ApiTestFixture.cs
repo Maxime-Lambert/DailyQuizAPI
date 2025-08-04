@@ -52,7 +52,7 @@ public class ApiTestFixture : IAsyncLifetime
 
     public async Task<(string accessToken, string refreshToken)> RegisterAndLoginAsync(string userName, string email, string password)
     {
-        CreateUserCommand createUserCommand = new(userName, email, password);
+        CreateUserCommand createUserCommand = new(userName, email, password, 0);
 
         var response = await Client.PostAsJsonAsync("/users", createUserCommand);
         response.EnsureSuccessStatusCode();
