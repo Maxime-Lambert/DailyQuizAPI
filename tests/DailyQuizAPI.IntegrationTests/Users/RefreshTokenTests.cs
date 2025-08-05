@@ -17,7 +17,7 @@ public sealed class RefreshTokenTests(ApiTestFixture fixture) : IClassFixture<Ap
     {
         var (accessToken, refreshToken) = await fixture.RegisterAndLoginAsync("refreshtest", "refresh@example.com", "Test123!");
 
-        RefreshCommand command = new(refreshToken, "127.0.0.1");
+        RefreshCommand command = new(refreshToken);
 
         var response = await _client.PostAsJsonAsync("/users/refresh", command);
 
