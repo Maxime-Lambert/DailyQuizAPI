@@ -27,17 +27,16 @@ public sealed class RefreshCommandHandler(UserManager<User> userManager, IOption
             throw new InvalidOperationException("Invalid refresh token.");
 
         token.RevokedAt = DateTime.UtcNow;
-        token.RevokedByIp = command.IpAdress;
 
         RefreshToken newRefreshToken = new()
         {
             Token = Guid.NewGuid().ToString("N"),
-            ExpiresAt = DateTime.UtcNow.AddDays(7),
-            CreatedByIp = command.IpAdress,
+            ExpiresAt = DateTime.UtcNow.AddDays(90)
         };
 
         token.ReplacedByToken = newRefreshToken.Token;
         user.RefreshTokens.Add(newRefreshToken);
+        user.LastLogin = DateOnly.FromDateTime(DateTime.UtcNow);
 
         await _userManager.UpdateAsync(user).ConfigureAwait(false);
 

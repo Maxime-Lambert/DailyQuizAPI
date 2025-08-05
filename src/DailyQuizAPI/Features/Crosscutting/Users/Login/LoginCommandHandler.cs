@@ -16,17 +16,18 @@ public class LoginCommandHandler(IOptions<AuthenticationOptions> options, UserMa
     public async Task<LoginResponse> Handle(LoginCommand request)
     {
         var user = await _userManager.FindByNameAsync(request.UserName).ConfigureAwait(false)
-            ?? throw new InvalidOperationException("User not found.");
+            ?? throw new InvalidOperationException("Utilisateur introuvable.");
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password).ConfigureAwait(false);
         if (!isPasswordValid)
-            throw new InvalidOperationException("Invalid password.");
+            throw new InvalidOperationException("Mot de passe incorrect.");
 
-        List<Claim> claims = [
-            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
-            new Claim(JwtRegisteredClaimNames.Name, request.UserName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        ];
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.NameId, user.Id),
+            new(JwtRegisteredClaimNames.Name, request.UserName),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -39,19 +40,19 @@ public class LoginCommandHandler(IOptions<AuthenticationOptions> options, UserMa
             signingCredentials: creds
         );
 
-        RefreshToken refreshToken = new()
+        var refreshToken = new RefreshToken
         {
             Token = Guid.NewGuid().ToString("N"),
-            ExpiresAt = DateTime.UtcNow.AddDays(7),
-            CreatedByIp = request.IpAddress
+            ExpiresAt = DateTime.UtcNow.AddDays(90)
         };
+
         user.RefreshTokens.Add(refreshToken);
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        user.LastLogin = today;
+        user.LastLogin = DateOnly.FromDateTime(DateTime.UtcNow);
+
         await _userManager.UpdateAsync(user).ConfigureAwait(false);
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
         return new LoginResponse(jwt, refreshToken.Token);
-
     }
 }
+
