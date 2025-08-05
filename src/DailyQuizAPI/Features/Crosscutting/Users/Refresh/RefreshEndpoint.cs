@@ -18,11 +18,31 @@ public static class RefreshEndpoint
     public static void MapRefreshEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost(ROUTE,
-            async ([FromServices] RefreshCommandHandler handler,
-                   [FromBody] RefreshCommand request,
+            async (HttpRequest request,
+                   HttpResponse response,
+                   [FromBody] RefreshCommand command,
+                   [FromServices] RefreshCommandHandler handler,
                    CancellationToken ct) =>
             {
-                var result = await handler.Handle(request, ct).ConfigureAwait(false);
+                if (request.Cookies.TryGetValue("refreshToken", out var tokenFromCookie))
+                {
+                    if (string.IsNullOrWhiteSpace(tokenFromCookie))
+                        return Results.BadRequest("Refresh token cookie is empty.");
+
+                    var resultFromCookie = await handler.Handle(
+                        new RefreshCommand(tokenFromCookie),
+                        ct
+                    ).ConfigureAwait(false);
+                    response.Cookies.Append("refreshToken", resultFromCookie.RefreshToken, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.UtcNow.AddDays(7)
+                    });
+                    return Results.Ok(new { accessToken = resultFromCookie.Token });
+                }
+                var result = await handler.Handle(command, ct).ConfigureAwait(false);
                 return Results.Ok(result);
             })
         .WithName(NAME)

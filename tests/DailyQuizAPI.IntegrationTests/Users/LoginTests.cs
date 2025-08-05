@@ -19,7 +19,7 @@ public class LoginTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
         var createUserResponse = await _client.PostAsJsonAsync("/users", createUserCommand);
         createUserResponse.EnsureSuccessStatusCode();
 
-        LoginCommand loginCommand = new(createUserCommand.UserName, createUserCommand.Password, "127.0.0.1");
+        LoginCommand loginCommand = new(createUserCommand.UserName, createUserCommand.Password);
         var loginResponse = await _client.PostAsJsonAsync("/users/login", loginCommand);
         loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 

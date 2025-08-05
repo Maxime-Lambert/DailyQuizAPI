@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿ using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Features.SumotApp.Ranking;
 using DailyQuizAPI.Persistence;
 using System.Security.Claims;

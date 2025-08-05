@@ -10,7 +10,8 @@ public sealed class ChoseSumotOfTheDay(QuizContext db, ILogger<ChoseSumotOfTheDa
 {
     public async Task RunAsync(CancellationToken ct = default)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var parisTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
+        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, parisTz));
         var existing = await db.Sumots.AnyAsync(s => s.Day == today, ct).ConfigureAwait(false);
         if (existing) return;
 

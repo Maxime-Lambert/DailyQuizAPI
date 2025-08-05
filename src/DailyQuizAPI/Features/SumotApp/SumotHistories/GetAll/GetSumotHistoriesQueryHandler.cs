@@ -13,7 +13,9 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
     public async Task<List<GetSumotHistoriesResponse>> Handle(GetSumotHistoriesQuery query, ClaimsPrincipal claims, CancellationToken ct)
     {
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var cacheKey = $"sumotHistories:{userId}:page:{query.Page}:size:{query.PageSize}";
+        if ((query.MaxDate.ToDateTime(TimeOnly.MinValue) - query.MinDate.ToDateTime(TimeOnly.MinValue)) > TimeSpan.FromDays(30))
+            throw new ArgumentException("La plage de dates ne peut pas dépasser 30 jours.", nameof(query));
+        var cacheKey = $"sumotHistories:{userId}:minDate:{query.MinDate}:maxDate:{query.MaxDate}";
 
         return await _cacheService.GetOrCreateAsync(cacheKey, async () =>
         {
@@ -25,13 +27,16 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
 
             friendIds.Add(userId);
 
-            var histories = await _quizContext.SumotHistories
-                .Where(h => friendIds.Contains(h.UserId))
-                .OrderBy(h => _quizContext.Sumots.FirstOrDefault(s => s.Word == h.Word)!.Day)
-                .Skip((query.Page - 1) * query.PageSize)
-                .Take(query.PageSize)
-                .ToListAsync(ct)
-                .ConfigureAwait(false);
+            var histories = await (
+                from history in _quizContext.SumotHistories
+                join sumot in _quizContext.Sumots
+                    on history.Word equals sumot.Word
+                where friendIds.Contains(history.UserId)
+                   && sumot.Day >= query.MinDate
+                   && sumot.Day <= query.MaxDate
+                orderby sumot.Day
+                select history
+            ).ToListAsync(ct).ConfigureAwait(false);
 
             return histories.Select(h => new GetSumotHistoriesResponse(
                 h.Id, h.Word, h.Tries, h.Ranking, h.UserId)).ToList();

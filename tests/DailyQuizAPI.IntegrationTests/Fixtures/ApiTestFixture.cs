@@ -57,7 +57,7 @@ public class ApiTestFixture : IAsyncLifetime
         var response = await Client.PostAsJsonAsync("/users", createUserCommand);
         response.EnsureSuccessStatusCode();
 
-        LoginCommand loginPayload = new(userName, password, "127.0.0.1");
+        LoginCommand loginPayload = new(userName, password);
 
         var loginResponse = await Client.PostAsJsonAsync("/users/login", loginPayload);
         loginResponse.EnsureSuccessStatusCode();
