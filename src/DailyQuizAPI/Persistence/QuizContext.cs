@@ -67,6 +67,8 @@ public sealed class QuizContext(DbContextOptions<QuizContext> options) : Identit
 
             entity.Ignore(sh => sh.Tries);
 
+            entity.Ignore(sh => sh.IsFinished);
+
             entity.Property<List<string>>("_tries")
                 .HasColumnName("Tries")
                 .HasConversion(
