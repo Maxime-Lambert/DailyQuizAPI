@@ -17,6 +17,8 @@ public sealed class SumotHistory
 
     private readonly List<string> _tries = [];
 
+    public bool IsFinished => _tries.Count > 0 && _tries[^1] == Word;
+
     public IReadOnlyCollection<string> Tries => _tries.AsReadOnly();
 
     public void AddTries(Collection<string> tries)

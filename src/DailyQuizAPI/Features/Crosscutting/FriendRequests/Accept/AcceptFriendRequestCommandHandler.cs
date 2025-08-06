@@ -16,6 +16,11 @@ public class AcceptFriendRequestCommandHandler(QuizContext quizContext, IRanking
     {
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
+        var userFriends = _quizContext.FriendRequests.Where(fr => fr.RequesterId == userId || fr.ReceiverId == userId);
+        var userFriendCount = await userFriends.CountAsync(ct).ConfigureAwait(false);
+        if (userFriendCount == 20)
+            throw new InvalidOperationException("You cannot have more than 20 friends.");
+
         var friendRequest = await _quizContext.FriendRequests.FirstOrDefaultAsync(fr =>
                 fr.RequesterId == userId && fr.ReceiverId == command.TargetUserId ||
                 fr.RequesterId == command.TargetUserId && fr.ReceiverId == userId,
