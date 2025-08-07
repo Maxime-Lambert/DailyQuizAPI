@@ -7,8 +7,8 @@ public static class HangfireSetup
 {
     private const string DAILY_SUMOT_JOB_NAME = "daily-sumot";
     private const string DAILY_INACTIVE_JOB_NAME = "daily-inactive-check";
-    private const int DAILY_SUMOT_JOB_HOUR = 2;
-    private const int DAILY_INACTIVE_JOB_HOUR = 4;
+    private const int DAILY_SUMOT_JOB_HOUR = 0;
+    private const int DAILY_INACTIVE_JOB_HOUR = 1;
 
     public static IServiceCollection AddCustomHangfire(this IServiceCollection services, IConfiguration configuration)
     {

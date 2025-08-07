@@ -15,8 +15,8 @@ using DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 using DailyQuizAPI.Features.Crosscutting.Users.Refresh;
 using DailyQuizAPI.Features.Crosscutting.Users.ResetPassword;
 using DailyQuizAPI.Features.Crosscutting.Users.Rollback;
-using DailyQuizAPI.Features.SumotApp.SumotHistories.Add;
 using DailyQuizAPI.Features.SumotApp.SumotHistories.GetAll;
+using DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
 using DailyQuizAPI.Features.SumotApp.Sumots.Extract;
 using DailyQuizAPI.Features.SumotApp.Sumots.GetAll;
 
@@ -34,8 +34,8 @@ public static class FeaturesSetup
         services.AddScoped<RemoveFriendCommandHandler>();
         services.AddScoped<CreateFriendRequestCommandHandler>();
 
-        services.AddScoped<AddSumotHistoriesCommandHandler>();
         services.AddScoped<GetSumotHistoriesQueryHandler>();
+        services.AddScoped<UpdateSumotHistoriesCommandHandler>();
 
         services.AddScoped<ExtractSumotsCommandHandler>();
         services.AddScoped<GetSumotsQueryHandler>();
@@ -66,8 +66,8 @@ public static class FeaturesSetup
 
         app.MapGetHealthchecks();
 
-        app.MapAddSumotHistoriesEndpoint();
         app.MapGetSumotHistoriesEndpoint();
+        app.MapUpdateSumotHistoriesEndpoint();
 
         app.MapGetSumotsEndpoint();
 
