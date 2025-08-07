@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.Features.SumotApp.SumotHistories.Add;
+﻿using DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
@@ -7,7 +7,7 @@ using Xunit;
 
 namespace DailyQuizAPI.IntegrationTests.SumotHistories;
 
-public sealed class AddSumotHistoriesTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
+public sealed class UpdateSumotHistoriesTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
     private readonly HttpClient _client = fixture.Client;
 
@@ -16,11 +16,11 @@ public sealed class AddSumotHistoriesTests(ApiTestFixture fixture) : IClassFixtu
     {
         var tokens = await fixture.RegisterAndLoginAsync("historyuser", "history@example.com", "Test123!");
         _client.DefaultRequestHeaders.Authorization = new("Bearer", tokens!.accessToken);
-        AddSumotHistoriesCommand command = new(
+        UpdateSumotHistoriesCommand command = new(
             [new("rouge", ["verts", "bleue", "rouge"])]
         );
 
-        var response = await _client.PostAsJsonAsync("/sumothistories/addrange", command);
+        var response = await _client.PostAsJsonAsync("/sumothistories/updaterange", command);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
