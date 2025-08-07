@@ -4,23 +4,23 @@ using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Security.Claims;
 
-namespace DailyQuizAPI.Features.SumotApp.SumotHistories.Add;
+namespace DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
 
-public static class AddSumotHistoriesEndpoint
+public static class UpdateSumotHistoriesEndpoint
 {
-    private const string ROUTE = "/sumothistories/addrange";
-    private const string NAME = "AddSumotHistories";
+    private const string ROUTE = "/sumothistories/updaterange";
+    private const string NAME = "UpdateRangeSumotHistories";
     private const string TAG = "SumotHistories";
-    private const string SUMMARY = "Ajouter un historique de tentative";
+    private const string SUMMARY = "Ajouter ou met à jour des historiques de parties";
     private const string DESCRIPTION = "Enregistre les tentatives d’un utilisateur pour un ou plusieurs mots donnés. Requiert un joueur authentifié.";
-    private const string OPERATION_ID = "SumotHistories_Add";
+    private const string OPERATION_ID = "SumotHistories_UpdateRange";
     private const string SUCCESS_DESCRIPTION = "Historiques enregistrés.";
 
-    public static void MapAddSumotHistoriesEndpoint(this IEndpointRouteBuilder app)
+    public static void MapUpdateSumotHistoriesEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost(ROUTE,
-            async ([FromServices] AddSumotHistoriesCommandHandler handler,
-                   [FromBody] AddSumotHistoriesCommand request,
+            async ([FromServices] UpdateSumotHistoriesCommandHandler handler,
+                   [FromBody] UpdateSumotHistoriesCommand request,
                    ClaimsPrincipal user,
                    CancellationToken ct) =>
             {

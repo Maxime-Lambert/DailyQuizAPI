@@ -11,7 +11,7 @@ public static class DeleteFriendRequestEndpoint
     private const string ROUTE = "/friendrequests/{targetId}";
     private const string NAME = "DeleteFriendRequest";
     private const string TAG = "FriendRequests";
-    private const string SUMMARY = "Supprimer une demande d’ami";
+    private const string SUMMARY = "Refuser une demande d’ami";
     private const string DESCRIPTION = "Supprime une demande d’ami en attente. Requiert un joueur authentifié.";
     private const string OPERATION_ID = "FriendRequests_Delete";
     private const string SUCCESS_DESCRIPTION = "Demande supprimée avec succès.";

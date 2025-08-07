@@ -1,5 +1,5 @@
-﻿using DailyQuizAPI.Features.SumotApp.SumotHistories.Add;
-using DailyQuizAPI.Features.SumotApp.SumotHistories.GetAll;
+﻿using DailyQuizAPI.Features.SumotApp.SumotHistories.GetAll;
+using DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
@@ -18,10 +18,10 @@ public sealed class GetSumotHistoriesTests(ApiTestFixture fixture) : IClassFixtu
         var tokens = await fixture.RegisterAndLoginAsync("gethistoryuser", "gethistory@example.com", "Test123!");
         _client.DefaultRequestHeaders.Authorization = new("Bearer", tokens.accessToken);
 
-        AddSumotHistoriesCommand addSumotHistoriesCommand = new(
+        UpdateSumotHistoriesCommand updateSumotHistoriesCommand = new(
             [new("bleue", ["bleue", "verte"])]
         );
-        await _client.PostAsJsonAsync("/sumothistories/addrange", addSumotHistoriesCommand);
+        await _client.PostAsJsonAsync("/sumothistories/updaterange", updateSumotHistoriesCommand);
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var query = new GetSumotHistoriesQuery(today, today);

@@ -39,7 +39,7 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
             ).ToListAsync(ct).ConfigureAwait(false);
 
             return histories.Select(h => new GetSumotHistoriesResponse(
-                h.Id, h.Word, h.Tries, h.Ranking, h.UserId)).ToList();
+                h.Id, h.Word, h.Tries, h.Ranking, h.User.UserName!)).ToList();
         }, TimeSpan.FromMinutes(10)).ConfigureAwait(false);
     }
 }
