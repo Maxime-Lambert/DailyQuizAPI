@@ -1,5 +1,6 @@
 ﻿namespace DailyQuizAPI.Features.Crosscutting.Users.ResetPassword;
 
+using DailyQuizAPI.Common.Exceptions;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -41,11 +42,13 @@ public sealed class ResetPasswordCommandHandler(IOptions<AuthenticationOptions> 
             throw new InvalidOperationException("Token invalide ou expiré.");
         }
 
-        var userId = principal[JwtRegisteredClaimNames.NameId].ToString();
+        var userId = principal[JwtRegisteredClaimNames.NameId].ToString()
+            ?? throw new InvalidOperationException("Token invalide");
+
         var token = principal["resettoken"].ToString();
 
-        var user = await _userManager.FindByIdAsync(userId!).ConfigureAwait(false)
-            ?? throw new InvalidOperationException("Utilisateur introuvable.");
+        var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
+            ?? throw new NotFoundException(nameof(User), userId);
 
         var result = await _userManager.ResetPasswordAsync(user, token!, command.Password).ConfigureAwait(false);
         if (!result.Succeeded)

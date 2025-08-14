@@ -1,4 +1,6 @@
-﻿using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Features.Crosscutting.Caching;
+using DailyQuizAPI.Features.Crosscutting.Users;
 using DailyQuizAPI.Features.SumotApp.Ranking;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +16,8 @@ public class AcceptFriendRequestCommandHandler(QuizContext quizContext, IRanking
 
     public async Task Handle(AcceptFriendRequestCommand command, ClaimsPrincipal claims, CancellationToken ct)
     {
-        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
 
         var userFriends = _quizContext.FriendRequests.Where(fr => fr.RequesterId == userId || fr.ReceiverId == userId);
         var userFriendCount = await userFriends.CountAsync(ct).ConfigureAwait(false);
@@ -22,10 +25,9 @@ public class AcceptFriendRequestCommandHandler(QuizContext quizContext, IRanking
             throw new InvalidOperationException("You cannot have more than 20 friends.");
 
         var friendRequest = await _quizContext.FriendRequests.FirstOrDefaultAsync(fr =>
-                fr.RequesterId == userId && fr.ReceiverId == command.TargetUserId ||
                 fr.RequesterId == command.TargetUserId && fr.ReceiverId == userId,
             ct).ConfigureAwait(false)
-            ?? throw new InvalidOperationException("Friend request not found.");
+            ?? throw new NotFoundException(nameof(User), command.TargetUserId);
 
         friendRequest.IsAccepted = true;
         friendRequest.AcceptedAt = DateTime.UtcNow;

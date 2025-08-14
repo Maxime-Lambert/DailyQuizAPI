@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DailyQuizAPI.Middlewares;
+namespace DailyQuizAPI.Middlewares.ExceptionHandlers;
 
 public sealed partial class InvalidOperationExceptionHandlerMiddleware(ILogger<InvalidOperationExceptionHandlerMiddleware> logger) : IExceptionHandler
 {

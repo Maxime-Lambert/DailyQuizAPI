@@ -11,7 +11,7 @@ public sealed class User : IdentityUser
 
     public ColorblindMode ColorblindMode { get; set; } = ColorblindMode.None;
 
-    public SmartKeyboardType SmartKeyboardType { get; set; } = SmartKeyboardType.CORRECT;
+    public SmartKeyboardType SmartKeyboardType { get; set; } = SmartKeyboardType.Correct;
 
     public ICollection<RefreshToken> RefreshTokens { get; } = [];
 

@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -12,9 +13,12 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
 
     public async Task<List<GetSumotHistoriesResponse>> Handle(GetSumotHistoriesQuery query, ClaimsPrincipal claims, CancellationToken ct)
     {
-        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
+
         if ((query.MaxDate.ToDateTime(TimeOnly.MinValue) - query.MinDate.ToDateTime(TimeOnly.MinValue)) > TimeSpan.FromDays(30))
-            throw new ArgumentException("La plage de dates ne peut pas dépasser 30 jours.", nameof(query));
+            throw new InvalidOperationException("La plage de dates ne peut pas dépasser 30 jours.");
+
         var cacheKey = $"sumotHistories:{userId}:minDate:{query.MinDate}:maxDate:{query.MaxDate}";
 
         return await _cacheService.GetOrCreateAsync(cacheKey, async () =>

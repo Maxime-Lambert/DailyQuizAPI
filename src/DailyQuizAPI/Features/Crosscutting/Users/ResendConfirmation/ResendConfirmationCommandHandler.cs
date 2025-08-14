@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Mail;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Mail;
 using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
@@ -22,8 +23,9 @@ public class ResendConfirmationCommandHandler(IOptions<AuthenticationOptions> op
         {
             throw new InvalidOperationException("Email cannot be null or empty.");
         }
+
         var user = await _userManager.FindByEmailAsync(command.Email).ConfigureAwait(false)
-            ?? throw new InvalidOperationException($"No user found with email '{command.Email}'.");
+            ?? throw new NotFoundException(nameof(User), command.Email);
 
         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
 

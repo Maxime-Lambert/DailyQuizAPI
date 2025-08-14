@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Middlewares.Authentication.Options;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -45,7 +46,7 @@ public sealed class ConfirmEmailCommandHandler(IOptions<AuthenticationOptions> o
         var token = principal["conftoken"].ToString();
 
         var user = await _userManager.FindByIdAsync(userId!).ConfigureAwait(false)
-            ?? throw new InvalidOperationException("Utilisateur introuvable.");
+            ?? throw new NotFoundException(nameof(User), userId ?? "no user id");
 
         var result = await _userManager.ConfirmEmailAsync(user, token!).ConfigureAwait(false);
         if (!result.Succeeded)

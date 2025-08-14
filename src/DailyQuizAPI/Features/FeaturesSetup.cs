@@ -8,6 +8,7 @@ using DailyQuizAPI.Features.Crosscutting.Healthchecks.GetAll;
 using DailyQuizAPI.Features.Crosscutting.Users.ConfirmEmail;
 using DailyQuizAPI.Features.Crosscutting.Users.Create;
 using DailyQuizAPI.Features.Crosscutting.Users.Delete;
+using DailyQuizAPI.Features.Crosscutting.Users.Export;
 using DailyQuizAPI.Features.Crosscutting.Users.ForgotPassword;
 using DailyQuizAPI.Features.Crosscutting.Users.GetOne;
 using DailyQuizAPI.Features.Crosscutting.Users.Login;
@@ -43,6 +44,7 @@ public static class FeaturesSetup
         services.AddScoped<ConfirmEmailCommandHandler>();
         services.AddScoped<CreateUserCommandHandler>();
         services.AddScoped<DeleteUserCommandHandler>();
+        services.AddScoped<ExportUserDataCommandHandler>();
         services.AddScoped<ForgotPasswordCommandHandler>();
         services.AddScoped<GetUserQueryHandler>();
         services.AddScoped<LoginCommandHandler>();
@@ -74,6 +76,7 @@ public static class FeaturesSetup
         app.MapConfirmEmailEndpoint();
         app.MapCreateUserEndpoint();
         app.MapDeleteUserEndpoint();
+        app.MapExportUserDataEndpoint();
         app.MapForgotPasswordEndpoint();
         app.MapGetUserEndpoint();
         app.MapLoginEndpoint();
