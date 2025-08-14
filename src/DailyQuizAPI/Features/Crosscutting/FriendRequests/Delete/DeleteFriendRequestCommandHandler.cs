@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -12,7 +13,8 @@ public sealed class DeleteFriendRequestCommandHandler(QuizContext quizContext, I
 
     public async Task Handle(string targetId, ClaimsPrincipal claims, CancellationToken ct)
     {
-        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
         var friendId = targetId;
 
         var request = await _quizContext.FriendRequests
@@ -20,7 +22,7 @@ public sealed class DeleteFriendRequestCommandHandler(QuizContext quizContext, I
                 (fr.RequesterId == userId && fr.ReceiverId == friendId ||
                  fr.RequesterId == friendId && fr.ReceiverId == userId),
                 ct)
-            .ConfigureAwait(false) ?? throw new InvalidOperationException("Friendship not found.");
+            .ConfigureAwait(false) ?? throw new NotFoundException(nameof(FriendRequest), userId);
 
         _quizContext.FriendRequests.Remove(request);
 

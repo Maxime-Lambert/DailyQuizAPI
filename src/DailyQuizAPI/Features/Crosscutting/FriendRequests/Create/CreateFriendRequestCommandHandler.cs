@@ -1,5 +1,7 @@
-﻿using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
+using DailyQuizAPI.Features.Crosscutting.Users;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -13,12 +15,13 @@ public class CreateFriendRequestCommandHandler(QuizContext quizContext, ICacheSe
 
     public async Task Handle(CreateFriendRequestCommand command, ClaimsPrincipal claims, CancellationToken ct)
     {
-        var senderId = claims.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var senderId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
 
         var user = await _quizContext.Users
             .FirstOrDefaultAsync(u => u.Id == senderId, ct)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException("User not found.");
+            ?? throw new NotFoundException(nameof(User), senderId);
 
         if (user.UserName == command.TargetUsername)
             throw new InvalidOperationException("You cannot friend yourself.");
@@ -26,7 +29,7 @@ public class CreateFriendRequestCommandHandler(QuizContext quizContext, ICacheSe
         var targetUser = await _quizContext.Users
             .FirstOrDefaultAsync(u => u.UserName == command.TargetUsername, ct)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException("Ce nom d'utilisateur n'existe pas.");
+            ?? throw new NotFoundException(nameof(User), command.TargetUsername);
 
         var exists = await _quizContext.FriendRequests.AnyAsync(fr =>
             fr.RequesterId == senderId && fr.ReceiverId == targetUser.Id ||

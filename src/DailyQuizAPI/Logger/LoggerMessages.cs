@@ -63,4 +63,11 @@ public static partial class LoggerMessages
         this ILogger logger,
         string email,
         string exceptionMessage);
+
+    [LoggerMessage(EventId = 1009, Level = LogLevel.Error,
+        Message = "Not Found Exception : {ExceptionMessage}")]
+    public static partial void LogNotFoundException(
+        this ILogger logger,
+        string exceptionMessage,
+        Exception exception);
 }

@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Middlewares.Authentication.Options;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +17,7 @@ public class LoginCommandHandler(IOptions<AuthenticationOptions> options, UserMa
     public async Task<LoginResponse> Handle(LoginCommand request)
     {
         var user = await _userManager.FindByNameAsync(request.UserName).ConfigureAwait(false)
-            ?? throw new InvalidOperationException("Utilisateur introuvable.");
+            ?? throw new NotFoundException(nameof(User), request.UserName);
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password).ConfigureAwait(false);
         if (!isPasswordValid)

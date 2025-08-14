@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Middlewares.Authentication.Options;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -19,7 +20,7 @@ public sealed class RefreshCommandHandler(UserManager<User> userManager, IOption
         var user = await _userManager.Users
             .Include(u => u.RefreshTokens)
             .FirstOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == command.RefreshToken), cancellationToken: ct).ConfigureAwait(false)
-             ?? throw new InvalidOperationException("User not found.");
+            ?? throw new NotFoundException(nameof(User), command.RefreshToken);
 
         var token = user.RefreshTokens.SingleOrDefault(t => t.Token == command.RefreshToken);
 

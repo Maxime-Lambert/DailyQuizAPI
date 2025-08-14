@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Mail;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Mail;
 using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +20,7 @@ public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> option
     public async Task Handle(ForgotPasswordCommand command)
     {
         var user = await _userManager.FindByEmailAsync(command.Email).ConfigureAwait(false)
-            ?? throw new InvalidOperationException("User not found.");
+            ?? throw new NotFoundException(nameof(User), command.Email);
 
         if (!user.EmailConfirmed)
         {

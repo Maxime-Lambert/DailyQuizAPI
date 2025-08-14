@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Features.SumotApp.Ranking;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +16,12 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
 
     public async Task Handle(UpdateSumotHistoriesCommand command, ClaimsPrincipal principal, CancellationToken ct)
     {
-        var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
 
         _cacheService.RemoveByPrefix($"sumotHistories:{userId}:");
 
-        foreach(var history in command.Histories)
+        foreach (var history in command.Histories)
         {
             var currentHistory = await _quizContext.SumotHistories
             .FirstOrDefaultAsync(h => h.UserId == userId && h.Word == history.Word, ct)
@@ -51,6 +53,6 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
                 await _rankingService.RecalculateRankingsAsync(userId, ct).ConfigureAwait(false);
         }
 
-        
+
     }
 }

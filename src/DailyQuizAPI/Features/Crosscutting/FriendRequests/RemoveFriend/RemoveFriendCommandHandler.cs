@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Features.SumotApp.Ranking;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,8 @@ public sealed class RemoveFriendCommandHandler(QuizContext quizContext, IRanking
 
     public async Task HandleAsync(RemoveFriendCommand command, ClaimsPrincipal claims, CancellationToken ct)
     {
-        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
 
         var friendRequest = await _quizContext.FriendRequests
             .FirstOrDefaultAsync(fr =>
@@ -22,7 +24,7 @@ public sealed class RemoveFriendCommandHandler(QuizContext quizContext, IRanking
                 (fr.RequesterId == userId && fr.ReceiverId == command.TargetUserId ||
                  fr.RequesterId == command.TargetUserId && fr.ReceiverId == userId), ct)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException("No accepted friendship found to remove.");
+            ?? throw new NotFoundException(nameof(FriendRequest), command.TargetUserId);
 
         _quizContext.FriendRequests.Remove(friendRequest);
 
