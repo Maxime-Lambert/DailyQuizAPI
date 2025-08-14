@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 public sealed class RollbackCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager)
@@ -29,41 +30,42 @@ public sealed class RollbackCommandHandler(IOptions<AuthenticationOptions> optio
             IssuerSigningKey = key
         };
 
-        Dictionary<string, object> principal = [];
         try
         {
             var validateToken = await handler.ValidateTokenAsync(command.Token, parameters).ConfigureAwait(false);
-            if (validateToken.IsValid)
-            {
-                principal = (Dictionary<string, object>)validateToken.Claims;
-            }
+            if (!validateToken.IsValid)
+                throw new InvalidOperationException("Token invalide ou expiré.");
+
+            var claimsDict = validateToken.Claims.ToDictionary(c => c.Key, c => c.Value.ToString());
+
+            var userId = claimsDict[ClaimTypes.NameIdentifier]
+                ?? throw new InvalidOperationException("Token invalide");
+            var username = claimsDict[JwtRegisteredClaimNames.Name]
+                ?? throw new InvalidOperationException("Token invalide");
+            var email = claimsDict[ClaimTypes.Email]
+                ?? throw new InvalidOperationException("Token invalide");
+            var token = claimsDict["rollbackToken"]
+                ?? throw new InvalidOperationException("Token invalide");
+
+            var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
+                ?? throw new NotFoundException(nameof(User), userId);
+
+            var result = await _userManager.VerifyUserTokenAsync(user, ROLLBACK_TOKEN_NAME, ROLLBACK_TOKEN_NAME, token!)
+                .ConfigureAwait(false);
+            if (!result)
+                throw new InvalidOperationException("Token invalide ou expiré.");
+
+            user.UserName = username;
+            user.Email = email;
+            user.EmailConfirmed = true;
+            user.RefreshTokens.Clear();
+            await _userManager.UpdateAsync(user).ConfigureAwait(false);
         }
         catch (Exception)
         {
             throw new InvalidOperationException("Token invalide ou expiré.");
         }
-
-        var userId = principal[JwtRegisteredClaimNames.NameId].ToString()
-            ?? throw new InvalidOperationException("Token invalide");
-        var username = principal[JwtRegisteredClaimNames.Name].ToString()
-            ?? throw new InvalidOperationException("Token invalide");
-        var email = principal[JwtRegisteredClaimNames.Email].ToString()
-            ?? throw new InvalidOperationException("Token invalide");
-        var token = principal["rollbackToken"].ToString()
-            ?? throw new InvalidOperationException("Token invalide");
-
-        var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), userId);
-
-        var result = await _userManager.VerifyUserTokenAsync(user, ROLLBACK_TOKEN_NAME, ROLLBACK_TOKEN_NAME, token!).ConfigureAwait(false);
-        if (!result)
-            throw new InvalidOperationException("Token invalide ou expiré.");
-
-        user.UserName = username;
-        user.Email = email;
-        user.EmailConfirmed = true;
-        user.RefreshTokens.Clear();
-        await _userManager.UpdateAsync(user).ConfigureAwait(false);
     }
+
 }
 

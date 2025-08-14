@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.ConfirmEmail;
@@ -28,29 +29,29 @@ public sealed class ConfirmEmailCommandHandler(IOptions<AuthenticationOptions> o
             IssuerSigningKey = key
         };
 
-        IDictionary<string, object> principal = new Dictionary<string, object>();
         try
         {
             var validateToken = await handler.ValidateTokenAsync(command.Token, parameters).ConfigureAwait(false);
-            if (validateToken.IsValid)
-            {
-                principal = validateToken.Claims;
-            }
+            if (!validateToken.IsValid)
+                throw new InvalidOperationException("Token invalide ou expiré.");
+
+            var claimsDict = validateToken.Claims.ToDictionary(c => c.Key, c => c.Value.ToString());
+
+            var userId = claimsDict[ClaimTypes.NameIdentifier];
+            var token = claimsDict["conftoken"];
+
+            var user = await _userManager.FindByIdAsync(userId!).ConfigureAwait(false)
+                ?? throw new NotFoundException(nameof(User), userId ?? "no user id");
+
+            var result = await _userManager.ConfirmEmailAsync(user, token!).ConfigureAwait(false);
+            if (!result.Succeeded)
+                throw new InvalidOperationException("Échec de la confirmation de l’e-mail.");
         }
         catch (Exception)
         {
             throw new InvalidOperationException("Token invalide ou expiré.");
         }
 
-        var userId = principal[JwtRegisteredClaimNames.NameId].ToString();
-        var token = principal["conftoken"].ToString();
-
-        var user = await _userManager.FindByIdAsync(userId!).ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), userId ?? "no user id");
-
-        var result = await _userManager.ConfirmEmailAsync(user, token!).ConfigureAwait(false);
-        if (!result.Succeeded)
-            throw new InvalidOperationException("Échec de la confirmation de l’e-mail.");
     }
 }
 

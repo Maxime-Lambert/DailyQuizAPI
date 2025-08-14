@@ -20,7 +20,7 @@ public sealed class UserPartialUpdateTests(ApiTestFixture fixture) : IClassFixtu
         _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
         PartialUpdateUserCommand updateCommand = new(
-            UserName: "newname",
+            Username: "newname",
             Email: "newemail@example.com",
             LastPassword: "Test123!",
             NewPassword: "NewPassword123!",

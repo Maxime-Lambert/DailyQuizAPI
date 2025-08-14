@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 public sealed class ResetPasswordCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager)
@@ -28,31 +29,32 @@ public sealed class ResetPasswordCommandHandler(IOptions<AuthenticationOptions> 
             IssuerSigningKey = key
         };
 
-        Dictionary<string, object> principal = [];
         try
         {
             var validateToken = await handler.ValidateTokenAsync(command.Token, parameters).ConfigureAwait(false);
-            if (validateToken.IsValid)
-            {
-                principal = (Dictionary<string, object>)validateToken.Claims;
-            }
+            if (!validateToken.IsValid)
+                throw new InvalidOperationException("Token invalide ou expiré.");
+
+            var claimsDict = validateToken.Claims.ToDictionary(c => c.Key, c => c.Value.ToString());
+
+            var userId = claimsDict[ClaimTypes.NameIdentifier]
+                ?? throw new InvalidOperationException("Token invalide");
+
+            var token = claimsDict["resettoken"]
+                ?? throw new InvalidOperationException("Token invalide");
+
+            var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
+                ?? throw new NotFoundException(nameof(User), userId);
+
+            var result = await _userManager.ResetPasswordAsync(user, token, command.Password).ConfigureAwait(false);
+            if (!result.Succeeded)
+                throw new InvalidOperationException("Échec de la mise à jour du mot de passe.");
         }
         catch (Exception)
         {
             throw new InvalidOperationException("Token invalide ou expiré.");
         }
 
-        var userId = principal[JwtRegisteredClaimNames.NameId].ToString()
-            ?? throw new InvalidOperationException("Token invalide");
-
-        var token = principal["resettoken"].ToString();
-
-        var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), userId);
-
-        var result = await _userManager.ResetPasswordAsync(user, token!, command.Password).ConfigureAwait(false);
-        if (!result.Succeeded)
-            throw new InvalidOperationException("Échec de la mise à jour du mot de passe.");
     }
 }
 
