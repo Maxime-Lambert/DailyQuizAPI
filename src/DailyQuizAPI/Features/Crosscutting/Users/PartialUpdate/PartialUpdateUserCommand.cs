@@ -3,7 +3,7 @@
 namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 
 public sealed record PartialUpdateUserCommand(
-    string? UserName,
+    string? Username,
     string? Email,
     string? LastPassword,
     string? NewPassword,

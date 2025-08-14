@@ -23,43 +23,40 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
             ?? throw new NotFoundException(nameof(User), userId);
 
-        if (!string.IsNullOrWhiteSpace(command.UserName))
-            user.UserName = command.UserName;
+        if (!string.IsNullOrWhiteSpace(command.Username))
+            user.UserName = command.Username;
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        if (string.IsNullOrEmpty(command.Email) && !string.IsNullOrEmpty(user.Email))
+
+        if (command.Email is not null)
         {
-            user.EmailConfirmed = false;
             await SendRollbackToken(command, user, creds).ConfigureAwait(false);
-        }
 
-        if (!string.IsNullOrWhiteSpace(command.Email))
-        {
             user.EmailConfirmed = false;
-            if (!string.IsNullOrEmpty(user.Email))
-            {
-                await SendRollbackToken(command, user, creds).ConfigureAwait(false);
-            }
             user.Email = command.Email;
-            var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
 
-            List<Claim> claims = [
-                new Claim(JwtRegisteredClaimNames.NameId, user.Id),
-                new Claim("conftoken", confirmationToken),
-            ];
+            if (user.Email.Length > 0)
+            {
+                var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
 
-            var token = new JwtSecurityToken(
-                issuer: _options.Issuer,
-                audience: _options.Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: creds
-            );
+                List<Claim> claims = [
+                    new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+                    new Claim("conftoken", confirmationToken),
+                ];
 
-            var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-            var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirm-email?token={Uri.EscapeDataString(jwtToken)}";
-            await _emailService.SendConfirmationLinkAsync(user, user.Email, confirmationLink, command.FrontEndName).ConfigureAwait(false);
+                var token = new JwtSecurityToken(
+                    issuer: _options.Issuer,
+                    audience: _options.Audience,
+                    claims: claims,
+                    expires: DateTime.UtcNow.AddHours(1),
+                    signingCredentials: creds
+                );
+
+                var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+                var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirm-email?token={Uri.EscapeDataString(jwtToken)}";
+                await _emailService.SendConfirmationLinkAsync(user, user.Email, confirmationLink, command.FrontEndName).ConfigureAwait(false);
+            }
         }
 
         if (command.ColorblindMode is not null)
