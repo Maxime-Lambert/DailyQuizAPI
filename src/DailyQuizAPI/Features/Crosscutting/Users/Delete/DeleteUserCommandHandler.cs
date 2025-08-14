@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Persistence;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Persistence;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
@@ -12,7 +13,7 @@ public sealed class DeleteUserCommandHandler(UserManager<User> userManager, Quiz
     public async Task Handle(DeleteUserCommand command, ClaimsPrincipal claims)
     {
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new InvalidOperationException("Utilisateur introuvable dans les revendications.");
+            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
 
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
             ?? throw new InvalidOperationException("L'utilisateur connecté est introuvable.");

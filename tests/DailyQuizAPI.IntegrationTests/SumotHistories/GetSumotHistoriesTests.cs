@@ -24,9 +24,7 @@ public sealed class GetSumotHistoriesTests(ApiTestFixture fixture) : IClassFixtu
         await _client.PostAsJsonAsync("/sumothistories/updaterange", updateSumotHistoriesCommand);
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var query = new GetSumotHistoriesQuery(today, today);
-        var uri = $"/sumothistories?MinDate={query.MinDate}&MaxDate={query.MaxDate}";
-
+        var uri = $"/sumothistories?MinDate={today:yyyy-MM-dd}&MaxDate={today:yyyy-MM-dd}";
         var response = await _client.GetAsync(uri);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 

@@ -168,4 +168,26 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
 
         await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
     }
+
+    public async Task SendContactMessageAsync(string email, string name, string fromEmail, string message)
+    {
+        var subject = $"Nouveau message de contact de {name}";
+        var plainText = $"""
+            Nom: {name}
+            Email: {fromEmail}
+
+            Message:
+            {message}
+            """;
+
+        var html = $"""
+            <p><strong>Nom :</strong> {name}</p>
+            <p><strong>Email :</strong> {fromEmail}</p>
+
+            <p><strong>Message :</strong></p>
+            <p>{message}</p>
+            """;
+
+        await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
+    }
 }

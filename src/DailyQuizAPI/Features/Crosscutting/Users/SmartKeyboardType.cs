@@ -2,7 +2,7 @@
 
 public enum SmartKeyboardType
 {
-    NONE = 0,
-    MISSING = 1,
-    CORRECT = 2
+    None = 0,
+    Missing = 1,
+    Correct = 2
 }

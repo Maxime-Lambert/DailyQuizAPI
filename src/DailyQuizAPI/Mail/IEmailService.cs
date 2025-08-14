@@ -14,4 +14,6 @@ public interface IEmailService
     Task SendInactivityWarningAsync(User user, string email);
 
     Task SendUserDeletedAsync(User user, string email);
+
+    Task SendContactMessageAsync(string email, string name, string fromEmail, string message);
 }

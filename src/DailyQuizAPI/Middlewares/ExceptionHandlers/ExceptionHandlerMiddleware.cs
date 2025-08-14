@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 
-namespace DailyQuizAPI.Middlewares;
+namespace DailyQuizAPI.Middlewares.ExceptionHandlers;
 
 public sealed partial class ExceptionHandlerMiddleware(ILogger<ExceptionHandlerMiddleware> logger) : IExceptionHandler
 {

@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Mail;
+﻿using DailyQuizAPI.Common.Exceptions;
+using DailyQuizAPI.Mail;
 using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
@@ -20,38 +21,25 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
     public async Task Handle(PartialUpdateUserCommand command, string userId)
     {
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
-            ?? throw new InvalidOperationException("User not found");
+            ?? throw new NotFoundException(nameof(User), userId);
 
         if (!string.IsNullOrWhiteSpace(command.UserName))
             user.UserName = command.UserName;
 
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        if (string.IsNullOrEmpty(command.Email) && !string.IsNullOrEmpty(user.Email))
+        {
+            user.EmailConfirmed = false;
+            await SendRollbackToken(command, user, creds).ConfigureAwait(false);
+        }
+
         if (!string.IsNullOrWhiteSpace(command.Email))
         {
             user.EmailConfirmed = false;
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             if (!string.IsNullOrEmpty(user.Email))
             {
-                var rollbackToken = await _userManager.GenerateUserTokenAsync(user, ROLLBACK_TOKEN_NAME, ROLLBACK_TOKEN_NAME).ConfigureAwait(false);
-
-                List<Claim> rollbackclaims = [
-                    new Claim(JwtRegisteredClaimNames.NameId, user.Id),
-                    new Claim(JwtRegisteredClaimNames.Name, user.UserName!),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim("rollbackToken", rollbackToken),
-                ];
-
-                var rollbacktoken = new JwtSecurityToken(
-                    issuer: _options.Issuer,
-                    audience: _options.Audience,
-                    claims: rollbackclaims,
-                    expires: DateTime.UtcNow.AddHours(1),
-                    signingCredentials: creds
-                );
-
-                var rollbackjwtToken = new JwtSecurityTokenHandler().WriteToken(rollbacktoken);
-                var rollbackLink = $"{FrontEndOrigins.SUMOT}/rollback?token={Uri.EscapeDataString(rollbackjwtToken)}";
-                await _emailService.SendRollbackAsync(user, user.Email, rollbackLink, command.FrontEndName).ConfigureAwait(false);
+                await SendRollbackToken(command, user, creds).ConfigureAwait(false);
             }
             user.Email = command.Email;
             var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
@@ -99,5 +87,32 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
         var updateResult = await _userManager.UpdateAsync(user).ConfigureAwait(false);
         if (!updateResult.Succeeded)
             throw new InvalidOperationException(string.Join(", ", updateResult.Errors.Select(e => e.Description)));
+    }
+
+    private async Task SendRollbackToken(PartialUpdateUserCommand command, User user, SigningCredentials creds)
+    {
+        if (user.Email is null)
+            return;
+
+        var rollbackToken = await _userManager.GenerateUserTokenAsync(user, ROLLBACK_TOKEN_NAME, ROLLBACK_TOKEN_NAME).ConfigureAwait(false);
+
+        List<Claim> rollbackclaims = [
+            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+                new Claim(JwtRegisteredClaimNames.Name, user.UserName!),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("rollbackToken", rollbackToken),
+            ];
+
+        var rollbacktoken = new JwtSecurityToken(
+            issuer: _options.Issuer,
+            audience: _options.Audience,
+            claims: rollbackclaims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: creds
+        );
+
+        var rollbackjwtToken = new JwtSecurityTokenHandler().WriteToken(rollbacktoken);
+        var rollbackLink = $"{FrontEndOrigins.SUMOT}/rollback?token={Uri.EscapeDataString(rollbackjwtToken)}";
+        await _emailService.SendRollbackAsync(user, user.Email, rollbackLink, command.FrontEndName).ConfigureAwait(false);
     }
 }
