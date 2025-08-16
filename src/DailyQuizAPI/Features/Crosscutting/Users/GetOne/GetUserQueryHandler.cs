@@ -18,6 +18,7 @@ public sealed class GetUserQueryHandler(UserManager<User> userManager)
             Enum.GetName(user.KeyboardLayout)!,
             Enum.GetName(user.ColorblindMode)!,
             Enum.GetName(user.SmartKeyboardType)!,
-            user.EmailConfirmed);
+            user.EmailConfirmed,
+            user.PlaysWithDifficultWords);
     }
 }

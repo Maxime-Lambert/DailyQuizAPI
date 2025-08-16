@@ -68,6 +68,11 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
         if (command.SmartKeyboardType is not null)
             user.SmartKeyboardType = command.SmartKeyboardType.Value;
 
+        if (command.PlaysWithDifficultWords is not null)
+        {
+            user.PlaysWithDifficultWords = command.PlaysWithDifficultWords.Value;
+        }
+
         if (!string.IsNullOrWhiteSpace(command.NewPassword))
         {
             if (string.IsNullOrWhiteSpace(command.LastPassword))

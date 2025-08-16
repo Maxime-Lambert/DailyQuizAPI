@@ -14,7 +14,7 @@ public static class ResendConfirmationEndpoint
     private const string OPERATION_ID = "Users_ResendConfirmation";
     private const string SUCCESS_DESCRIPTION = "Mail envoyé.";
 
-    public static void MapCreateUserEndpoint(this IEndpointRouteBuilder app)
+    public static void MapResendConfirmationEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost(ROUTE,
             async ([FromServices] ResendConfirmationCommandHandler handler,
