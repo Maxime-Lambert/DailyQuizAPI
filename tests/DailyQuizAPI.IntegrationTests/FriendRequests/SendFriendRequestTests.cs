@@ -21,7 +21,7 @@ public sealed class SendFriendRequestTests(ApiTestFixture fixture) : IClassFixtu
 
         CreateFriendRequestCommand command = new("receiver");
 
-        var response = await _client.PostAsJsonAsync("/friendrequests/send", command);
+        var response = await _client.PostAsJsonAsync("/friendrequests", command);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
     }
