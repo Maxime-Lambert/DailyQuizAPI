@@ -25,8 +25,8 @@ public class LoginCommandHandler(IOptions<AuthenticationOptions> options, UserMa
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.NameId, user.Id),
-            new(JwtRegisteredClaimNames.Name, request.UserName),
+            new(ClaimTypes.NameIdentifier, user.Id),
+            new(ClaimTypes.Name, request.UserName),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

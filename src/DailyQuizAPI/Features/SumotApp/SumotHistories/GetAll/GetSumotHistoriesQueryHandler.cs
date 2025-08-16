@@ -31,19 +31,24 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
 
             friendIds.Add(userId);
 
-            var histories = await (
+            return await (
                 from history in _quizContext.SumotHistories
                 join sumot in _quizContext.Sumots
                     on history.Word equals sumot.Word
+                join user in _quizContext.Users
+                    on history.UserId equals user.Id
                 where friendIds.Contains(history.UserId)
                    && sumot.Day >= query.MinDate
                    && sumot.Day <= query.MaxDate
                 orderby sumot.Day
-                select history
+                select new GetSumotHistoriesResponse(
+                    history.Id,
+                    history.Word,
+                    history.Tries,
+                    history.Ranking,
+                    user.UserName!
+                )
             ).ToListAsync(ct).ConfigureAwait(false);
-
-            return histories.Select(h => new GetSumotHistoriesResponse(
-                h.Id, h.Word, h.Tries, h.Ranking, h.User.UserName!)).ToList();
         }, TimeSpan.FromMinutes(10)).ConfigureAwait(false);
     }
 }

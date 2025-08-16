@@ -7,12 +7,12 @@ namespace DailyQuizAPI.IntegrationTests.Sumots;
 
 public class GetSumotsTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task GetSumots_ReturnsOk()
     {
-        var response = await _client.GetAsync("/sumots");
+        var response = await Client.GetAsync("/sumots");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

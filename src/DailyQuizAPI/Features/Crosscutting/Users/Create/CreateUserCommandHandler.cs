@@ -45,7 +45,7 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
 
         List<Claim> claims = [
-            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim("conftoken", confirmationToken),
         ];
 

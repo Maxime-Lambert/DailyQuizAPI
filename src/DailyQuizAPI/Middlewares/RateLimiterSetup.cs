@@ -8,8 +8,8 @@ public static class RateLimiterSetup
     private const string POLICY_NAME = "ByAuth";
     private const string ANONYMOUS_USER_KEY = "anon";
     private const string UNKNOWN_USER_KEY = "unknown";
-    private const int AUTHENTICATED_USER_PERMIT_LIMIT = 60;
-    private const int ANONYMOUS_USER_PERMIT_LIMIT = 10;
+    private const int AUTHENTICATED_USER_PERMIT_LIMIT = 600;
+    private const int ANONYMOUS_USER_PERMIT_LIMIT = 60;
     private const int RATE_LIMIT_WINDOW_MINUTES = 1;
     private const int RATE_LIMIT_QUEUE_LIMIT = 2;
 

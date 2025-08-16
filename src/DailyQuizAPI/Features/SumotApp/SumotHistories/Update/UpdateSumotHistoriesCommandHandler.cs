@@ -32,27 +32,19 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
                 currentHistory.ClearTries();
                 currentHistory.AddTries(new Collection<string>([.. history.Tries]));
                 _quizContext.SumotHistories.Update(currentHistory);
-                await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
-                if (currentHistory.IsFinished)
-                    await _rankingService.RecalculateRankingsAsync(userId, ct).ConfigureAwait(false);
-                return;
             }
-
-            var newHistory = new SumotHistory
+            else
             {
-                UserId = userId,
-                Word = history.Word,
-            };
-            newHistory.AddTries(new Collection<string>([.. history.Tries]));
-
-            await _quizContext.SumotHistories.AddAsync(newHistory, ct).ConfigureAwait(false);
-
-            await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
-
-            if (newHistory.IsFinished)
-                await _rankingService.RecalculateRankingsAsync(userId, ct).ConfigureAwait(false);
+                var newHistory = new SumotHistory
+                {
+                    UserId = userId,
+                    Word = history.Word,
+                };
+                newHistory.AddTries(new Collection<string>([.. history.Tries]));
+                await _quizContext.SumotHistories.AddAsync(newHistory, ct).ConfigureAwait(false);
+            }
         }
-
-
+        await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
+        await _rankingService.RecalculateRankingsAsync(userId, ct).ConfigureAwait(false);
     }
 }

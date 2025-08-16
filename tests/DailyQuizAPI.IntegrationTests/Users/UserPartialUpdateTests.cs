@@ -9,19 +9,22 @@ namespace DailyQuizAPI.IntegrationTests.Users;
 
 public sealed class UserPartialUpdateTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task UserPartialUpdate_UpdatesUserSuccessfully()
     {
-        var (token, _) = await fixture.RegisterAndLoginAsync("updateuser", "update@example.com", "Test123!");
-        var userId = await fixture.GetUserIdByUsernameAsync("updateuser");
+        await fixture.ResetDatabaseAsync();
+        var unique = Guid.NewGuid().ToString("N")[..8];
+        var (token, _) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
+        var userId = await fixture.GetUserIdByUsernameAsync($"user_{unique}");
 
-        _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
+        Client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
+        var newUnique = Guid.NewGuid().ToString("N")[..8];
         PartialUpdateUserCommand updateCommand = new(
-            Username: "newname",
-            Email: "newemail@example.com",
+            Username: $"user_{newUnique}",
+            Email: $"user_{newUnique}@example.com",
             LastPassword: "Test123!",
             NewPassword: "NewPassword123!",
             ColorblindMode: null,
@@ -30,7 +33,7 @@ public sealed class UserPartialUpdateTests(ApiTestFixture fixture) : IClassFixtu
             0
         );
 
-        var response = await _client.PatchAsJsonAsync($"/users/{userId}", updateCommand);
+        var response = await Client.PatchAsJsonAsync($"/users/{userId}", updateCommand);
 
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }

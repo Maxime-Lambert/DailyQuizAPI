@@ -1,133 +1,153 @@
 ﻿using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Persistence;
 using HtmlAgilityPack;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Net;
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DailyQuizAPI.Features.SumotApp.Sumots.Extract;
 
 public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheService cacheService)
 {
-    private const string ODS_FILENAME = "ods6.txt";
+    private const string CSV_FILENAME = "Lexique-query-2025-08-15 14-58-10.csv";
     private readonly ICacheService _cacheService = cacheService;
     private readonly QuizContext _quizContext = quizContext;
+    private static readonly List<string> INAPPROPRIATE_WORDS =
+    [
+        "ASIATE", "BOCHE", "BOCHES", "CHINO", "CHINOS", "GOGOL", "GOGOLS", "MONGOL", "GOUDOU", "GOUINE",
+        "LOPES", "NABOT", "NABOTS", "NEGRE", "NEGRES", "PEDES", "PEDE", "ROMANO", "SCHLEU", "VIOLS",
+        "SALOPE", "PUTES", "PUTAIN", "VIOLER", "VIOLE", "VIOLES", "VIOLEE", "ENCULE", "ENCULER", "NIQUE",
+        "NIQUER", "TARBA", "TARBAS", "BATARD", "FOUTRE", "CONNE", "CONNES", "CONARD", "MERDE", "MERDES",
+        "CHIANT", "BAISE", "BAISER", "BAISES", "ORGIE", "ORGIES", "SALAUD", "ZOBES"
+    ];
 
-    public async Task Handle(ExtractSumotsCommand request, CancellationToken cancellationToken)
+    public async Task Handle(CancellationToken cancellationToken)
     {
-        var sumotsFilePath = Path.Combine(AppContext.BaseDirectory, ODS_FILENAME);
-        var words = await File.ReadAllLinesAsync(sumotsFilePath, cancellationToken).ConfigureAwait(false);
-        var sumots = words.Where(w => w.Length == request.WordLength)
-                         .Distinct()
-                         .Where(w => !_quizContext.Sumots.Any(s => s.Word! == w))
-                         .Select(w => new Sumot { Word = w.Trim().ToUpperInvariant(), Day = null })
-                         .ToList();
-
-        if (sumots.Count == 0)
-        {
-            _cacheService.RemoveByPrefix("sumots:");
-        }
+        var excelFilePath = Path.Combine(AppContext.BaseDirectory, CSV_FILENAME);
+        var sumotsFromLexique = await LoadSumotsFromCsvAsync(excelFilePath, cancellationToken).ConfigureAwait(false);
+        var existingSumots = await _quizContext.Sumots.ToListAsync(cancellationToken).ConfigureAwait(false);
 
         using var client = new HttpClient();
-        foreach (var sumot in sumots)
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("SumotBot/1.0 (+https://sumot.app; contact@sumot.app)");
+        foreach (var sumot in sumotsFromLexique)
         {
-            var lowerWord = sumot.Word.ToLowerInvariant();
-
-            var attempts = new HashSet<string>();
-
-            var baseForms = new HashSet<string>
+            var existing = existingSumots.FirstOrDefault(s => s.Word == sumot.Word);
+            if (existing is not null)
             {
-                lowerWord
-            };
-
-            if (lowerWord.EndsWith('s'))
-                baseForms.Add(lowerWord[..^1]);
-
-            if (lowerWord.EndsWith('x'))
-                baseForms.Add(lowerWord[..^1]);
-
-            if (lowerWord.EndsWith('t'))
-                baseForms.Add(lowerWord[..^1] + 'r');
-
-            baseForms.Add(lowerWord + 's');
-
-            baseForms.Select(baseForms => baseForms.ToUpperInvariant())
-                     .ToList()
-                     .ForEach(upperForm => baseForms.Add(upperForm));
-
-            baseForms.Add(char.ToUpper(lowerWord[0], CultureInfo.InvariantCulture) + lowerWord[1..]);
-
-            if (lowerWord.EndsWith('s'))
-                baseForms.Add(char.ToUpper(lowerWord[0], CultureInfo.InvariantCulture) + lowerWord[1..^1]);
-
-            foreach (var form in baseForms)
-            {
-                attempts.Add(form);
-
-                foreach (var variant in GenerateAccentVariants(form))
-                    attempts.Add(variant);
-
-                foreach (var variant in GenerateLigatureVariants(form))
-                    attempts.Add(variant);
+                sumot.Definition = existing.Definition;
+                sumot.DefinitionWord = existing.DefinitionWord;
             }
-
-            foreach (var attempt in attempts.Where(a => !string.IsNullOrEmpty(a)))
+            else
             {
-                var uri = new Uri($"https://fr.wiktionary.org/w/api.php?action=parse&page={attempt}&format=json&origin=*&prop=text");
-                var response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1308 // Normaliser les chaînes en majuscules
+                var lowerWord = sumot.Word.ToLowerInvariant();
+#pragma warning restore CA1308 // Normaliser les chaînes en majuscules
 
-                if (!response.IsSuccessStatusCode)
+                var attempts = new HashSet<string>
                 {
-                    continue;
+                    lowerWord,
+                    sumot.Word,
+                    char.ToUpper(lowerWord[0], CultureInfo.InvariantCulture) + lowerWord[1..]
+                };
+
+                var baseForms = new HashSet<string>
+                {
+                    lowerWord,
+                    char.ToUpper(lowerWord[0], CultureInfo.InvariantCulture) + lowerWord[1..]
+                };
+
+                foreach (var form in baseForms)
+                {
+                    foreach (var variant in GenerateAccentVariants(form))
+                        attempts.Add(variant);
+
+                    foreach (var variant in GenerateLigatureVariants(form))
+                        attempts.Add(variant);
                 }
 
-                var json = await response.Content.ReadFromJsonAsync<JsonDocument>(cancellationToken).ConfigureAwait(false);
-
-                if (json is null)
+                foreach (var attempt in attempts.Where(a => !string.IsNullOrEmpty(a)))
                 {
-                    continue;
-                }
+                    var uri = new Uri($"https://fr.wiktionary.org/w/api.php?action=parse&page={attempt}&format=json&origin=*&prop=text");
+                    HttpResponseMessage? response = null;
+                    int retryCount = 0;
 
-                if (json.RootElement.TryGetProperty("error", out var _))
-                {
-                    continue;
-                }
+                    while (retryCount < 5)
+                    {
+                        response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
 
-                if (!json.RootElement.TryGetProperty("parse", out var parse))
-                {
-                    continue;
-                }
+                        if (response.StatusCode == (HttpStatusCode)429)
+                        {
+                            var delayMs = (int)Math.Pow(2, retryCount) * 1000;
+                            Console.WriteLine($"[WARN] 429 reçu pour '{attempt}', retry dans {delayMs} ms...");
+                            await Task.Delay(delayMs, cancellationToken).ConfigureAwait(false);
+                            retryCount++;
+                            continue;
+                        }
 
-                if (!parse.TryGetProperty("text", out var text) || !text.TryGetProperty("*", out var htmlElement))
-                {
-                    continue;
-                }
+                        break;
+                    }
 
-                var html = htmlElement.GetString();
-                if (string.IsNullOrWhiteSpace(html))
-                {
-                    continue;
-                }
+                    if (response is null || !response.IsSuccessStatusCode)
+                        continue;
 
-                var doc = new HtmlDocument();
-                doc.LoadHtml(html);
+                    var json = await response.Content.ReadFromJsonAsync<JsonDocument>(cancellationToken).ConfigureAwait(false);
 
-                var headings = doc.DocumentNode.SelectNodes("//div[contains(@class,'mw-parser-output')]//h2 | //h3");
-                if (headings == null)
-                {
-                    continue;
-                }
+                    if (json is null)
+                    {
+                        continue;
+                    }
 
-                var definition = ExtractFirstDefinition(doc);
-                if (string.IsNullOrWhiteSpace(definition))
-                {
-                    continue;
+                    if (json.RootElement.TryGetProperty("error", out var _))
+                    {
+                        continue;
+                    }
+
+                    if (!json.RootElement.TryGetProperty("parse", out var parse))
+                    {
+                        continue;
+                    }
+
+                    if (!parse.TryGetProperty("text", out var text) || !text.TryGetProperty("*", out var htmlElement))
+                    {
+                        continue;
+                    }
+
+                    var html = htmlElement.GetString();
+                    if (string.IsNullOrWhiteSpace(html))
+                    {
+                        continue;
+                    }
+
+                    var doc = new HtmlDocument();
+                    doc.LoadHtml(html);
+
+                    var headings = doc.DocumentNode.SelectNodes("//div[contains(@class,'mw-parser-output')]//h2 | //h3");
+                    if (headings is null)
+                    {
+                        continue;
+                    }
+
+                    var definition = ExtractFirstDefinition(doc);
+                    if (string.IsNullOrWhiteSpace(definition))
+                    {
+                        continue;
+                    }
+                    sumot.Definition = definition;
+                    sumot.DefinitionWord = attempt;
+                    break;
                 }
-                sumot.Definition = definition;
-                sumot.DefinitionWord = attempt;
-                break;
+                if (string.IsNullOrEmpty(sumot.Definition))
+                    Console.WriteLine("pas trouvé pour " + sumot.Word);
             }
         }
-        _quizContext.Sumots.AddRange(sumots.Where(s => !string.IsNullOrEmpty(s.DefinitionWord)));
+        var defs = sumotsFromLexique.Where(s => !string.IsNullOrEmpty(s.DefinitionWord));
+        _quizContext.Sumots.RemoveRange(existingSumots);
+        _cacheService.RemoveByPrefix("sumots:");
+        await _quizContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _quizContext.Sumots.AddRangeAsync(defs, cancellationToken).ConfigureAwait(false);
         await _quizContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -286,5 +306,75 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
             .Replace("\u00A0", " ", StringComparison.InvariantCultureIgnoreCase)
             .Trim()
             .ToUpperInvariant();
+    }
+
+    public async Task<List<Sumot>> LoadSumotsFromCsvAsync(string csvPath, CancellationToken cancellationToken)
+    {
+        var lines = await File.ReadAllLinesAsync(csvPath, Encoding.UTF8, cancellationToken)
+                              .ConfigureAwait(false);
+
+        if (lines.Length <= 1)
+            return [];
+
+        var header = lines[0].Split(';');
+        int idxWord = Array.IndexOf(header, "Word");
+        int idxLemme = Array.IndexOf(header, "lemme");
+        int idxCgram = Array.IndexOf(header, "cgram");
+        int idxFreqLem = Array.IndexOf(header, "freqlemfilms2");
+
+        var sumotsDict = new Dictionary<string, Sumot>();
+
+        foreach (var line in lines.Skip(1))
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            var cols = line.Split(';');
+            if (cols.Length <= idxFreqLem)
+                continue;
+
+            var wordRaw = cols[idxWord].Trim();
+            if (wordRaw.Contains('-', StringComparison.InvariantCulture)
+                || wordRaw.Contains(' ', StringComparison.InvariantCulture)
+                || INAPPROPRIATE_WORDS.Contains(wordRaw.ToUpperInvariant()))
+                continue;
+            var lemme = cols[idxLemme].Trim();
+            var cgram = cols[idxCgram].Trim();
+            var freqlemfilms2Str = cols[idxFreqLem].Trim().Replace(',', '.');
+
+            if (!double.TryParse(freqlemfilms2Str, NumberStyles.Any, CultureInfo.InvariantCulture, out var freqlemfilms2))
+                freqlemfilms2 = 0;
+
+            // On enlève les accents + majuscules
+            var word = RemoveDiacritics(wordRaw).ToUpperInvariant();
+
+            bool isDifficult = freqlemfilms2 < 1 || ((cgram == "VER" || cgram == "AUX") && !string.Equals(wordRaw, lemme, StringComparison.OrdinalIgnoreCase));
+
+            if (sumotsDict.TryGetValue(word, out var existing))
+            {
+                if (!isDifficult && existing.IsDifficult)
+                {
+                    existing.IsDifficult = false;
+                }
+            }
+            else
+            {
+                sumotsDict[word] = new Sumot
+                {
+                    Word = word,
+                    Day = null,
+                    IsDifficult = isDifficult
+                };
+            }
+        }
+
+        return sumotsDict.Values.ToList();
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var normalized = text.Normalize(NormalizationForm.FormD);
+        var regex = new Regex(@"\p{Mn}", RegexOptions.Compiled);
+        return regex.Replace(normalized, string.Empty);
     }
 }

@@ -10,16 +10,18 @@ namespace DailyQuizAPI.IntegrationTests.Users;
 
 public sealed class RefreshTokenTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task Refresh_ReturnsNewAccessToken()
     {
-        var (accessToken, refreshToken) = await fixture.RegisterAndLoginAsync("refreshtest", "refresh@example.com", "Test123!");
+        await fixture.ResetDatabaseAsync();
+        var unique = Guid.NewGuid().ToString("N")[..8];
+        var (token, refreshToken) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
 
         RefreshCommand command = new(refreshToken);
 
-        var response = await _client.PostAsJsonAsync("/users/refresh", command);
+        var response = await Client.PostAsJsonAsync("/users/refresh", command);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -27,7 +29,7 @@ public sealed class RefreshTokenTests(ApiTestFixture fixture) : IClassFixture<Ap
         content.Should().NotBeNull();
         content!.Token.Should().NotBeNullOrWhiteSpace();
         content.RefreshToken.Should().NotBeNullOrWhiteSpace();
-        content.Token.Should().NotBe(accessToken);
+        content.Token.Should().NotBe(token);
     }
 }
 

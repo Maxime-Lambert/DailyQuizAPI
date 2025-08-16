@@ -10,17 +10,19 @@ namespace DailyQuizAPI.IntegrationTests.Users;
 
 public class LoginTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task Login_ReturnsJwtToken_WhenCredentialsAreValid()
     {
-        CreateUserCommand createUserCommand = new("loginuser", "login@example.com", "LoginTest123!", 0);
-        var createUserResponse = await _client.PostAsJsonAsync("/users", createUserCommand);
+        await fixture.ResetDatabaseAsync();
+        var unique = Guid.NewGuid().ToString("N")[..8];
+        CreateUserCommand createUserCommand = new($"user_{unique}", $"user_{unique}@example.com", "LoginTest123!", 0);
+        var createUserResponse = await Client.PostAsJsonAsync("/users", createUserCommand);
         createUserResponse.EnsureSuccessStatusCode();
 
         LoginCommand loginCommand = new(createUserCommand.UserName, createUserCommand.Password);
-        var loginResponse = await _client.PostAsJsonAsync("/users/login", loginCommand);
+        var loginResponse = await Client.PostAsJsonAsync("/users/login", loginCommand);
         loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var result = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();

@@ -9,12 +9,12 @@ namespace DailyQuizAPI.Features.Crosscutting.FriendRequests.Send;
 
 public static class CreateFriendRequestEndpoint
 {
-    private const string ROUTE = "/friendrequests/{targetUsername}";
-    private const string NAME = "SendFriendRequest";
+    private const string ROUTE = "/friendrequests";
+    private const string NAME = "CreateFriendRequest";
     private const string TAG = "FriendRequests";
     private const string SUMMARY = "Envoyer une demande d’ami";
     private const string DESCRIPTION = "Crée une nouvelle demande d’ami. Requiert un joueur authentifié.";
-    private const string OPERATION_ID = "FriendRequests_Send";
+    private const string OPERATION_ID = "FriendRequests_Create";
     private const string SUCCESS_DESCRIPTION = "Demande envoyée avec succès.";
 
     public static void MapSendFriendRequestEndpoint(this IEndpointRouteBuilder app)
@@ -45,7 +45,7 @@ public static class CreateFriendRequestEndpoint
             operation.Responses[StatusCodes.Status201Created.ToString(CultureInfo.InvariantCulture)].Description = SUCCESS_DESCRIPTION;
             operation.Responses[StatusCodes.Status400BadRequest.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.BADREQUEST;
             operation.Responses[StatusCodes.Status401Unauthorized.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.UNAUTHORIZED;
-            operation.Responses[StatusCodes.Status404NotFound.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.NOTFOUND; 
+            operation.Responses[StatusCodes.Status404NotFound.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.NOTFOUND;
             operation.Responses[StatusCodes.Status429TooManyRequests.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.TOOMANYREQUESTS;
             operation.Responses[StatusCodes.Status500InternalServerError.ToString(CultureInfo.InvariantCulture)].Description = SwaggerErrorDescriptions.SERVERERROR;
             return operation;

@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Middlewares;
-using DailyQuizAPI.OpenApi;
+﻿using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
@@ -19,10 +18,9 @@ public static class ExtractSumotsEndpoint
     {
         app.MapPost(ROUTE,
             async ([FromServices] ExtractSumotsCommandHandler handler,
-                   [FromBody] ExtractSumotsCommand command,
                    CancellationToken ct) =>
             {
-                await handler.Handle(command, ct).ConfigureAwait(false);
+                await handler.Handle(ct).ConfigureAwait(false);
                 return Results.Ok();
             })
         .WithName(NAME)

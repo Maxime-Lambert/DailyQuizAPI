@@ -30,7 +30,7 @@ public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> option
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
 
         List<Claim> resetClaims = [
-            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim("resettoken", resetToken),
         ];
 

@@ -10,22 +10,24 @@ namespace DailyQuizAPI.IntegrationTests.SumotHistories;
 
 public sealed class GetSumotHistoriesTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task GetSumotHistories_ReturnsOk()
     {
-        var tokens = await fixture.RegisterAndLoginAsync("gethistoryuser", "gethistory@example.com", "Test123!");
-        _client.DefaultRequestHeaders.Authorization = new("Bearer", tokens.accessToken);
+        await fixture.ResetDatabaseAsync();
+        var unique = Guid.NewGuid().ToString("N")[..8];
+        var (token, _) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
+        Client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
         UpdateSumotHistoriesCommand updateSumotHistoriesCommand = new(
             [new("bleue", ["bleue", "verte"])]
         );
-        await _client.PostAsJsonAsync("/sumothistories/updaterange", updateSumotHistoriesCommand);
+        await Client.PostAsJsonAsync("/sumothistories/updaterange", updateSumotHistoriesCommand);
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var uri = $"/sumothistories?MinDate={today:yyyy-MM-dd}&MaxDate={today:yyyy-MM-dd}";
-        var response = await _client.GetAsync(uri);
+        var response = await Client.GetAsync(uri);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var result = await response.Content.ReadFromJsonAsync<List<GetSumotHistoriesResponse>>();
