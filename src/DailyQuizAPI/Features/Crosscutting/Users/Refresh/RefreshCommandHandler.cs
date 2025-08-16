@@ -42,8 +42,8 @@ public sealed class RefreshCommandHandler(UserManager<User> userManager, IOption
         await _userManager.UpdateAsync(user).ConfigureAwait(false);
 
         List<Claim> claims = [
-            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
-            new Claim(JwtRegisteredClaimNames.Name, user.UserName ?? ""),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Name, user.UserName ?? ""),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         ];
 

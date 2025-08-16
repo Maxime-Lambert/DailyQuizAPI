@@ -7,12 +7,12 @@ namespace DailyQuizAPI.IntegrationTests.Healthchecks;
 
 public class GetHealthcheckTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task HealthCheck_ReturnsHealthy()
     {
-        var response = await _client.GetAsync("/healthchecks");
+        var response = await Client.GetAsync("/healthchecks");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var json = await response.Content.ReadAsStringAsync();
         json.Should().Contain("Healthy");

@@ -1,4 +1,5 @@
-﻿using Testcontainers.PostgreSql;
+﻿using DotNet.Testcontainers.Builders;
+using Testcontainers.PostgreSql;
 
 namespace DailyQuizAPI.IntegrationTests.Containers;
 
@@ -12,6 +13,7 @@ public static class PostgresTestContainer
             .WithUsername("test")
             .WithPassword("test")
             .WithDatabase("dailyquiz_test")
+            .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5432))
             .Build();
     }
 }

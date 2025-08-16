@@ -9,17 +9,19 @@ namespace DailyQuizAPI.IntegrationTests.Users;
 
 public sealed class GetUserTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task UserGet_ReturnsOk()
     {
-        var (token, _) = await fixture.RegisterAndLoginAsync("updateuser", "update@example.com", "Test123!");
-        var userId = await fixture.GetUserIdByUsernameAsync("updateuser");
+        await fixture.ResetDatabaseAsync();
+        var unique = Guid.NewGuid().ToString("N")[..8];
+        var (token, _) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
+        var userId = await fixture.GetUserIdByUsernameAsync($"user_{unique}");
 
-        _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
+        Client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
-        var response = await _client.GetAsync($"/users/{userId}");
+        var response = await Client.GetAsync($"/users/{userId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 

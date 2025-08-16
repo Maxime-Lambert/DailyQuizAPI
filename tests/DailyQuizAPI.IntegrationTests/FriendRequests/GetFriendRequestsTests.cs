@@ -10,19 +10,21 @@ namespace DailyQuizAPI.IntegrationTests.FriendRequests;
 
 public sealed class GetFriendRequestsTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task GetFriendRequests_ReturnsOk()
     {
-        var (tokenSender, _) = await fixture.RegisterAndLoginAsync("sender3", "sender3@example.com", "Test123!");
-        var (tokenReceiver, _) = await fixture.RegisterAndLoginAsync("receiver3", "receiver3@example.com", "Test123!");
+        await fixture.ResetDatabaseAsync();
+        var unique = Guid.NewGuid().ToString("N")[..8];
+        var (tokenSender, _) = await fixture.RegisterAndLoginAsync($"sender_{unique}", $"sender_{unique}@example.com", "Test123!");
+        var (tokenReceiver, _) = await fixture.RegisterAndLoginAsync($"receiver_{unique}", $"receiver_{unique}@example.com", "Test123!");
 
-        _client.DefaultRequestHeaders.Authorization = new("Bearer", tokenSender);
-        await _client.PostAsJsonAsync("/friendrequests", new CreateFriendRequestCommand("receiver3"));
+        Client.DefaultRequestHeaders.Authorization = new("Bearer", tokenSender);
+        await Client.PostAsJsonAsync("/friendrequests", new CreateFriendRequestCommand($"receiver_{unique}"));
 
-        _client.DefaultRequestHeaders.Authorization = new("Bearer", tokenReceiver);
-        var response = await _client.GetAsync("/friendrequests");
+        Client.DefaultRequestHeaders.Authorization = new("Bearer", tokenReceiver);
+        var response = await Client.GetAsync("/friendrequests");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 

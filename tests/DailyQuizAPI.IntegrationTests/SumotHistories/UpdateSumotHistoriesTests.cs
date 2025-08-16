@@ -9,18 +9,20 @@ namespace DailyQuizAPI.IntegrationTests.SumotHistories;
 
 public sealed class UpdateSumotHistoriesTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task AddSumotHistories_ReturnsOk()
     {
-        var tokens = await fixture.RegisterAndLoginAsync("historyuser", "history@example.com", "Test123!");
-        _client.DefaultRequestHeaders.Authorization = new("Bearer", tokens!.accessToken);
+        await fixture.ResetDatabaseAsync();
+        var unique = Guid.NewGuid().ToString("N")[..8];
+        var (token, _) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
+        Client.DefaultRequestHeaders.Authorization = new("Bearer", token);
         UpdateSumotHistoriesCommand command = new(
             [new("rouge", ["verts", "bleue", "rouge"])]
         );
 
-        var response = await _client.PostAsJsonAsync("/sumothistories/updaterange", command);
+        var response = await Client.PostAsJsonAsync("/sumothistories/updaterange", command);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

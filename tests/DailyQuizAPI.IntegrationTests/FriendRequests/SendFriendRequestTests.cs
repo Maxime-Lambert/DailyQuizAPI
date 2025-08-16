@@ -9,19 +9,21 @@ namespace DailyQuizAPI.IntegrationTests.FriendRequests;
 
 public sealed class SendFriendRequestTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private HttpClient Client => fixture.Client!;
 
     [Fact]
     public async Task SendFriendRequest_ReturnsCreated()
     {
-        var (tokenSender, _) = await fixture.RegisterAndLoginAsync("sender", "sender@example.com", "Test123!");
-        var (tokenReceiver, _) = await fixture.RegisterAndLoginAsync("receiver", "receiver@example.com", "Test123!");
+        await fixture.ResetDatabaseAsync();
+        var unique = Guid.NewGuid().ToString("N")[..8];
+        var (tokenSender, _) = await fixture.RegisterAndLoginAsync($"sender_{unique}", $"sender_{unique}@example.com", "Test123!");
+        var (tokenReceiver, _) = await fixture.RegisterAndLoginAsync($"receiver_{unique}", $"receiver_{unique}@example.com", "Test123!");
 
-        _client.DefaultRequestHeaders.Authorization = new("Bearer", tokenSender);
+        Client.DefaultRequestHeaders.Authorization = new("Bearer", tokenSender);
 
-        CreateFriendRequestCommand command = new("receiver");
+        CreateFriendRequestCommand command = new($"receiver_{unique}");
 
-        var response = await _client.PostAsJsonAsync("/friendrequests", command);
+        var response = await Client.PostAsJsonAsync("/friendrequests", command);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
     }

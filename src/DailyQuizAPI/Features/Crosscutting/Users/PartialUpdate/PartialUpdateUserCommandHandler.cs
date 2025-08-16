@@ -41,7 +41,7 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
                 var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
 
                 List<Claim> claims = [
-                    new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim("conftoken", confirmationToken),
                 ];
 
@@ -94,9 +94,9 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
         var rollbackToken = await _userManager.GenerateUserTokenAsync(user, ROLLBACK_TOKEN_NAME, ROLLBACK_TOKEN_NAME).ConfigureAwait(false);
 
         List<Claim> rollbackclaims = [
-            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
-                new Claim(JwtRegisteredClaimNames.Name, user.UserName!),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim("rollbackToken", rollbackToken),
             ];
 
