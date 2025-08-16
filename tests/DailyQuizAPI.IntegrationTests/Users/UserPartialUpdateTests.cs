@@ -30,6 +30,7 @@ public sealed class UserPartialUpdateTests(ApiTestFixture fixture) : IClassFixtu
             ColorblindMode: null,
             KeyboardLayout: null,
             SmartKeyboardType: null,
+            PlaysWithDifficultWords: false,
             0
         );
 

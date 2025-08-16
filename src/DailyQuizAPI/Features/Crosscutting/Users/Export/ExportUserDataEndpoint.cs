@@ -1,5 +1,6 @@
 ﻿namespace DailyQuizAPI.Features.Crosscutting.Users.Export;
 
+using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -17,14 +18,15 @@ public static class ExportUserDataEndpoint
 
     public static void MapExportUserDataEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapDelete(ROUTE,
+        app.MapPost(ROUTE,
             async ([FromServices] ExportUserDataCommandHandler handler,
-                   ClaimsPrincipal claims) =>
+                    ClaimsPrincipal user) =>
             {
-                var result = await handler.Handle(claims).ConfigureAwait(false);
-                return Results.Ok(result);
+                var result = await handler.Handle(user).ConfigureAwait(false);
+                return Results.File([.. result.FileContent], result.ContentType, result.FileName);
             })
         .WithName(NAME)
+        .RequireAuthorization(SecurityPolicies.PLAYER)
         .Produces(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status401Unauthorized)
