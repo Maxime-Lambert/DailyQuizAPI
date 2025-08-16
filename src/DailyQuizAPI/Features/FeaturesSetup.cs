@@ -18,7 +18,6 @@ using DailyQuizAPI.Features.Crosscutting.Users.ResetPassword;
 using DailyQuizAPI.Features.Crosscutting.Users.Rollback;
 using DailyQuizAPI.Features.SumotApp.SumotHistories.GetAll;
 using DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
-using DailyQuizAPI.Features.SumotApp.Sumots.Extract;
 using DailyQuizAPI.Features.SumotApp.Sumots.GetAll;
 
 namespace DailyQuizAPI.Features;
@@ -38,7 +37,6 @@ public static class FeaturesSetup
         services.AddScoped<GetSumotHistoriesQueryHandler>();
         services.AddScoped<UpdateSumotHistoriesCommandHandler>();
 
-        services.AddScoped<ExtractSumotsCommandHandler>();
         services.AddScoped<GetSumotsQueryHandler>();
 
         services.AddScoped<ConfirmEmailCommandHandler>();

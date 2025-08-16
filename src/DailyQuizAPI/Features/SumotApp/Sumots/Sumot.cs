@@ -11,4 +11,6 @@ public sealed class Sumot
     public string Definition { get; set; } = string.Empty;
 
     public string DefinitionWord { get; set; } = string.Empty;
+
+    public bool IsDifficult { get; set; }
 }
