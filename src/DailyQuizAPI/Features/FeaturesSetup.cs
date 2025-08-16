@@ -14,6 +14,7 @@ using DailyQuizAPI.Features.Crosscutting.Users.GetOne;
 using DailyQuizAPI.Features.Crosscutting.Users.Login;
 using DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 using DailyQuizAPI.Features.Crosscutting.Users.Refresh;
+using DailyQuizAPI.Features.Crosscutting.Users.ResendConfirmation;
 using DailyQuizAPI.Features.Crosscutting.Users.ResetPassword;
 using DailyQuizAPI.Features.Crosscutting.Users.Rollback;
 using DailyQuizAPI.Features.SumotApp.SumotHistories.GetAll;
@@ -49,6 +50,7 @@ public static class FeaturesSetup
         services.AddScoped<PartialUpdateUserCommandHandler>();
         services.AddScoped<RefreshCommandHandler>();
         services.AddScoped<ResetPasswordCommandHandler>();
+        services.AddScoped<ResendConfirmationCommandHandler>();
         services.AddScoped<RollbackCommandHandler>();
 
         return services;
@@ -81,6 +83,7 @@ public static class FeaturesSetup
         app.MapPartialUpdateUserEndpoint();
         app.MapRefreshEndpoint();
         app.MapResetPasswordEndpoint();
+        app.MapResendConfirmationEndpoint();
         app.MapRollbackEndpoint();
 
         return app;

@@ -10,5 +10,6 @@ public sealed record PartialUpdateUserCommand(
     ColorblindMode? ColorblindMode,
     KeyboardLayout? KeyboardLayout,
     SmartKeyboardType? SmartKeyboardType,
+    bool? PlaysWithDifficultWords,
     FrontEndNames FrontEndName
 );

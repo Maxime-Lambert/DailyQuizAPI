@@ -1,6 +1,7 @@
 ﻿using DailyQuizAPI.Common.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.Export;
@@ -26,15 +27,16 @@ public sealed class ExportUserDataCommandHandler(UserManager<User> userManager)
             user.KeyboardLayout,
             user.ColorblindMode,
             user.SmartKeyboardType,
+            user.PlaysWithDifficultWords,
             user.LastLogin,
-            RefreshTokens = user.RefreshTokens.Select(rt => new { rt.Token, rt.ExpiresAt }),
             user.SumotHistories
         };
 
         var json = JsonSerializer.Serialize(exportObject, CACHED_JSON_SERIALIZER_OPTIONS);
-        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        var bytes = Encoding.UTF8.GetBytes(json);
 
-        return new ExportUserDataResponse(bytes, $"userdata-{user.UserName}.json", "application/json");
+        return new(bytes, $"userdata-{user.UserName}.json", "application/json");
     }
 }
+
 
