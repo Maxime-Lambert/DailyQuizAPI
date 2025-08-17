@@ -14,7 +14,6 @@ public sealed class GetUserTests(ApiTestFixture fixture) : IClassFixture<ApiTest
     [Fact]
     public async Task UserGet_ReturnsOk()
     {
-        await fixture.ResetDatabaseAsync();
         var unique = Guid.NewGuid().ToString("N")[..8];
         var (token, _) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
         var userId = await fixture.GetUserIdByUsernameAsync($"user_{unique}");

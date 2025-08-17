@@ -14,7 +14,6 @@ public class CreateUserTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixt
     [Fact]
     public async Task CreateUser_Returns201_WhenUserIsValid()
     {
-        await fixture.ResetDatabaseAsync();
         var unique = Guid.NewGuid().ToString("N")[..8];
         CreateUserCommand user = new($"user_{unique}", $"user_{unique}@example.com", "StrongPassword123!", 0);
 

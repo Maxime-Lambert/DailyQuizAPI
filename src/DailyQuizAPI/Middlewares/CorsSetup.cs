@@ -14,7 +14,8 @@ public static class CorsSetup
                 policy.WithOrigins(FrontEndOrigins.SUMOT)
                       .AllowAnyHeader()
                       .AllowAnyMethod()
-                      .AllowCredentials();
+                      .AllowCredentials()
+                      .WithExposedHeaders("WWW-Authenticate");
             });
         });
 

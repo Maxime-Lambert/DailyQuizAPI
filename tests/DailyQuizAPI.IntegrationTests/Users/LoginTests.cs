@@ -15,7 +15,6 @@ public class LoginTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
     [Fact]
     public async Task Login_ReturnsJwtToken_WhenCredentialsAreValid()
     {
-        await fixture.ResetDatabaseAsync();
         var unique = Guid.NewGuid().ToString("N")[..8];
         CreateUserCommand createUserCommand = new($"user_{unique}", $"user_{unique}@example.com", "LoginTest123!", 0);
         var createUserResponse = await Client.PostAsJsonAsync("/users", createUserCommand);

@@ -14,7 +14,6 @@ public sealed class UpdateSumotHistoriesTests(ApiTestFixture fixture) : IClassFi
     [Fact]
     public async Task AddSumotHistories_ReturnsOk()
     {
-        await fixture.ResetDatabaseAsync();
         var unique = Guid.NewGuid().ToString("N")[..8];
         var (token, _) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
         Client.DefaultRequestHeaders.Authorization = new("Bearer", token);

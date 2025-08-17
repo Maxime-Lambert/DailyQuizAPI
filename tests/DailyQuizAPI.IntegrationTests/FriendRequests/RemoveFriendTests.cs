@@ -16,7 +16,6 @@ public sealed class RemoveFriendTests(ApiTestFixture fixture) : IClassFixture<Ap
     [Fact]
     public async Task RemoveFriend_ReturnsOk()
     {
-        await fixture.ResetDatabaseAsync();
         var unique = Guid.NewGuid().ToString("N")[..8];
         var (tokenSender, _) = await fixture.RegisterAndLoginAsync($"sender_{unique}", $"sender_{unique}@example.com", "Test123!");
         var (tokenReceiver, _) = await fixture.RegisterAndLoginAsync($"receiver_{unique}", $"receiver_{unique}@example.com", "Test123!");
