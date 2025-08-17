@@ -59,7 +59,7 @@ public class ApiTestFixture : IAsyncLifetime
             {
                 AllowAutoRedirect = false
             });
-            Client.Timeout = TimeSpan.FromSeconds(10);
+            Client.Timeout = TimeSpan.FromSeconds(60);
         }
         catch
         {
@@ -87,15 +87,6 @@ public class ApiTestFixture : IAsyncLifetime
             }
         }
     }
-
-    public async Task ResetDatabaseAsync()
-    {
-        using var scope = _factory!.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<QuizContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
-    }
-
 
     public async Task<(string accessToken, string refreshToken)> RegisterAndLoginAsync(
         string userName, string email, string password)

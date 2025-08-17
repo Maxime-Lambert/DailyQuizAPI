@@ -15,7 +15,6 @@ public sealed class RefreshTokenTests(ApiTestFixture fixture) : IClassFixture<Ap
     [Fact]
     public async Task Refresh_ReturnsNewAccessToken()
     {
-        await fixture.ResetDatabaseAsync();
         var unique = Guid.NewGuid().ToString("N")[..8];
         var (token, refreshToken) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
 

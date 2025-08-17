@@ -13,7 +13,9 @@ public static class PostgresTestContainer
             .WithUsername("test")
             .WithPassword("test")
             .WithDatabase("dailyquiz_test")
-            .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5432))
+            .WithWaitStrategy(Wait.ForUnixContainer()
+                .UntilPortIsAvailable(5432)
+                .UntilCommandIsCompleted("pg_isready -U test -d dailyquiz_test"))
             .Build();
     }
 }
