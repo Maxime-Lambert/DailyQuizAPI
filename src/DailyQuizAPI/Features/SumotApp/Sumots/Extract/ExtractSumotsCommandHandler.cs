@@ -135,13 +135,17 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
                 Console.WriteLine("pas trouvé pour " + sumot.Word);
         }
         var defs = sumotsFromLexique.Where(s => !string.IsNullOrEmpty(s.DefinitionWord));
+        _cacheService.RemoveByPrefix("sumots:");
+        await _quizContext.Sumots.AddRangeAsync(defs, cancellationToken).ConfigureAwait(false);
+        await _quizContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        foreach (var mot in sumotsFromLexique.Where(s => string.IsNullOrEmpty(s.DefinitionWord)))
+        {
+            Console.WriteLine("pas de définition : " + mot);
+        }
         foreach (var mot in defs.Where(s => INAPPROPRIATE_WORDS.Contains(s.Word)))
         {
             Console.WriteLine("inapproprié : " + mot);
         }
-        _cacheService.RemoveByPrefix("sumots:");
-        await _quizContext.Sumots.AddRangeAsync(defs, cancellationToken).ConfigureAwait(false);
-        await _quizContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private static HashSet<string> GenerateAccentVariants(string word)

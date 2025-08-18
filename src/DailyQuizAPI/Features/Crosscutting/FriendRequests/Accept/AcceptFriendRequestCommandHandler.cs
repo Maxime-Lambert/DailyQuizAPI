@@ -32,9 +32,9 @@ public class AcceptFriendRequestCommandHandler(QuizContext quizContext, ICacheSe
 
         await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
 
-        _cacheService.Remove($"friendRequests:{userId}");
-        _cacheService.Remove($"friendRequests:{command.TargetUserId}");
-        _cacheService.Remove($"sumotHistories:{userId}");
-        _cacheService.Remove($"sumotHistories:{command.TargetUserId}");
+        _cacheService.RemoveByPrefix($"friendRequests:{userId}");
+        _cacheService.RemoveByPrefix($"friendRequests:{command.TargetUserId}");
+        _cacheService.RemoveByPrefix($"sumotHistories:{userId}");
+        _cacheService.RemoveByPrefix($"sumotHistories:{command.TargetUserId}");
     }
 }

@@ -16,7 +16,6 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
         var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)
             ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
 
-        _cacheService.RemoveByPrefix($"sumotHistories:{userId}:");
 
         foreach (var history in command.Histories)
         {
@@ -43,5 +42,6 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
             }
         }
         await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
+        _cacheService.RemoveByPrefix($"sumotHistories:{userId}");
     }
 }
