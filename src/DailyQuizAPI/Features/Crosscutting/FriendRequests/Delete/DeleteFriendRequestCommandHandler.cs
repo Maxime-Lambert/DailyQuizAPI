@@ -28,7 +28,7 @@ public sealed class DeleteFriendRequestCommandHandler(QuizContext quizContext, I
 
         await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
 
-        _cacheService.Remove($"friendRequests:{userId}");
-        _cacheService.Remove($"friendRequests:{targetId}");
+        _cacheService.RemoveByPrefix($"friendRequests:{userId}");
+        _cacheService.RemoveByPrefix($"friendRequests:{targetId}");
     }
 }

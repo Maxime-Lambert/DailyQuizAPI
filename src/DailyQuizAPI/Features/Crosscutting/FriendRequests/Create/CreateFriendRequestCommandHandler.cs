@@ -50,7 +50,7 @@ public class CreateFriendRequestCommandHandler(QuizContext quizContext, ICacheSe
 
         await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
 
-        _cacheService.Remove($"friendRequests:{user.Id}");
-        _cacheService.Remove($"friendRequests:{targetUser.Id}");
+        _cacheService.RemoveByPrefix($"friendRequests:{user.Id}");
+        _cacheService.RemoveByPrefix($"friendRequests:{targetUser.Id}");
     }
 }
