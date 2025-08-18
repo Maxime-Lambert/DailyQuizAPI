@@ -20,7 +20,7 @@ public sealed class GetSumotHistoriesTests(ApiTestFixture fixture) : IClassFixtu
         Client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
         UpdateSumotHistoriesCommand updateSumotHistoriesCommand = new(
-            [new("bleue", ["bleue", "verte"])]
+            [new("bleue", ["bleue", "verte"], true)]
         );
         await Client.PostAsJsonAsync("/sumothistories/updaterange", updateSumotHistoriesCommand);
 

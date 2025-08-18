@@ -2,4 +2,4 @@
 
 namespace DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
 
-public sealed record UpdateSumotHistoryCommand(string Word, Collection<string> Tries);
+public sealed record UpdateSumotHistoryCommand(string Word, Collection<string> Tries, bool Won);

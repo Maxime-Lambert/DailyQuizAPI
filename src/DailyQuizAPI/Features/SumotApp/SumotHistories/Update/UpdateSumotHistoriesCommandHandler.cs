@@ -1,17 +1,14 @@
 ﻿using DailyQuizAPI.Common.Exceptions;
 using DailyQuizAPI.Features.Crosscutting.Caching;
-using DailyQuizAPI.Features.SumotApp.Ranking;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.ObjectModel;
 using System.Security.Claims;
 
 namespace DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
 
-public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, IRankingService rankingService, ICacheService cacheService)
+public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, ICacheService cacheService)
 {
     private readonly QuizContext _quizContext = quizContext;
-    private readonly IRankingService _rankingService = rankingService;
     private readonly ICacheService _cacheService = cacheService;
 
     public async Task Handle(UpdateSumotHistoriesCommand command, ClaimsPrincipal principal, CancellationToken ct)
@@ -29,8 +26,8 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
 
             if (currentHistory != null)
             {
-                currentHistory.ClearTries();
-                currentHistory.AddTries(new Collection<string>([.. history.Tries]));
+                currentHistory.ReplaceTries(history.Tries);
+                currentHistory.Won = history.Won;
                 _quizContext.SumotHistories.Update(currentHistory);
             }
             else
@@ -39,12 +36,12 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
                 {
                     UserId = userId,
                     Word = history.Word,
+                    Won = history.Won,
                 };
-                newHistory.AddTries(new Collection<string>([.. history.Tries]));
+                newHistory.ReplaceTries(history.Tries);
                 await _quizContext.SumotHistories.AddAsync(newHistory, ct).ConfigureAwait(false);
             }
         }
         await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
-        await _rankingService.RecalculateRankingsAsync(userId, ct).ConfigureAwait(false);
     }
 }

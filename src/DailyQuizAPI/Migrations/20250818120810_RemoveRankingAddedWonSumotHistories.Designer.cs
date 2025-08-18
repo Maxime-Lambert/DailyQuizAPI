@@ -3,6 +3,7 @@ using System;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DailyQuizAPI.Migrations
 {
     [DbContext(typeof(QuizContext))]
-    partial class QuizContextModelSnapshot : ModelSnapshot
+    [Migration("20250818120810_RemoveRankingAddedWonSumotHistories")]
+    partial class RemoveRankingAddedWonSumotHistories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -204,33 +207,16 @@ namespace DailyQuizAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("_tries")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("Tries");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("SumotHistories");
-                });
-
-            modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.SumotHistories.SumotTry", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("SumotHistoryId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SumotHistoryId");
-
-                    b.ToTable("SumotTry");
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.Sumots.Sumot", b =>
@@ -437,15 +423,6 @@ namespace DailyQuizAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.SumotHistories.SumotTry", b =>
-                {
-                    b.HasOne("DailyQuizAPI.Features.SumotApp.SumotHistories.SumotHistory", null)
-                        .WithMany("Tries")
-                        .HasForeignKey("SumotHistoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -502,11 +479,6 @@ namespace DailyQuizAPI.Migrations
                     b.Navigation("RefreshTokens");
 
                     b.Navigation("_sumotHistories");
-                });
-
-            modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.SumotHistories.SumotHistory", b =>
-                {
-                    b.Navigation("Tries");
                 });
 #pragma warning restore 612, 618
         }

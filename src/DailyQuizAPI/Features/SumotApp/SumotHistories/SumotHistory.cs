@@ -1,5 +1,4 @@
 ﻿using DailyQuizAPI.Features.Crosscutting.Users;
-using System.Collections.ObjectModel;
 
 namespace DailyQuizAPI.Features.SumotApp.SumotHistories;
 
@@ -9,23 +8,23 @@ public sealed class SumotHistory
 
     public string Word { get; set; } = string.Empty;
 
-    public int? Ranking { get; set; }
-
     public string UserId { get; set; } = string.Empty;
 
     public User User { get; set; } = default!;
 
-    private readonly List<string> _tries = [];
+    public bool Won { get; set; }
 
-    public bool IsFinished => _tries.Count > 0 && _tries[^1] == Word;
+    private readonly List<SumotTry> _tries = [];
 
-    public IReadOnlyCollection<string> Tries => _tries.AsReadOnly();
+    public IReadOnlyCollection<SumotTry> Tries => _tries.AsReadOnly();
 
-    public void AddTries(Collection<string> tries)
+    public void ReplaceTries(IEnumerable<string> newTries)
     {
-        _tries.AddRange(tries);
+        _tries.Clear();
+        foreach (var t in newTries)
+        {
+            _tries.Add(new SumotTry { Value = t });
+        }
     }
-
-    public void ClearTries() => _tries.Clear();
-
 }
+
