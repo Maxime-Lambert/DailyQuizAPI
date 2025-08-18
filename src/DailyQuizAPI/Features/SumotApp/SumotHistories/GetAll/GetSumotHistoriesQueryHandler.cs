@@ -40,15 +40,16 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
                 where friendIds.Contains(history.UserId)
                    && sumot.Day >= query.MinDate
                    && sumot.Day <= query.MaxDate
-                orderby sumot.Day
+                orderby sumot.Day descending
+                orderby history.Tries.Count ascending
+                orderby history.Won descending
                 select new GetSumotHistoriesResponse(
                     history.Id,
                     history.Word,
-                    history.Tries,
-                    history.Ranking,
+                    history.Tries.Select(t => t.Value).ToList(),
+                    history.Won,
                     user.UserName!
-                )
-            ).ToListAsync(ct).ConfigureAwait(false);
+                )).ToListAsync(ct).ConfigureAwait(false);
         }, TimeSpan.FromMinutes(10)).ConfigureAwait(false);
     }
 }

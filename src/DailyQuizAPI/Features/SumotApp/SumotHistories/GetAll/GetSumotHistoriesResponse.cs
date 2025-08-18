@@ -4,6 +4,6 @@ public sealed record GetSumotHistoriesResponse(
     int Id,
     string Word,
     IReadOnlyCollection<string> Tries,
-    int? Ranking,
+    bool Won,
     string UserName
 );

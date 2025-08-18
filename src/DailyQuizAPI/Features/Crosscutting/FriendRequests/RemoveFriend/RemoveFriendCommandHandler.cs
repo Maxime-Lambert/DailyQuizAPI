@@ -1,16 +1,14 @@
 ﻿using DailyQuizAPI.Common.Exceptions;
 using DailyQuizAPI.Features.Crosscutting.Caching;
-using DailyQuizAPI.Features.SumotApp.Ranking;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace DailyQuizAPI.Features.Crosscutting.FriendRequests.RemoveFriend;
 
-public sealed class RemoveFriendCommandHandler(QuizContext quizContext, IRankingService rankingService, ICacheService cacheService)
+public sealed class RemoveFriendCommandHandler(QuizContext quizContext, ICacheService cacheService)
 {
     private readonly QuizContext _quizContext = quizContext;
-    private readonly IRankingService _rankingService = rankingService;
     private readonly ICacheService _cacheService = cacheService;
 
     public async Task HandleAsync(RemoveFriendCommand command, ClaimsPrincipal claims, CancellationToken ct)
@@ -29,9 +27,6 @@ public sealed class RemoveFriendCommandHandler(QuizContext quizContext, IRanking
         _quizContext.FriendRequests.Remove(friendRequest);
 
         await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
-
-        await _rankingService.RecalculateRankingsAsync(friendRequest.RequesterId, ct).ConfigureAwait(false);
-        await _rankingService.RecalculateRankingsAsync(friendRequest.ReceiverId, ct).ConfigureAwait(false);
 
         _cacheService.Remove($"friendRequests:{userId}");
         _cacheService.Remove($"friendRequests:{command.TargetUserId}");
