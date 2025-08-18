@@ -5,7 +5,6 @@ using DailyQuizAPI.Features.SumotApp.SumotHistories;
 using DailyQuizAPI.Features.SumotApp.Sumots;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 namespace DailyQuizAPI.Persistence;
 
@@ -67,14 +66,10 @@ public sealed class QuizContext(DbContextOptions<QuizContext> options) : Identit
 
             entity.Ignore(sh => sh.Tries);
 
-            entity.Ignore(sh => sh.IsFinished);
-
-            entity.Property<List<string>>("_tries")
-                .HasColumnName("Tries")
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null)!)
-                .HasColumnType("jsonb");
+            entity.HasMany(h => h.Tries)
+                .WithOne()
+                .HasForeignKey(t => t.SumotHistoryId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<FriendRequest>(entity =>

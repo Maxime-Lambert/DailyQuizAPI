@@ -9,7 +9,7 @@ namespace DailyQuizAPI.IntegrationTests.AppSettings;
 
 public class AppSettingEndpointTests(ApiTestFixture fixture) : IClassFixture<ApiTestFixture>
 {
-    private readonly HttpClient _client = fixture.Client;
+    private readonly HttpClient _client = fixture.Client!;
 
     [Fact]
     public async Task CreateAppSetting_ReturnsCreated()

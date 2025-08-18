@@ -18,7 +18,7 @@ public sealed class UpdateSumotHistoriesTests(ApiTestFixture fixture) : IClassFi
         var (token, _) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
         Client.DefaultRequestHeaders.Authorization = new("Bearer", token);
         UpdateSumotHistoriesCommand command = new(
-            [new("rouge", ["verts", "bleue", "rouge"])]
+            [new("rouge", ["verts", "bleue", "rouge"], true)]
         );
 
         var response = await Client.PostAsJsonAsync("/sumothistories/updaterange", command);

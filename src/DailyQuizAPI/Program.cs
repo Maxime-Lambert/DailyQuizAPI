@@ -1,7 +1,6 @@
 using DailyQuizAPI.Features;
 using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Features.Crosscutting.Healthchecks;
-using DailyQuizAPI.Features.SumotApp.Ranking;
 using DailyQuizAPI.Jobs;
 using DailyQuizAPI.Logger;
 using DailyQuizAPI.Mail;
@@ -25,7 +24,6 @@ builder.Services
     .AddCustomRateLimiter()
     .AddCustomSwagger()
     .AddPersistence()
-    .AddScoped<IRankingService, RankingService>()
     .AddSingleton<ICacheService, MemoryCacheService>()
     .AddSmtpEmail(builder.Configuration)
     .AddProblemDetails()

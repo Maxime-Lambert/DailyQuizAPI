@@ -17,11 +17,12 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
     private readonly QuizContext _quizContext = quizContext;
     private static readonly List<string> INAPPROPRIATE_WORDS =
     [
-        "ASIATE", "BOCHE", "BOCHES", "CHINO", "CHINOS", "GOGOL", "GOGOLS", "MONGOL", "GOUDOU", "GOUINE",
-        "LOPES", "NABOT", "NABOTS", "NEGRE", "NEGRES", "PEDES", "PEDE", "ROMANO", "SCHLEU", "VIOLS",
-        "SALOPE", "PUTES", "PUTAIN", "VIOLER", "VIOLE", "VIOLES", "VIOLEE", "ENCULE", "ENCULER", "NIQUE",
-        "NIQUER", "TARBA", "TARBAS", "BATARD", "FOUTRE", "CONNE", "CONNES", "CONARD", "MERDE", "MERDES",
-        "CHIANT", "BAISE", "BAISER", "BAISES", "ORGIE", "ORGIES", "SALAUD", "ZOBES"
+        "ASIATE", "BOCHE", "BOCHES", "GOGOL", "GOGOLS", "GOUDOU", "GOUINE", "LOPES", "NABOT", "NABOTS", "NEGRE",
+        "NEGRES", "PEDES", "PEDE", "ROMANO", "SCHLEU", "VIOLS", "SALOPE", "PUTES", "PUTAIN", "VIOLER", "VIOLE",
+        "VIOLES", "VIOLEE", "ENCULE", "ENCULER", "NIQUE", "NIQUER", "TARBA", "TARBAS", "BATARD", "FOUTRE",
+        "CONNE", "CONNES", "CONARD", "MERDE", "MERDES", "BAISE", "BAISER", "BAISES", "ORGIE", "ORGIES",
+        "SALAUD", "ZOBES", "VIOLEZ", "VIOLA", "ENCULA", "ENCULEE", "BAISEE", "ENCULEZ", "BAISEZ", "NIQUA",
+        "NIQUEZ", "CHIER"
     ];
 
     public async Task Handle(CancellationToken cancellationToken)
@@ -32,121 +33,113 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
 
         using var client = new HttpClient();
         client.DefaultRequestHeaders.UserAgent.ParseAdd("SumotBot/1.0 (+https://sumot.app; contact@sumot.app)");
-        foreach (var sumot in sumotsFromLexique)
+        foreach (var sumot in sumotsFromLexique.Where(s => !existingSumots.Any(es => es.Word == s.Word)))
         {
-            var existing = existingSumots.FirstOrDefault(s => s.Word == sumot.Word);
-            if (existing is not null)
-            {
-                sumot.Definition = existing.Definition;
-                sumot.DefinitionWord = existing.DefinitionWord;
-            }
-            else
-            {
 #pragma warning disable CA1308 // Normaliser les chaînes en majuscules
-                var lowerWord = sumot.Word.ToLowerInvariant();
+            var lowerWord = sumot.Word.ToLowerInvariant();
 #pragma warning restore CA1308 // Normaliser les chaînes en majuscules
 
-                var attempts = new HashSet<string>
+            var attempts = new HashSet<string>
+            {
+                lowerWord,
+                sumot.Word,
+                char.ToUpper(lowerWord[0], CultureInfo.InvariantCulture) + lowerWord[1..]
+            };
+
+            var baseForms = new HashSet<string>
+            {
+                lowerWord,
+                char.ToUpper(lowerWord[0], CultureInfo.InvariantCulture) + lowerWord[1..]
+            };
+
+            foreach (var form in baseForms)
+            {
+                foreach (var variant in GenerateAccentVariants(form))
+                    attempts.Add(variant);
+
+                foreach (var variant in GenerateLigatureVariants(form))
+                    attempts.Add(variant);
+            }
+
+            foreach (var attempt in attempts.Where(a => !string.IsNullOrEmpty(a)))
+            {
+                var uri = new Uri($"https://fr.wiktionary.org/w/api.php?action=parse&page={attempt}&format=json&origin=*&prop=text");
+                HttpResponseMessage? response = null;
+                int retryCount = 0;
+
+                while (retryCount < 5)
                 {
-                    lowerWord,
-                    sumot.Word,
-                    char.ToUpper(lowerWord[0], CultureInfo.InvariantCulture) + lowerWord[1..]
-                };
+                    response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
 
-                var baseForms = new HashSet<string>
-                {
-                    lowerWord,
-                    char.ToUpper(lowerWord[0], CultureInfo.InvariantCulture) + lowerWord[1..]
-                };
-
-                foreach (var form in baseForms)
-                {
-                    foreach (var variant in GenerateAccentVariants(form))
-                        attempts.Add(variant);
-
-                    foreach (var variant in GenerateLigatureVariants(form))
-                        attempts.Add(variant);
-                }
-
-                foreach (var attempt in attempts.Where(a => !string.IsNullOrEmpty(a)))
-                {
-                    var uri = new Uri($"https://fr.wiktionary.org/w/api.php?action=parse&page={attempt}&format=json&origin=*&prop=text");
-                    HttpResponseMessage? response = null;
-                    int retryCount = 0;
-
-                    while (retryCount < 5)
+                    if (response.StatusCode == (HttpStatusCode)429)
                     {
-                        response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
-
-                        if (response.StatusCode == (HttpStatusCode)429)
-                        {
-                            var delayMs = (int)Math.Pow(2, retryCount) * 1000;
-                            Console.WriteLine($"[WARN] 429 reçu pour '{attempt}', retry dans {delayMs} ms...");
-                            await Task.Delay(delayMs, cancellationToken).ConfigureAwait(false);
-                            retryCount++;
-                            continue;
-                        }
-
-                        break;
-                    }
-
-                    if (response is null || !response.IsSuccessStatusCode)
-                        continue;
-
-                    var json = await response.Content.ReadFromJsonAsync<JsonDocument>(cancellationToken).ConfigureAwait(false);
-
-                    if (json is null)
-                    {
+                        var delayMs = (int)Math.Pow(2, retryCount) * 1000;
+                        Console.WriteLine($"[WARN] 429 reçu pour '{attempt}', retry dans {delayMs} ms...");
+                        await Task.Delay(delayMs, cancellationToken).ConfigureAwait(false);
+                        retryCount++;
                         continue;
                     }
-
-                    if (json.RootElement.TryGetProperty("error", out var _))
-                    {
-                        continue;
-                    }
-
-                    if (!json.RootElement.TryGetProperty("parse", out var parse))
-                    {
-                        continue;
-                    }
-
-                    if (!parse.TryGetProperty("text", out var text) || !text.TryGetProperty("*", out var htmlElement))
-                    {
-                        continue;
-                    }
-
-                    var html = htmlElement.GetString();
-                    if (string.IsNullOrWhiteSpace(html))
-                    {
-                        continue;
-                    }
-
-                    var doc = new HtmlDocument();
-                    doc.LoadHtml(html);
-
-                    var headings = doc.DocumentNode.SelectNodes("//div[contains(@class,'mw-parser-output')]//h2 | //h3");
-                    if (headings is null)
-                    {
-                        continue;
-                    }
-
-                    var definition = ExtractFirstDefinition(doc);
-                    if (string.IsNullOrWhiteSpace(definition))
-                    {
-                        continue;
-                    }
-                    sumot.Definition = definition;
-                    sumot.DefinitionWord = attempt;
                     break;
                 }
-                if (string.IsNullOrEmpty(sumot.Definition))
-                    Console.WriteLine("pas trouvé pour " + sumot.Word);
+
+                if (response is null || !response.IsSuccessStatusCode)
+                    continue;
+
+                var json = await response.Content.ReadFromJsonAsync<JsonDocument>(cancellationToken).ConfigureAwait(false);
+
+                if (json is null)
+                {
+                    continue;
+                }
+
+                if (json.RootElement.TryGetProperty("error", out var _))
+                {
+                    continue;
+                }
+
+                if (!json.RootElement.TryGetProperty("parse", out var parse))
+                {
+                    continue;
+                }
+
+                if (!parse.TryGetProperty("text", out var text) || !text.TryGetProperty("*", out var htmlElement))
+                {
+                    continue;
+                }
+
+                var html = htmlElement.GetString();
+                if (string.IsNullOrWhiteSpace(html))
+                {
+                    continue;
+                }
+
+                var doc = new HtmlDocument();
+                doc.LoadHtml(html);
+
+                var headings = doc.DocumentNode.SelectNodes("//div[contains(@class,'mw-parser-output')]//h2 | //h3");
+                if (headings is null)
+                {
+                    continue;
+                }
+
+                var definition = ExtractFirstDefinition(doc);
+                if (string.IsNullOrWhiteSpace(definition))
+                {
+                    continue;
+                }
+                sumot.Definition = definition;
+                sumot.DefinitionWord = attempt;
+                break;
             }
+            if (string.IsNullOrEmpty(sumot.Definition))
+                Console.WriteLine("pas trouvé pour " + sumot.Word);
         }
         var defs = sumotsFromLexique.Where(s => !string.IsNullOrEmpty(s.DefinitionWord));
-        _quizContext.Sumots.RemoveRange(existingSumots);
+        foreach (var mot in defs.Where(s => INAPPROPRIATE_WORDS.Contains(s.Word)))
+        {
+            Console.WriteLine("inapproprié : " + mot);
+        }
         _cacheService.RemoveByPrefix("sumots:");
-        await _quizContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         await _quizContext.Sumots.AddRangeAsync(defs, cancellationToken).ConfigureAwait(false);
         await _quizContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -320,7 +313,7 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
         int idxWord = Array.IndexOf(header, "Word");
         int idxLemme = Array.IndexOf(header, "lemme");
         int idxCgram = Array.IndexOf(header, "cgram");
-        int idxFreqLem = Array.IndexOf(header, "freqlemfilms2");
+        int idxFreqFilm = Array.IndexOf(header, "freqfilms2");
 
         var sumotsDict = new Dictionary<string, Sumot>();
 
@@ -330,25 +323,25 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
                 continue;
 
             var cols = line.Split(';');
-            if (cols.Length <= idxFreqLem)
+
+            var wordRaw = cols[idxWord];
+            if (wordRaw.Contains('-', StringComparison.InvariantCulture)
+                || wordRaw.Contains(' ', StringComparison.InvariantCulture))
                 continue;
 
-            var wordRaw = cols[idxWord].Trim();
-            if (wordRaw.Contains('-', StringComparison.InvariantCulture)
-                || wordRaw.Contains(' ', StringComparison.InvariantCulture)
-                || INAPPROPRIATE_WORDS.Contains(wordRaw.ToUpperInvariant()))
-                continue;
+            wordRaw = wordRaw.Trim();
             var lemme = cols[idxLemme].Trim();
             var cgram = cols[idxCgram].Trim();
-            var freqlemfilms2Str = cols[idxFreqLem].Trim().Replace(',', '.');
+            var freqfilms2Str = cols[idxFreqFilm].Trim().Replace(',', '.');
 
-            if (!double.TryParse(freqlemfilms2Str, NumberStyles.Any, CultureInfo.InvariantCulture, out var freqlemfilms2))
-                freqlemfilms2 = 0;
+            if (!double.TryParse(freqfilms2Str, NumberStyles.Any, CultureInfo.InvariantCulture, out var freqfilms2))
+                freqfilms2 = 0;
 
-            // On enlève les accents + majuscules
             var word = RemoveDiacritics(wordRaw).ToUpperInvariant();
+            if (INAPPROPRIATE_WORDS.Contains(wordRaw.ToUpperInvariant()))
+                continue;
 
-            bool isDifficult = freqlemfilms2 < 1 || ((cgram == "VER" || cgram == "AUX") && !string.Equals(wordRaw, lemme, StringComparison.OrdinalIgnoreCase));
+            bool isDifficult = freqfilms2 < 0.5 || ((cgram == "VER" || cgram == "AUX") && !string.Equals(wordRaw, lemme, StringComparison.OrdinalIgnoreCase));
 
             if (sumotsDict.TryGetValue(word, out var existing))
             {
@@ -368,7 +361,7 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
             }
         }
 
-        return sumotsDict.Values.ToList();
+        return [.. sumotsDict.Values];
     }
 
     private static string RemoveDiacritics(string text)
