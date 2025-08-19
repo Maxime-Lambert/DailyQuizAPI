@@ -42,7 +42,8 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                         s.Word ?? string.Empty,
                         s.Day,
                         s.Definition,
-                        s.DefinitionWord))
+                        s.DefinitionWord,
+                        s.IsDifficult))
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
@@ -57,7 +58,8 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                         s.Word ?? string.Empty,
                         s.Day,
                         s.Definition,
-                        s.DefinitionWord))
+                        s.DefinitionWord,
+                        s.IsDifficult))
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
@@ -75,7 +77,8 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                         s.Word ?? string.Empty,
                         s.Day,
                         s.Definition,
-                        s.DefinitionWord))
+                        s.DefinitionWord,
+                        s.IsDifficult))
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
@@ -93,7 +96,8 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                     s.Word ?? string.Empty,
                     s.Day,
                         s.Definition,
-                        s.DefinitionWord))
+                        s.DefinitionWord,
+                        s.IsDifficult))
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
