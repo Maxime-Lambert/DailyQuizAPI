@@ -45,7 +45,9 @@ public sealed class ConfirmEmailCommandHandler(IOptions<AuthenticationOptions> o
             return;
         }
 
-        await _userManager.ConfirmEmailAsync(user, originalToken).ConfigureAwait(false);
+        var result = await _userManager.ConfirmEmailAsync(user, originalToken).ConfigureAwait(false);
+        if (!result.Succeeded)
+            throw new InvalidOperationException("Échec de la confirmation de l'email");
     }
 }
 

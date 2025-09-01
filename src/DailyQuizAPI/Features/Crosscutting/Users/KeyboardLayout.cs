@@ -4,5 +4,6 @@ public enum KeyboardLayout
 {
     AZERTY = 0,
     QWERTY = 1,
-    QWERTZ = 2
+    QWERTZ = 2,
+    Hidden = 3
 }

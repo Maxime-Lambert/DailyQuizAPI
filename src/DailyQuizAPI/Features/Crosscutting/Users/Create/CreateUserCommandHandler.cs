@@ -29,6 +29,12 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
             EmailConfirmed = false
         };
 
+        var usernameExists = await _userManager.FindByNameAsync(request.UserName).ConfigureAwait(false);
+        if (usernameExists != null)
+        {
+            throw new InvalidOperationException($"Le nom d'utilisateur '{request.UserName}' existe déjà");
+        }
+
         if (!string.IsNullOrEmpty(request.Email))
         {
             var existingUser = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
@@ -39,7 +45,11 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
             user.Email = request.Email;
         }
 
-        await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
+        var result = await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Échec de la création de l'utilisateur");
+        }
 
         if (string.IsNullOrEmpty(request.Email))
         {

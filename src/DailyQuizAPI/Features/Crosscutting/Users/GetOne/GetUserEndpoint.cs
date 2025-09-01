@@ -1,6 +1,8 @@
-﻿using DailyQuizAPI.OpenApi;
+﻿using DailyQuizAPI.Middlewares;
+using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using System.Security.Claims;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.GetOne;
 
@@ -16,13 +18,15 @@ public static class GetUserEndpoint
 
     public static void MapGetUserEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet(ROUTE, async ([FromRoute] string id,
-            [FromServices] GetUserQueryHandler handler) =>
+        app.MapGet(ROUTE, async (
+            [FromServices] GetUserQueryHandler handler,
+            ClaimsPrincipal claims) =>
         {
-            var result = await handler.Handle(id).ConfigureAwait(false);
+            var result = await handler.Handle(claims).ConfigureAwait(false);
             return Results.Ok(result);
         })
         .WithName(NAME)
+        .RequireAuthorization(SecurityPolicies.PLAYER)
         .Produces(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status429TooManyRequests)

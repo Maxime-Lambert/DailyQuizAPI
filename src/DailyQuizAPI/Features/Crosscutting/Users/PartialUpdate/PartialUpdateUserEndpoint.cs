@@ -1,6 +1,8 @@
-﻿using DailyQuizAPI.OpenApi;
+﻿using DailyQuizAPI.Middlewares;
+using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using System.Security.Claims;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 
@@ -16,14 +18,16 @@ public static class PartialUpdateUserEndpoint
 
     public static void MapPartialUpdateUserEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPatch(ROUTE, async (string id,
+        app.MapPatch(ROUTE, async (
             [FromBody] PartialUpdateUserCommand command,
-            [FromServices] PartialUpdateUserCommandHandler handler) =>
+            [FromServices] PartialUpdateUserCommandHandler handler,
+            ClaimsPrincipal claims) =>
         {
-            await handler.Handle(command, id).ConfigureAwait(false);
+            await handler.Handle(command, claims).ConfigureAwait(false);
             return Results.NoContent();
         })
         .WithName(NAME)
+        .RequireAuthorization(SecurityPolicies.PLAYER)
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound)
