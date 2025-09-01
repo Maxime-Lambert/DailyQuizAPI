@@ -8,7 +8,7 @@ namespace DailyQuizAPI.Features.Crosscutting.Users.GetOne;
 
 public static class GetUserEndpoint
 {
-    private const string ROUTE = "/users/{id}";
+    private const string ROUTE = "/users";
     private const string NAME = "GetUser";
     private const string TAG = "Users";
     private const string SUMMARY = "Récupérer un utilisateur";
