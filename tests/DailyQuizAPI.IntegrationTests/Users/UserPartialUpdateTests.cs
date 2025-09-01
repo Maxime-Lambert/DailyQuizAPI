@@ -16,7 +16,6 @@ public sealed class UserPartialUpdateTests(ApiTestFixture fixture) : IClassFixtu
     {
         var unique = Guid.NewGuid().ToString("N")[..8];
         var (token, _) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
-        var userId = await fixture.GetUserIdByUsernameAsync($"user_{unique}");
 
         Client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
@@ -33,7 +32,7 @@ public sealed class UserPartialUpdateTests(ApiTestFixture fixture) : IClassFixtu
             0
         );
 
-        var response = await Client.PatchAsJsonAsync($"/users/{userId}", updateCommand);
+        var response = await Client.PatchAsJsonAsync($"/users", updateCommand);
 
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }

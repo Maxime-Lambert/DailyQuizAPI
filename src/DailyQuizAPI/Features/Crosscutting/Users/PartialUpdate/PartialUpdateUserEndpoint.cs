@@ -8,7 +8,7 @@ namespace DailyQuizAPI.Features.Crosscutting.Users.PartialUpdate;
 
 public static class PartialUpdateUserEndpoint
 {
-    private const string ROUTE = "/users/{id}";
+    private const string ROUTE = "/users";
     private const string NAME = "PartialUpdateUser";
     private const string TAG = "Users";
     private const string SUMMARY = "Mettre à jour partiellement un utilisateur";
