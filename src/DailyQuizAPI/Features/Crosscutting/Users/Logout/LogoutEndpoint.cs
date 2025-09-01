@@ -33,7 +33,6 @@ public static class LogoutEndpoint
                     {
                         HttpOnly = true,
                         Secure = true,
-                        SameSite = SameSiteMode.Strict,
                         Expires = DateTimeOffset.UtcNow.AddDays(-1)
                     });
                     await handler.Handle(commandSpa).ConfigureAwait(false);
