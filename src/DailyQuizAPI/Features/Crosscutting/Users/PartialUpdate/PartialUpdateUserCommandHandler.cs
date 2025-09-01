@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Exceptions;
-using DailyQuizAPI.Mail;
+﻿using DailyQuizAPI.Mail;
 using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
@@ -18,10 +17,13 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
     private readonly IEmailService _emailService = emailService;
     private const string ROLLBACK_TOKEN_NAME = "Rollback";
 
-    public async Task Handle(PartialUpdateUserCommand command, string userId)
+    public async Task Handle(PartialUpdateUserCommand command, ClaimsPrincipal userClaims)
     {
+        var userId = userClaims.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new InvalidOperationException("Connexion invalide");
+
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
-            ?? throw new NotFoundException("L'utilisateur n'existe pas");
+            ?? throw new InvalidOperationException("Connexion invalide");
 
         if (!string.IsNullOrWhiteSpace(command.Username))
             user.UserName = command.Username;
@@ -78,7 +80,7 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
         if (!string.IsNullOrWhiteSpace(command.NewPassword))
         {
             if (string.IsNullOrWhiteSpace(command.LastPassword))
-                throw new InvalidOperationException("Pour modifier le mot de passe sans email, il faut l'ancien mot de passe");
+                throw new InvalidOperationException("Pour modifier le mot de passe, il faut l'ancien mot de passe");
             var passwordCheck = await _userManager.CheckPasswordAsync(user, command.LastPassword).ConfigureAwait(false);
             if (!passwordCheck)
                 throw new InvalidOperationException("L'ancien mot de passe est incorrect");

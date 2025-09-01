@@ -19,7 +19,6 @@ public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> option
     public async Task Handle(ForgotPasswordCommand command)
     {
         var user = await _userManager.FindByEmailAsync(command.Email).ConfigureAwait(false);
-
         if (user is null || !user.EmailConfirmed)
         {
             return;

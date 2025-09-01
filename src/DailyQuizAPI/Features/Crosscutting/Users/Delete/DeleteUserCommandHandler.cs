@@ -18,18 +18,12 @@ public sealed class DeleteUserCommandHandler(UserManager<User> userManager, Quiz
             ?? throw new InvalidOperationException("Connexion invalide");
 
         var checkPassword = await _userManager.CheckPasswordAsync(user, command.Password).ConfigureAwait(false);
-
         if (!checkPassword)
         {
-            return;
+            throw new InvalidOperationException("Mot de passe incorrect");
         }
 
-        var result = await _userManager.DeleteAsync(user).ConfigureAwait(false);
-
-        if (!result.Succeeded)
-        {
-            return;
-        }
+        await _userManager.DeleteAsync(user).ConfigureAwait(false);
 
         var friends = _quizContext.FriendRequests
             .Where(fr => fr.ReceiverId == userId || fr.RequesterId == userId);
