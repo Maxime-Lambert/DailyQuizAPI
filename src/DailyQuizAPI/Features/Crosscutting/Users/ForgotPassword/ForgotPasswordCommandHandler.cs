@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
-using DailyQuizAPI.Mail;
+﻿using DailyQuizAPI.Mail;
 using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
@@ -19,19 +18,19 @@ public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> option
 
     public async Task Handle(ForgotPasswordCommand command)
     {
-        var user = await _userManager.FindByEmailAsync(command.Email).ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), command.Email);
+        var user = await _userManager.FindByEmailAsync(command.Email).ConfigureAwait(false);
 
-        if (!user.EmailConfirmed)
+        if (user is null || !user.EmailConfirmed)
         {
-            throw new InvalidOperationException("User email is not confirmed.");
+            return;
         }
 
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
+        var encodedToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(resetToken));
 
         List<Claim> resetClaims = [
             new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim("resettoken", resetToken),
+            new Claim("resettoken", encodedToken),
         ];
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
@@ -46,7 +45,7 @@ public class ForgotPasswordCommandHandler(IOptions<AuthenticationOptions> option
         );
 
         var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-        var resetLink = $"{FrontEndOrigins.SUMOT}/reset-Password?token={Uri.EscapeDataString(jwtToken)}";
+        var resetLink = $"{FrontEndOrigins.SUMOT}/resetpassword?token={Uri.EscapeDataString(jwtToken)}";
 
         await _emailService.SendPasswordResetLinkAsync(user, command.Email, resetLink, command.FrontEndName).ConfigureAwait(false);
     }

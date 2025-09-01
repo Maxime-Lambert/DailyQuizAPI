@@ -64,8 +64,6 @@ public sealed class QuizContext(DbContextOptions<QuizContext> options) : Identit
         {
             entity.HasKey(sh => sh.Id);
 
-            entity.Ignore(sh => sh.Tries);
-
             entity.HasMany(h => h.Tries)
                 .WithOne()
                 .HasForeignKey(t => t.SumotHistoryId)

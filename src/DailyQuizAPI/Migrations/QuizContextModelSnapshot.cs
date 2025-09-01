@@ -33,7 +33,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasKey("Key");
 
-                    b.ToTable("AppSettings");
+                    b.ToTable("AppSettings", (string)null);
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.FriendRequests.FriendRequest", b =>
@@ -68,7 +68,7 @@ namespace DailyQuizAPI.Migrations
                     b.HasIndex("RequesterId", "ReceiverId")
                         .IsUnique();
 
-                    b.ToTable("FriendRequests");
+                    b.ToTable("FriendRequests", (string)null);
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.Users.RefreshToken", b =>
@@ -100,7 +100,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshToken");
+                    b.ToTable("RefreshToken", (string)null);
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.Users.User", b =>
@@ -208,7 +208,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SumotHistories");
+                    b.ToTable("SumotHistories", (string)null);
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.SumotHistories.SumotTry", b =>
@@ -230,7 +230,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasIndex("SumotHistoryId");
 
-                    b.ToTable("SumotTry");
+                    b.ToTable("SumotTry", (string)null);
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.Sumots.Sumot", b =>
@@ -261,7 +261,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sumots");
+                    b.ToTable("Sumots", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

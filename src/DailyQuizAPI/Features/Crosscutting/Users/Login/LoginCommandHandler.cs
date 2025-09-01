@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
-using DailyQuizAPI.Middlewares.Authentication.Options;
+﻿using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -9,7 +8,7 @@ using System.Text;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.Login;
 
-public class LoginCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager)
+public sealed class LoginCommandHandler(IOptions<AuthenticationOptions> options, UserManager<User> userManager)
 {
     private readonly AuthenticationOptions _options = options.Value;
     private readonly UserManager<User> _userManager = userManager;
@@ -17,11 +16,11 @@ public class LoginCommandHandler(IOptions<AuthenticationOptions> options, UserMa
     public async Task<LoginResponse> Handle(LoginCommand request)
     {
         var user = await _userManager.FindByNameAsync(request.UserName).ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), request.UserName);
+            ?? throw new InvalidOperationException("La combinaison nom d'utilisateur / mot de passe est incorrecte");
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password).ConfigureAwait(false);
         if (!isPasswordValid)
-            throw new InvalidOperationException("Mot de passe incorrect.");
+            throw new InvalidOperationException("La combinaison nom d'utilisateur / mot de passe est incorrecte");
 
         var claims = new List<Claim>
         {

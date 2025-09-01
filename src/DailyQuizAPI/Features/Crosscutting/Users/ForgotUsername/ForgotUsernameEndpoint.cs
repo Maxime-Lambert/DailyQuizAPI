@@ -1,24 +1,24 @@
-﻿namespace DailyQuizAPI.Features.Crosscutting.Users.ForgotPassword;
+﻿namespace DailyQuizAPI.Features.Crosscutting.Users.ForgotUsername;
 
 using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
-public static class ForgotPasswordEndpoint
+public static class ForgotUsernameEndpoint
 {
-    private const string ROUTE = "/users/forgotpassword";
-    private const string NAME = "ForgotPassword";
+    private const string ROUTE = "/users/forgotusername";
+    private const string NAME = "ForgotUsername";
     private const string TAG = "Users";
-    private const string SUMMARY = "Pour récupérer un mot de passe";
-    private const string DESCRIPTION = "Envoie un lien qui permet de mettre à jour le mot de passe.";
-    private const string OPERATION_ID = "Users_ForgotPassword";
+    private const string SUMMARY = "Pour récupérer un nom d'utilisateur";
+    private const string DESCRIPTION = "Envoie un mail avec le nom d'utilsateur lié à l'email.";
+    private const string OPERATION_ID = "Users_ForgotUsername";
     private const string SUCCESS_DESCRIPTION = "Mail envoyé.";
 
-    public static void MapForgotPasswordEndpoint(this IEndpointRouteBuilder app)
+    public static void MapForgotUsernameEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost(ROUTE,
-            async ([FromServices] ForgotPasswordCommandHandler handler,
-                    [FromBody] ForgotPasswordCommand command) =>
+            async ([FromServices] ForgotUsernameCommandHandler handler,
+                    [FromBody] ForgotUsernameCommand command) =>
             {
                 await handler.Handle(command).ConfigureAwait(false);
                 return Results.NoContent();

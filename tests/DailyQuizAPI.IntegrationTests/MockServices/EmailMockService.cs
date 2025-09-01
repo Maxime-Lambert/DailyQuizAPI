@@ -11,6 +11,11 @@ public class FakeEmailService : IEmailService
         return Task.CompletedTask;
     }
 
+    public Task SendUsernameAsync(User user, string email, FrontEndNames frontEndName)
+    {
+        return Task.CompletedTask;
+    }
+
     Task IEmailService.SendConfirmationLinkAsync(User user, string email, string confirmationLink, FrontEndNames frontEndName)
     {
         return Task.CompletedTask;

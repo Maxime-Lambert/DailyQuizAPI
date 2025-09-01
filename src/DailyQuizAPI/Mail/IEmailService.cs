@@ -9,6 +9,8 @@ public interface IEmailService
 
     Task SendPasswordResetLinkAsync(User user, string email, string resetLink, FrontEndNames frontEndName);
 
+    Task SendUsernameAsync(User user, string email, FrontEndNames frontEndName);
+
     Task SendRollbackAsync(User user, string email, string rollbackLink, FrontEndNames frontEndName);
 
     Task SendInactivityWarningAsync(User user, string email);

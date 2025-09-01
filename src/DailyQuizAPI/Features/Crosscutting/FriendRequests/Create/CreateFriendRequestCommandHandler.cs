@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
+﻿using DailyQuizAPI.Exceptions;
 using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
 using DailyQuizAPI.Features.Crosscutting.Users;
@@ -16,20 +16,20 @@ public class CreateFriendRequestCommandHandler(QuizContext quizContext, ICacheSe
     public async Task Handle(CreateFriendRequestCommand command, ClaimsPrincipal claims, CancellationToken ct)
     {
         var senderId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
+            ?? throw new InvalidOperationException("Connexion invalide");
 
         var user = await _quizContext.Users
             .FirstOrDefaultAsync(u => u.Id == senderId, ct)
             .ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), senderId);
+            ?? throw new InvalidOperationException("Connexion invalide");
 
         if (user.UserName == command.TargetUsername)
-            throw new InvalidOperationException("You cannot friend yourself.");
+            throw new InvalidOperationException("Impossible de s'ajouter soi-même en ami");
 
         var targetUser = await _quizContext.Users
             .FirstOrDefaultAsync(u => u.UserName == command.TargetUsername, ct)
             .ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), command.TargetUsername);
+            ?? throw new NotFoundException("L'utilisateur ciblé n'existe pas");
 
         var exists = await _quizContext.FriendRequests.AnyAsync(fr =>
             fr.RequesterId == senderId && fr.ReceiverId == targetUser.Id ||
@@ -37,7 +37,7 @@ public class CreateFriendRequestCommandHandler(QuizContext quizContext, ICacheSe
             .ConfigureAwait(false);
 
         if (exists)
-            throw new InvalidOperationException("Friend request already exists.");
+            throw new InvalidOperationException("Cette demande d'ami existe déjà");
 
         var request = new FriendRequest
         {

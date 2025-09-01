@@ -14,16 +14,14 @@ public sealed class SumotHistory
 
     public bool Won { get; set; }
 
-    private readonly List<SumotTry> _tries = [];
-
-    public IReadOnlyCollection<SumotTry> Tries => _tries.AsReadOnly();
+    public ICollection<SumotTry> Tries { get; private set; } = [];
 
     public void ReplaceTries(IEnumerable<string> newTries)
     {
-        _tries.Clear();
+        Tries.Clear();
         foreach (var t in newTries)
         {
-            _tries.Add(new SumotTry { Value = t });
+            Tries.Add(new SumotTry { Value = t });
         }
     }
 }

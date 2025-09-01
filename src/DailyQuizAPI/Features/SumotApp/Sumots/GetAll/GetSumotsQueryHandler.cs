@@ -30,7 +30,7 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                 .ConfigureAwait(false);
 
             if (databaseVersion?.Value is null)
-                throw new InvalidOperationException("DatabaseVersion setting is missing or invalid.");
+                throw new InvalidOperationException("DatabaseVersion n'est pas présent");
 
             var version = int.Parse(databaseVersion.Value, CultureInfo.InvariantCulture);
 
@@ -86,7 +86,7 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
             }
 
             if (request.Day > today)
-                throw new InvalidOperationException("La date demandée est dans le futur.");
+                throw new InvalidOperationException("La date demandée est dans le futur");
 
             var byDay = await _quizContext.Sumots
                 .Where(s => s.Day > request.Day)
