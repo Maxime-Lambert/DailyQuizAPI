@@ -19,10 +19,17 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
     [
         "ASIATE", "BOCHE", "BOCHES", "GOGOL", "GOGOLS", "GOUDOU", "GOUINE", "LOPES", "NABOT", "NABOTS", "NEGRE",
         "NEGRES", "PEDES", "PEDE", "ROMANO", "SCHLEU", "VIOLS", "SALOPE", "PUTES", "PUTAIN", "VIOLER", "VIOLE",
-        "VIOLES", "VIOLEE", "ENCULE", "ENCULER", "NIQUE", "NIQUER", "TARBA", "TARBAS", "BATARD", "FOUTRE",
-        "CONNE", "CONNES", "CONARD", "MERDE", "MERDES", "BAISE", "BAISER", "BAISES", "ORGIE", "ORGIES",
-        "SALAUD", "ZOBES", "VIOLEZ", "VIOLA", "ENCULA", "ENCULEE", "BAISEE", "ENCULEZ", "BAISEZ", "NIQUA",
-        "NIQUEZ", "CHIER"
+        "VIOLES", "VIOLEE", "ENCULE", "ENCULER", "NIQUE", "NIQUER", "TARBA", "TARBAS", "BATARD", "FOUTRE", "CONNE",
+        "CONNES", "CONARD", "MERDE", "MERDES", "BAISE", "BAISER", "BAISES", "ORGIE", "ORGIES", "SALAUD", "ZOBES",
+        "VIOLEZ", "VIOLA", "ENCULA", "ENCULEE", "ENCULEZ", "BAISEZ", "NIQUA", "NIQUEZ", "CHIER", "CHIEUR", "CHBEB",
+        "BIATCH", "BICOT", "BITCH", "BLOKE", "BOUGRE", "BOUKAK", "BRELE", "BRIDEE", "CAFRE", "CASSOS", "CATIN",
+        "CHLEUH", "CONNE", "DUCON", "EMPAFE", "ENCULE", "GARCE", "PUTAIN", "SALAUD", "FIOTTE", "FLOCO", "FRITZ",
+        "FROUZE", "GAUPE", "GIAOUR", "GLANDU", "GNOUL", "GNOULE", "GODDAM", "GODON", "GOGOL", "GOGOLE", "GOUINE",
+        "KAFFIR", "KAWISH", "KIKOO", "KIKOU", "KONAR", "KRAUT", "KROUIA", "MACHO", "MANAWA", "MERCON", "MERDE",
+        "MICHTO", "MINUS", "NDEPSO", "NEGRE", "NEGRO", "NEWFIE", "NIAFOU", "NIAQUE", "NIQUER", "PAKOS", "PAKPAK",
+        "PECQUE", "PISSOU", "PLOUC", "POONER", "PORCAS", "POUNDE", "PUTAIN", "RATEE", "FOUTRE", "SALAUD", "SALOP",
+        "SALOPE", "SCHLEU", "SWERF", "YEULE", "TAGGLE", "BOCHE", "TETEUX", "TEUBE", "TOCARD", "TROON", "TRUIE",
+        "YOUTRE", "ZEMEL"
     ];
 
     public async Task Handle(CancellationToken cancellationToken)
@@ -201,6 +208,7 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
 
         return null;
     }
+
     private static string? GetDefinitionForSection(HtmlDocument doc, string section)
     {
         var output = doc.DocumentNode.SelectSingleNode("//div[contains(@class,'mw-parser-output')]");
@@ -329,8 +337,8 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
             var cols = line.Split(';');
 
             var wordRaw = cols[idxWord];
-            if (wordRaw.Contains('-', StringComparison.InvariantCulture)
-                || wordRaw.Contains(' ', StringComparison.InvariantCulture))
+            if (wordRaw.Contains('-', StringComparison.OrdinalIgnoreCase)
+                || wordRaw.Contains(' ', StringComparison.OrdinalIgnoreCase))
                 continue;
 
             wordRaw = wordRaw.Trim();
@@ -342,7 +350,7 @@ public sealed class ExtractSumotsCommandHandler(QuizContext quizContext, ICacheS
                 freqfilms2 = 0;
 
             var word = RemoveDiacritics(wordRaw).ToUpperInvariant();
-            if (INAPPROPRIATE_WORDS.Contains(wordRaw.ToUpperInvariant()))
+            if (INAPPROPRIATE_WORDS.Contains(word.ToUpperInvariant()))
                 continue;
 
             bool isDifficult = freqfilms2 < 0.5 || ((cgram == "VER" || cgram == "AUX") && !string.Equals(wordRaw, lemme, StringComparison.OrdinalIgnoreCase));

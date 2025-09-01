@@ -1,23 +1,26 @@
-﻿using DailyQuizAPI.Common.Exceptions;
-using Microsoft.AspNetCore.Identity;
+﻿using DailyQuizAPI.Persistence;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.Export;
 
-public sealed class ExportUserDataCommandHandler(UserManager<User> userManager)
+public sealed class ExportUserDataCommandHandler(QuizContext quizContext)
 {
     private static readonly JsonSerializerOptions CACHED_JSON_SERIALIZER_OPTIONS = new() { WriteIndented = true };
-    private readonly UserManager<User> _userManager = userManager;
+    private readonly QuizContext _quizContext = quizContext;
 
     public async Task<ExportUserDataResponse> Handle(ClaimsPrincipal claims)
     {
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
+            ?? throw new InvalidOperationException("Connexion invalide");
 
-        var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
-            ?? throw new InvalidOperationException("L'utilisateur connecté est introuvable.");
+        var user = await _quizContext.Users
+            .Include(u => u.SumotHistories)
+            .FirstOrDefaultAsync(u => u.Id == userId)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException("Connexion invalide");
 
         var exportObject = new
         {

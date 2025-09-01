@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
+﻿using DailyQuizAPI.Exceptions;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,12 +20,12 @@ public sealed class RefreshCommandHandler(UserManager<User> userManager, IOption
         var user = await _userManager.Users
             .Include(u => u.RefreshTokens)
             .FirstOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == command.RefreshToken), cancellationToken: ct).ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), command.RefreshToken);
+            ?? throw new InvalidOperationException("Refresh token invalide");
 
         var token = user.RefreshTokens.SingleOrDefault(t => t.Token == command.RefreshToken);
 
         if (token is null || !token.IsActive)
-            throw new InvalidOperationException("Invalid refresh token.");
+            throw new InvalidOperationException("Refresh token invalide");
 
         token.RevokedAt = DateTime.UtcNow;
 

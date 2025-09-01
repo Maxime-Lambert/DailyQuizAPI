@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
+﻿using DailyQuizAPI.Exceptions;
 using DailyQuizAPI.Mail;
 using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Middlewares.Authentication.Options;
@@ -21,7 +21,7 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
     public async Task Handle(PartialUpdateUserCommand command, string userId)
     {
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), userId);
+            ?? throw new NotFoundException("L'utilisateur n'existe pas");
 
         if (!string.IsNullOrWhiteSpace(command.Username))
             user.UserName = command.Username;
@@ -29,20 +29,21 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        var needsRollbackEmail = false;
+
         if (command.Email is not null)
         {
-            await SendRollbackToken(command, user, creds).ConfigureAwait(false);
-
             user.EmailConfirmed = false;
             user.Email = command.Email;
 
             if (user.Email.Length > 0)
             {
                 var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+                var encodedToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(confirmationToken));
 
                 List<Claim> claims = [
                     new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim("conftoken", confirmationToken),
+                    new Claim("conftoken", encodedToken),
                 ];
 
                 var token = new JwtSecurityToken(
@@ -54,8 +55,9 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
                 );
 
                 var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-                var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirm-email?token={Uri.EscapeDataString(jwtToken)}";
+                var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirmemail?token={Uri.EscapeDataString(jwtToken)}";
                 await _emailService.SendConfirmationLinkAsync(user, user.Email, confirmationLink, command.FrontEndName).ConfigureAwait(false);
+                needsRollbackEmail = true;
             }
         }
 
@@ -76,19 +78,19 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
         if (!string.IsNullOrWhiteSpace(command.NewPassword))
         {
             if (string.IsNullOrWhiteSpace(command.LastPassword))
-                throw new InvalidOperationException("Last password is required to change the password.");
+                throw new InvalidOperationException("Pour modifier le mot de passe sans email, il faut l'ancien mot de passe");
             var passwordCheck = await _userManager.CheckPasswordAsync(user, command.LastPassword).ConfigureAwait(false);
             if (!passwordCheck)
-                throw new InvalidOperationException("Last password is incorrect.");
+                throw new InvalidOperationException("L'ancien mot de passe est incorrect");
             var token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
-            var result = await _userManager.ResetPasswordAsync(user, token, command.NewPassword).ConfigureAwait(false);
-            if (!result.Succeeded)
-                throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
+            await _userManager.ResetPasswordAsync(user, token, command.NewPassword).ConfigureAwait(false);
+            needsRollbackEmail = true;
         }
 
-        var updateResult = await _userManager.UpdateAsync(user).ConfigureAwait(false);
-        if (!updateResult.Succeeded)
-            throw new InvalidOperationException(string.Join(", ", updateResult.Errors.Select(e => e.Description)));
+        if (needsRollbackEmail)
+            await SendRollbackToken(command, user, creds).ConfigureAwait(false);
+
+        await _userManager.UpdateAsync(user).ConfigureAwait(false);
     }
 
     private async Task SendRollbackToken(PartialUpdateUserCommand command, User user, SigningCredentials creds)
@@ -97,12 +99,13 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
             return;
 
         var rollbackToken = await _userManager.GenerateUserTokenAsync(user, ROLLBACK_TOKEN_NAME, ROLLBACK_TOKEN_NAME).ConfigureAwait(false);
+        var encodedToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(rollbackToken));
 
         List<Claim> rollbackclaims = [
             new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName!),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim("rollbackToken", rollbackToken),
+                new Claim("rollbackToken", encodedToken),
             ];
 
         var rollbacktoken = new JwtSecurityToken(

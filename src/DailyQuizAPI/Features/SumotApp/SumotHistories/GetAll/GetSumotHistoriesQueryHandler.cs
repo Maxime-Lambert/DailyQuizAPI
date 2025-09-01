@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
-using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -14,10 +13,10 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
     public async Task<List<GetSumotHistoriesResponse>> Handle(GetSumotHistoriesQuery query, ClaimsPrincipal claims, CancellationToken ct)
     {
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
+            ?? throw new InvalidOperationException("Connexion invalide");
 
         if ((query.MaxDate.ToDateTime(TimeOnly.MinValue) - query.MinDate.ToDateTime(TimeOnly.MinValue)) > TimeSpan.FromDays(30))
-            throw new InvalidOperationException("La plage de dates ne peut pas dépasser 30 jours.");
+            throw new InvalidOperationException("La plage de dates ne peut pas dépasser 30 jours");
 
         var cacheKey = $"sumotHistories:{userId}:minDate:{query.MinDate}:maxDate:{query.MaxDate}";
 
@@ -40,13 +39,15 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
                 where friendIds.Contains(history.UserId)
                    && sumot.Day >= query.MinDate
                    && sumot.Day <= query.MaxDate
-                orderby sumot.Day descending
-                orderby history.Tries.Count ascending
-                orderby history.Won descending
+                orderby sumot.Day descending,
+                 history.Tries.Count ascending,
+                 history.Won descending
                 select new GetSumotHistoriesResponse(
                     history.Id,
                     history.Word,
-                    history.Tries.Select(t => t.Value).ToList(),
+                    history.Tries
+                        .OrderBy(t => t.Id)
+                        .Select(t => t.Value).ToList(),
                     history.Won,
                     user.UserName!
                 )).ToListAsync(ct).ConfigureAwait(false);

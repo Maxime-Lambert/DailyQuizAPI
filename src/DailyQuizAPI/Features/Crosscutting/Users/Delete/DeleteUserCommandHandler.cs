@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
-using DailyQuizAPI.Persistence;
+﻿using DailyQuizAPI.Persistence;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
@@ -13,20 +12,24 @@ public sealed class DeleteUserCommandHandler(UserManager<User> userManager, Quiz
     public async Task Handle(DeleteUserCommand command, ClaimsPrincipal claims)
     {
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
+            ?? throw new InvalidOperationException("Connexion invalide");
 
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
-            ?? throw new InvalidOperationException("L'utilisateur connecté est introuvable.");
+            ?? throw new InvalidOperationException("Connexion invalide");
 
         var checkPassword = await _userManager.CheckPasswordAsync(user, command.Password).ConfigureAwait(false);
 
         if (!checkPassword)
-            throw new InvalidOperationException("Mot de passe incorrect.");
+        {
+            return;
+        }
 
         var result = await _userManager.DeleteAsync(user).ConfigureAwait(false);
 
         if (!result.Succeeded)
-            throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
+        {
+            return;
+        }
 
         var friends = _quizContext.FriendRequests
             .Where(fr => fr.ReceiverId == userId || fr.RequesterId == userId);

@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
-using DailyQuizAPI.Middlewares.Authentication.Options;
+﻿using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -29,29 +28,24 @@ public sealed class ConfirmEmailCommandHandler(IOptions<AuthenticationOptions> o
             IssuerSigningKey = key
         };
 
-        try
+        var validateToken = await handler.ValidateTokenAsync(command.Token, parameters).ConfigureAwait(false);
+        if (!validateToken.IsValid)
+            throw new InvalidOperationException("Token invalide ou expiré");
+
+        var claimsDict = validateToken.Claims.ToDictionary(c => c.Key, c => c.Value.ToString());
+
+        var userId = claimsDict[ClaimTypes.NameIdentifier];
+        var encodedToken = claimsDict["conftoken"];
+        var originalToken = Encoding.UTF8.GetString(Convert.FromBase64String(encodedToken!));
+        var user = await _userManager.FindByIdAsync(userId!).ConfigureAwait(false)
+            ?? throw new InvalidOperationException("Token invalide");
+
+        if (user.EmailConfirmed)
         {
-            var validateToken = await handler.ValidateTokenAsync(command.Token, parameters).ConfigureAwait(false);
-            if (!validateToken.IsValid)
-                throw new InvalidOperationException("Token invalide ou expiré.");
-
-            var claimsDict = validateToken.Claims.ToDictionary(c => c.Key, c => c.Value.ToString());
-
-            var userId = claimsDict[ClaimTypes.NameIdentifier];
-            var token = claimsDict["conftoken"];
-
-            var user = await _userManager.FindByIdAsync(userId!).ConfigureAwait(false)
-                ?? throw new NotFoundException(nameof(User), userId ?? "no user id");
-
-            var result = await _userManager.ConfirmEmailAsync(user, token!).ConfigureAwait(false);
-            if (!result.Succeeded)
-                throw new InvalidOperationException("Échec de la confirmation de l’e-mail.");
-        }
-        catch (Exception)
-        {
-            throw new InvalidOperationException("Token invalide ou expiré.");
+            return;
         }
 
+        await _userManager.ConfirmEmailAsync(user, originalToken).ConfigureAwait(false);
     }
 }
 

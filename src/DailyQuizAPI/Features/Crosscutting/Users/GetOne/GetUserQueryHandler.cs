@@ -1,4 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
+﻿using DailyQuizAPI.Exceptions;
 using Microsoft.AspNetCore.Identity;
 
 namespace DailyQuizAPI.Features.Crosscutting.Users.GetOne;
@@ -10,7 +10,7 @@ public sealed class GetUserQueryHandler(UserManager<User> userManager)
     public async Task<GetUserResponse> Handle(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
-            ?? throw new NotFoundException(nameof(User), userId);
+            ?? throw new NotFoundException("L'utilisateur n'existe pas");
 
         return new GetUserResponse(user.Id,
             user.UserName!,

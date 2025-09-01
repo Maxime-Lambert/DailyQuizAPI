@@ -11,54 +11,44 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
 {
     private readonly SmtpOptions _options = options.Value;
 
-    public async Task SendConfirmationLinkAsync(User user, string email, string confirmationLink, FrontEndNames frontEndName)
+    private static string BuildButton(string url, string text) =>
+        $"""
+        <p style="margin: 20px 0; text-align: center;">
+            <a href="{url}" style="
+                display:inline-block;
+                background:#4F46E5;
+                color:white;
+                padding:12px 24px;
+                text-decoration:none;
+                border-radius:8px;
+                font-weight:bold;
+                font-family:sans-serif;
+            ">
+                {text}
+            </a>
+        </p>
+        """;
+
+    private static string BuildTemplate(string userName, string content, string? footerNote = null)
     {
-        var subject = "Confirmation de ton adresse e-mail";
-        var plainText = $"""
-            Bonjour {user.UserName},
+        var now = DateTime.Now.ToString("f", CultureInfo.GetCultureInfo("fr-FR"));
 
-            Merci d'avoir créé ton compte ALED depuis notre application {Enum.GetName(frontEndName)}.
-            Pour activer ton compte, clique sur le lien suivant :
-
-            {confirmationLink}
-
-            Si tu n’as pas demandé cela, ignore simplement ce message.
-            """;
-
-        var html = $"""
-            <p>Bonjour {user.UserName},</p>
-            <p>Merci d'avoir créé ton compte <strong>ALED</strong> depuis notre application <strong>{Enum.GetName(frontEndName)}</strong>.<br />
-            Pour activer ton compte, clique sur le lien suivant :</p>
-            <p><a href="{confirmationLink}">{confirmationLink}</a></p>
-            <p>Si tu n’as pas demandé cela, ignore simplement ce message.</p>
-            """;
-
-        await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
-    }
-
-    public async Task SendPasswordResetLinkAsync(User user, string email, string resetLink, FrontEndNames frontEndName)
-    {
-        var subject = "Réinitialisation de ton mot de passe";
-        var plainText = $"""
-            Bonjour {user.UserName},
-
-            Tu as initialisé une demande pour réinitialiser ton mot de passe depuis notre application 
-            {Enum.GetName(frontEndName)}, pour cela, clique sur le lien suivant :
-
-            {resetLink}
-
-            Ce lien expirera sous peu.
-            """;
-
-        var html = $"""
-            <p>Bonjour {user.UserName},</p>
-            <p>Tu as initialisé une demande pour réinitialiser ton mot de passe depuis notre application 
-            <strong>{Enum.GetName(frontEndName)}</strong>, pour cela, clique sur le lien suivant :</p>
-            <p><a href="{resetLink}">{resetLink}</a></p>
-            <p>Ce lien expirera sous peu.</p>
-            """;
-
-        await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
+        return $"""
+        <div style="max-width:600px;margin:auto;font-family:sans-serif;line-height:1.6;color:#333;">
+            <div style="background:#4F46E5;color:white;padding:16px;border-radius:8px 8px 0 0;text-align:center;">
+                <h2 style="margin:0;">ALED</h2>
+            </div>
+            <div style="padding:24px;background:white;border:1px solid #ddd;border-top:0;">
+                <p>Salut {userName},</p>  
+                {content}
+                <p style="margin-top:32px;">À bientôt,<br>L’équipe ALED</p>
+            </div>
+            <div style="background:#f9f9f9;color:#666;padding:12px;font-size:12px;border-radius:0 0 8px 8px;text-align:center;">
+                <p>Ce message a été généré automatiquement le {now}.</p>
+                {(footerNote is not null ? $"<p>{footerNote}</p>" : "")}
+            </div>
+        </div>
+        """;
     }
 
     private async Task SendEmailAsync(string target, string subject, string plainTextContent, string? htmlContent = null)
@@ -83,88 +73,135 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
         await smtp.DisconnectAsync(true).ConfigureAwait(false);
     }
 
+    // --- Emails ---
+
+    public async Task SendConfirmationLinkAsync(User user, string email, string confirmationLink, FrontEndNames frontEndName)
+    {
+        var subject = "Confirme ton adresse e-mail";
+        var plainText = $"""
+            Bonjour {user.UserName},
+
+            Merci d'avoir créé ton compte ALED depuis notre application {frontEndName}.
+            Pour activer ton compte, clique sur le lien suivant :
+
+            {confirmationLink}
+
+            Si tu n’as pas demandé cela, ignore simplement ce message.
+            """;
+
+        var html = BuildTemplate(user.UserName!, $"""
+            <p>Merci d'avoir créé ton compte <strong>ALED</strong> depuis notre application <strong>{frontEndName}</strong>.</p>
+            <p>Pour activer ton compte, clique sur le bouton ci-dessous :</p>
+            {BuildButton(confirmationLink, "Activer mon compte")}
+            <p>Si tu n’as pas demandé cela, ignore simplement ce message.</p>
+        """);
+
+        await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
+    }
+
+    public async Task SendPasswordResetLinkAsync(User user, string email, string resetLink, FrontEndNames frontEndName)
+    {
+        var subject = "Réinitialise ton mot de passe";
+        var plainText = $"""
+            Bonjour {user.UserName},
+
+            Tu as demandé à réinitialiser ton mot de passe depuis {frontEndName}.
+            Clique sur le lien suivant pour continuer :
+
+            {resetLink}
+
+            Ce lien expirera sous peu.
+            """;
+
+        var html = BuildTemplate(user.UserName!, $"""
+            <p>Tu as demandé à réinitialiser ton mot de passe depuis <strong>{frontEndName}</strong>.</p>
+            <p>Clique sur le bouton ci-dessous pour continuer :</p>
+            {BuildButton(resetLink, "Réinitialiser mon mot de passe")}
+            <p><small>Ce lien expirera sous peu.</small></p>
+        """);
+
+        await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
+    }
+
+    public async Task SendUsernameAsync(User user, string email, FrontEndNames frontEndName)
+    {
+        var subject = "Ton nom d’utilisateur";
+        var plainText = $"""
+            Bonjour,
+
+            Tu as demandé à récupérer ton nom d'utilisateur depuis {frontEndName}.
+
+            Ton nom d'utilisateur est : {user.UserName}
+            """;
+
+        var html = BuildTemplate(user.UserName!, $"""
+            <p>Tu as demandé à récupérer ton nom d’utilisateur depuis <strong>{frontEndName}</strong>.</p>
+            <p>Ton nom d’utilisateur est : <strong>{user.UserName}</strong></p>
+        """);
+
+        await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
+    }
+
     public async Task SendRollbackAsync(User user, string email, string rollbackLink, FrontEndNames frontEndName)
     {
-        var subject = "Annulation des modifications de ton compte";
-        var now = DateTime.Now.ToString("f", CultureInfo.GetCultureInfo("fr-FR"));
-
+        var subject = "Annule les changements sur ton compte";
         var plainText = $"""
-        Bonjour {user.UserName},
+            Bonjour {user.UserName},
 
-        Des modifications concernant l'e-mail de ton compte ALED ont été effectuées sur ton compte le {now}
-        depuis notre application {frontEndName}.
+            Des modifications de l’e-mail de ton compte ALED ont été effectuées depuis {frontEndName}.
+            Si tu n’es pas à l’origine de ces changements, annule-les ici :
 
-        Si tu n’es pas à l’origine de ces changements, tu peux les annuler en cliquant sur le lien suivant :
+            {rollbackLink}
 
-        {rollbackLink}
+            Sinon, ignore ce message.
+            """;
 
-        Si tu as bien effectué ces modifications, ignore simplement ce message.
-        """;
-
-        var html = $"""
-        <p>Bonjour {user.UserName},</p>
-        <p>Des modifications concernant l'e-mail de ton compte <strong>ALED</strong> ont été effectuées sur ton compte le <strong>{now}</strong>
-        depuis notre application <strong>{frontEndName}</strong>.</p>
-        <p>Si tu n’es pas à l’origine de ces changements, tu peux les annuler en cliquant sur le lien suivant :</p>
-        <p><a href="{rollbackLink}">{rollbackLink}</a></p>
-        <p>Si tu as bien effectué ces modifications, ignore simplement ce message.</p>
-        """;
+        var html = BuildTemplate(user.UserName!, $"""
+            <p>Des modifications de l’adresse e-mail de ton compte <strong>ALED</strong> ont été effectuées depuis <strong>{frontEndName}</strong>.</p>
+            <p>Si tu n’es pas à l’origine de ces changements, tu peux les annuler en cliquant sur le bouton ci-dessous :</p>
+            {BuildButton(rollbackLink, "Annuler les modifications")}
+            <p>Si tu as bien effectué ces changements, ignore ce message.</p>
+        """);
 
         await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
     }
 
     public async Task SendInactivityWarningAsync(User user, string email)
     {
-        var subject = "Votre compte est inactif depuis 18 mois";
-        var now = DateTime.Now.ToString("f", CultureInfo.GetCultureInfo("fr-FR"));
-
+        var subject = "Ton compte est inactif depuis 18 mois";
         var plainText = $"""
-        Bonjour {user.UserName},
+            Bonjour {user.UserName},
 
-        Votre compte ALED est inactif depuis 18 mois.
+            Ton compte ALED est inactif depuis 18 mois.
+            Conformément au RGPD, il sera supprimé dans 6 mois si tu ne te reconnectes pas.
 
-        Conformément au Règlement Général sur la Protection des Données (RGPD), votre compte sera supprimé dans 6 mois si aucune connexion n’est effectuée d’ici là.
+            Connecte-toi avant cette échéance pour conserver ton compte.
+            """;
 
-        Si vous souhaitez conserver votre compte, connectez-vous simplement avant cette échéance.
-
-        Ce message a été généré automatiquement le {now}.
-        """;
-
-        var html = $"""
-        <p>Bonjour {user.UserName},</p>
-        <p>Votre compte <strong>ALED</strong> est inactif depuis 18 mois.</p>
-        <p>Conformément au <strong>RGPD</strong>, votre compte sera supprimé dans 6 mois si aucune connexion n’est effectuée d’ici là.</p>
-        <p>Si vous souhaitez conserver votre compte, connectez-vous simplement avant cette échéance.</p>
-        <p><small>Ce message a été généré automatiquement le {now}.</small></p>
-        """;
+        var html = BuildTemplate(user.UserName!, $"""
+            <p>Ton compte <strong>ALED</strong> est inactif depuis 18 mois.</p>
+            <p>Conformément au <strong>RGPD</strong>, il sera supprimé dans 6 mois si tu ne te reconnectes pas.</p>
+            <p><strong>Connecte-toi avant cette échéance pour conserver ton compte.</strong></p>
+        """);
 
         await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
     }
 
     public async Task SendUserDeletedAsync(User user, string email)
     {
-        var subject = "Suppression de votre compte";
-        var now = DateTime.Now.ToString("f", CultureInfo.GetCultureInfo("fr-FR"));
-
+        var subject = "Ton compte a été supprimé";
         var plainText = $"""
-        Bonjour {user.UserName},
+            Bonjour {user.UserName},
 
-        Votre compte ALED est inactif depuis 2 ans.
+            Ton compte ALED est resté inactif pendant 2 ans et a donc été supprimé, conformément au RGPD.
 
-        Conformément au Règlement Général sur la Protection des Données (RGPD), votre compte et toutes vos données personnelles sont donc supprimés.
+            Toutes tes données personnelles ont été effacées.
+            """;
 
-        Si vous souhaitez conserver votre compte, connectez-vous simplement avant cette échéance.
-
-        Ce message a été généré automatiquement le {now}.
-        """;
-
-        var html = $"""
-        <p>Bonjour {user.UserName},</p>
-        <p>Votre compte <strong>ALED</strong> est inactif depuis 18 mois.</p>
-        <p>Conformément au <strong>RGPD</strong>, votre compte sera supprimé dans 6 mois si aucune connexion n’est effectuée d’ici là.</p>
-        <p>Si vous souhaitez conserver votre compte, connectez-vous simplement avant cette échéance.</p>
-        <p><small>Ce message a été généré automatiquement le {now}.</small></p>
-        """;
+        var html = BuildTemplate(user.UserName!, $"""
+            <p>Ton compte <strong>ALED</strong> est resté inactif pendant <strong>2 ans</strong> et a donc été supprimé, conformément au <strong>RGPD</strong>.</p>
+            <p>Toutes tes données personnelles ont été effacées.</p>
+        """);
 
         await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
     }
@@ -181,12 +218,13 @@ public class SmtpEmailService(IOptions<SmtpOptions> options) : IEmailService
             """;
 
         var html = $"""
-            <p><strong>Nom :</strong> {name}</p>
-            <p><strong>Email :</strong> {fromEmail}</p>
-
-            <p><strong>Message :</strong></p>
-            <p>{message}</p>
-            """;
+            <div style="font-family:sans-serif;max-width:600px;margin:auto;">
+                <p><strong>Nom :</strong> {name}</p>
+                <p><strong>Email :</strong> {fromEmail}</p>
+                <p><strong>Message :</strong></p>
+                <blockquote style="border-left:3px solid #ddd;padding-left:12px;color:#555;">{message}</blockquote>
+            </div>
+        """;
 
         await SendEmailAsync(email, subject, plainText, html).ConfigureAwait(false);
     }
