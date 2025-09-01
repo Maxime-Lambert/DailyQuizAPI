@@ -31,6 +31,7 @@ public static class LoginEndpoint
                     {
                         HttpOnly = true,
                         Secure = true,
+                        SameSite = SameSiteMode.None,
                         Expires = DateTimeOffset.UtcNow.AddDays(7)
                     });
 
