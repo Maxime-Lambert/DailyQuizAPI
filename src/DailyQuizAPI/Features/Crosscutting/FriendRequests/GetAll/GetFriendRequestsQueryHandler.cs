@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
-using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -16,7 +15,7 @@ public sealed class GetFriendRequestsQueryHandler(QuizContext quizContext, ICach
     public async Task<GetFriendRequestsResponse> Handle(ClaimsPrincipal claims, CancellationToken ct)
     {
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
+            ?? throw new InvalidOperationException("Connexion invalide");
 
         var cacheKey = $"friendRequests:{userId}";
 

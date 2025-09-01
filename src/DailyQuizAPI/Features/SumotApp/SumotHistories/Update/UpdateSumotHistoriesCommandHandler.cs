@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Common.Exceptions;
-using DailyQuizAPI.Features.Crosscutting.Caching;
+﻿using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -14,14 +13,14 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
     public async Task Handle(UpdateSumotHistoriesCommand command, ClaimsPrincipal principal, CancellationToken ct)
     {
         var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new NotFoundException("Utilisateur introuvable dans les revendications.");
-
+            ?? throw new InvalidOperationException("Connexion invalide");
 
         foreach (var history in command.Histories)
         {
             var currentHistory = await _quizContext.SumotHistories
-            .FirstOrDefaultAsync(h => h.UserId == userId && h.Word == history.Word, ct)
-            .ConfigureAwait(false);
+                .Include(h => h.Tries)
+                .FirstOrDefaultAsync(h => h.UserId == userId && h.Word == history.Word, ct)
+                .ConfigureAwait(false);
 
             if (currentHistory != null)
             {
@@ -41,7 +40,19 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
                 await _quizContext.SumotHistories.AddAsync(newHistory, ct).ConfigureAwait(false);
             }
         }
+
+        var friendIds = await _quizContext.FriendRequests
+            .Where(fr => fr.IsAccepted && (fr.RequesterId == userId || fr.ReceiverId == userId))
+            .Select(fr => fr.RequesterId == userId ? fr.ReceiverId : fr.RequesterId)
+            .ToListAsync(ct)
+            .ConfigureAwait(false);
+
+        friendIds.Add(userId);
+
         await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
-        _cacheService.RemoveByPrefix($"sumotHistories:{userId}");
+        foreach (var id in friendIds)
+        {
+            _cacheService.RemoveByPrefix($"sumotHistories:{userId}");
+        }
     }
 }

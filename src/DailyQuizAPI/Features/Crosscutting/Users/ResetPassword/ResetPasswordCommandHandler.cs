@@ -1,6 +1,5 @@
 ﻿namespace DailyQuizAPI.Features.Crosscutting.Users.ResetPassword;
 
-using DailyQuizAPI.Common.Exceptions;
 using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -29,32 +28,23 @@ public sealed class ResetPasswordCommandHandler(IOptions<AuthenticationOptions> 
             IssuerSigningKey = key
         };
 
-        try
-        {
-            var validateToken = await handler.ValidateTokenAsync(command.Token, parameters).ConfigureAwait(false);
-            if (!validateToken.IsValid)
-                throw new InvalidOperationException("Token invalide ou expiré.");
+        var validateToken = await handler.ValidateTokenAsync(command.Token, parameters).ConfigureAwait(false);
+        if (!validateToken.IsValid)
+            throw new InvalidOperationException("Token invalide ou expiré");
 
-            var claimsDict = validateToken.Claims.ToDictionary(c => c.Key, c => c.Value.ToString());
+        var claimsDict = validateToken.Claims.ToDictionary(c => c.Key, c => c.Value.ToString());
 
-            var userId = claimsDict[ClaimTypes.NameIdentifier]
-                ?? throw new InvalidOperationException("Token invalide");
+        var userId = claimsDict[ClaimTypes.NameIdentifier]
+            ?? throw new InvalidOperationException("Token invalide");
 
-            var token = claimsDict["resettoken"]
-                ?? throw new InvalidOperationException("Token invalide");
+        var encodedToken = claimsDict["resettoken"]
+            ?? throw new InvalidOperationException("Token invalide");
+        var originalToken = Encoding.UTF8.GetString(Convert.FromBase64String(encodedToken!));
 
-            var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
-                ?? throw new NotFoundException(nameof(User), userId);
+        var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
+            ?? throw new InvalidOperationException("Token invalide");
 
-            var result = await _userManager.ResetPasswordAsync(user, token, command.Password).ConfigureAwait(false);
-            if (!result.Succeeded)
-                throw new InvalidOperationException("Échec de la mise à jour du mot de passe.");
-        }
-        catch (Exception)
-        {
-            throw new InvalidOperationException("Token invalide ou expiré.");
-        }
-
+        await _userManager.ResetPasswordAsync(user, originalToken, command.Password).ConfigureAwait(false);
     }
 }
 

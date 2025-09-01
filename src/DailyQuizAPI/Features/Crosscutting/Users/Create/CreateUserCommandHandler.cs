@@ -18,9 +18,15 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
 
     public async Task Handle(CreateUserCommand request)
     {
+        if (request.UserName.Length > 19)
+        {
+            throw new InvalidOperationException("Les pseudos ne peuvent pas dépasser 15 caractères");
+        }
+
         var user = new User
         {
-            UserName = request.UserName
+            UserName = request.UserName,
+            EmailConfirmed = false
         };
 
         if (!string.IsNullOrEmpty(request.Email))
@@ -28,14 +34,12 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
             var existingUser = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
             if (existingUser != null)
             {
-                throw new InvalidOperationException($"An account with email '{request.Email}' already exists.");
+                throw new InvalidOperationException($"L'adresse email '{request.Email}' existe déjà");
             }
             user.Email = request.Email;
         }
 
-        var result = await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
-        if (!result.Succeeded)
-            throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
+        await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(request.Email))
         {
@@ -43,10 +47,11 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
         }
 
         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+        var encodedToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(confirmationToken));
 
         List<Claim> claims = [
             new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim("conftoken", confirmationToken),
+            new Claim("conftoken", encodedToken),
         ];
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
@@ -61,7 +66,7 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
         );
 
         var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-        var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirm-email?token={Uri.EscapeDataString(jwtToken)}";
+        var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirmemail?token={Uri.EscapeDataString(jwtToken)}";
         await _emailService.SendConfirmationLinkAsync(user, request.Email, confirmationLink, request.FrontEndName).ConfigureAwait(false);
     }
 }

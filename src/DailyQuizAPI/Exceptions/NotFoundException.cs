@@ -1,4 +1,4 @@
-﻿namespace DailyQuizAPI.Common.Exceptions;
+﻿namespace DailyQuizAPI.Exceptions;
 
 public sealed class NotFoundException : Exception
 {
@@ -8,11 +8,6 @@ public sealed class NotFoundException : Exception
 
     public NotFoundException(string message)
         : base(message)
-    {
-    }
-
-    public NotFoundException(string name, object key)
-        : base($"L'entité {name} ({key}) n'a pas pu être trouvée")
     {
     }
 
