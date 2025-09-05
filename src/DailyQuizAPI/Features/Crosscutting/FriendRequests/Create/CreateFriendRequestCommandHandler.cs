@@ -1,12 +1,10 @@
 ﻿using DailyQuizAPI.Exceptions;
 using DailyQuizAPI.Features.Crosscutting.Caching;
-using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
-using DailyQuizAPI.Features.Crosscutting.Users;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace DailyQuizAPI.Features.Crosscutting.FriendRequests.Send;
+namespace DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
 
 public class CreateFriendRequestCommandHandler(QuizContext quizContext, ICacheService cacheService)
 {
@@ -23,11 +21,13 @@ public class CreateFriendRequestCommandHandler(QuizContext quizContext, ICacheSe
             .ConfigureAwait(false)
             ?? throw new InvalidOperationException("Connexion invalide");
 
-        if (user.UserName == command.TargetUsername)
+        var normalizedTargetUserName = command.TargetUserName.ToUpperInvariant();
+
+        if (user.NormalizedUserName == normalizedTargetUserName)
             throw new InvalidOperationException("Impossible de s'ajouter soi-même en ami");
 
         var targetUser = await _quizContext.Users
-            .FirstOrDefaultAsync(u => u.UserName == command.TargetUsername, ct)
+            .FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedTargetUserName, ct)
             .ConfigureAwait(false)
             ?? throw new NotFoundException("L'utilisateur ciblé n'existe pas");
 

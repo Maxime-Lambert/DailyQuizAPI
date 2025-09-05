@@ -26,8 +26,9 @@ public sealed class QuizContext(DbContextOptions<QuizContext> options) : Identit
         {
             entity.HasKey(s => s.Id);
             entity.Property(s => s.Word).IsRequired();
+            entity.HasIndex(s => s.Word);
+            entity.HasIndex(s => s.Day);
         });
-
 
         builder.Entity<AppSetting>(entity =>
         {
@@ -37,13 +38,10 @@ public sealed class QuizContext(DbContextOptions<QuizContext> options) : Identit
 
         builder.Entity<User>(entity =>
         {
-            entity.HasMany<SumotHistory>("_sumotHistories")
-                .WithOne(sh => sh.User)
-                .HasForeignKey(sh => sh.UserId)
-                .IsRequired()
+            entity.HasMany(h => h.SumotHistories)
+                .WithOne(h => h.User)
+                .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            entity.Ignore(h => h.SumotHistories);
 
             entity.HasIndex(u => u.UserName)
                 .IsUnique();
@@ -68,6 +66,8 @@ public sealed class QuizContext(DbContextOptions<QuizContext> options) : Identit
                 .WithOne()
                 .HasForeignKey(t => t.SumotHistoryId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(h => h.Word);
         });
 
         builder.Entity<FriendRequest>(entity =>
@@ -85,6 +85,8 @@ public sealed class QuizContext(DbContextOptions<QuizContext> options) : Identit
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(fr => new { fr.RequesterId, fr.ReceiverId }).IsUnique();
+            entity.HasIndex(fr => fr.RequesterId);
+            entity.HasIndex(fr => fr.ReceiverId);
         });
 
     }

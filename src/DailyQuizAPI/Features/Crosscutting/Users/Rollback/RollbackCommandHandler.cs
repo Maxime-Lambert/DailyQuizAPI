@@ -37,7 +37,7 @@ public sealed class RollbackCommandHandler(IOptions<AuthenticationOptions> optio
 
         var userId = claimsDict[ClaimTypes.NameIdentifier]
             ?? throw new InvalidOperationException("Token invalide");
-        var username = claimsDict[JwtRegisteredClaimNames.Name]
+        var userName = claimsDict[JwtRegisteredClaimNames.Name]
             ?? throw new InvalidOperationException("Token invalide");
         var email = claimsDict[ClaimTypes.Email]
             ?? throw new InvalidOperationException("Token invalide");
@@ -53,7 +53,7 @@ public sealed class RollbackCommandHandler(IOptions<AuthenticationOptions> optio
         if (!result)
             throw new InvalidOperationException("Token invalide");
 
-        user.UserName = username;
+        user.UserName = userName;
         user.Email = email;
         user.EmailConfirmed = true;
         user.RefreshTokens.Clear();

@@ -21,7 +21,7 @@ public sealed class UserPartialUpdateTests(ApiTestFixture fixture) : IClassFixtu
 
         var newUnique = Guid.NewGuid().ToString("N")[..8];
         PartialUpdateUserCommand updateCommand = new(
-            Username: $"user_{newUnique}",
+            UserName: $"user_{newUnique}",
             Email: $"user_{newUnique}@example.com",
             LastPassword: "Test123!",
             NewPassword: "NewPassword123!",

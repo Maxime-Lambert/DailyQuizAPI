@@ -52,7 +52,7 @@ public sealed class GetFriendRequestsQueryHandler(QuizContext quizContext, ICach
                 new(accepted),
                 new(pending)
             );
-        }, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
+        }, TimeSpan.FromMinutes(60)).ConfigureAwait(false);
     }
 }
 

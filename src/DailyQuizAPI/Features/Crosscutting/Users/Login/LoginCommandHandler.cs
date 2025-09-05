@@ -52,7 +52,7 @@ public sealed class LoginCommandHandler(IOptions<AuthenticationOptions> options,
         await _userManager.UpdateAsync(user).ConfigureAwait(false);
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-        return new LoginResponse(jwt, refreshToken.Token);
+        return new LoginResponse(jwt, refreshToken.Token, refreshToken.ExpiresAt);
     }
 }
 

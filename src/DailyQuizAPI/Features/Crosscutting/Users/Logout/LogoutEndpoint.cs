@@ -1,4 +1,5 @@
 ﻿using DailyQuizAPI.Features.Crosscutting.Users.Login;
+using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -46,6 +47,7 @@ public static class LogoutEndpoint
                 }
             })
         .WithName(NAME)
+        .RequireAuthorization(SecurityPolicies.PLAYER)
         .Produces<LoginResponse>(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status429TooManyRequests)

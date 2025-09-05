@@ -1,11 +1,10 @@
-﻿using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
-using DailyQuizAPI.Middlewares;
+﻿using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Security.Claims;
 
-namespace DailyQuizAPI.Features.Crosscutting.FriendRequests.Send;
+namespace DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
 
 public static class CreateFriendRequestEndpoint
 {

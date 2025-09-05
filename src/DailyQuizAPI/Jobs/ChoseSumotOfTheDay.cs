@@ -1,4 +1,5 @@
-﻿using DailyQuizAPI.Features.SumotApp.Sumots;
+﻿using DailyQuizAPI.Features.Crosscutting.Caching;
+using DailyQuizAPI.Features.SumotApp.Sumots;
 using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.Persistence;
 using Hangfire;
@@ -8,17 +9,21 @@ using System.Security.Cryptography;
 namespace DailyQuizAPI.Jobs;
 
 [AutomaticRetry(Attempts = 6, DelaysInSeconds = new[] { 600, 600, 600, 600, 600, 600 })]
-public sealed class ChoseSumotOfTheDay(QuizContext db, ILogger<ChoseSumotOfTheDay> logger)
+public sealed class ChoseSumotOfTheDay(QuizContext db, ILogger<ChoseSumotOfTheDay> logger, ICacheService cacheService)
 {
+    private readonly QuizContext _db = db;
+    private readonly ILogger<ChoseSumotOfTheDay> _logger = logger;
+    private readonly ICacheService _cacheService = cacheService;
+
     public async Task RunAsync(CancellationToken ct = default)
     {
         var parisTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
         var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, parisTz));
 
-        if (await db.Sumots.AnyAsync(s => s.Day == today, ct).ConfigureAwait(false))
+        if (await _db.Sumots.AnyAsync(s => s.Day == today, ct).ConfigureAwait(false))
             return;
 
-        var AreTwoLastSumotsLengthFive = await db.Sumots
+        var AreTwoLastSumotsLengthFive = await _db.Sumots
             .Where(s => s.Day != null)
             .OrderByDescending(s => s.Day)
             .Take(2)
@@ -31,7 +36,7 @@ public sealed class ChoseSumotOfTheDay(QuizContext db, ILogger<ChoseSumotOfTheDa
 
         if (candidate is null)
         {
-            await db.Sumots.Where(s => s.Word.Length == sumotLength)
+            await _db.Sumots.Where(s => s.Word.Length == sumotLength)
                 .ExecuteUpdateAsync(
                 setters => setters.SetProperty(s => s.Day, (DateOnly?)null),
                 ct
@@ -41,20 +46,21 @@ public sealed class ChoseSumotOfTheDay(QuizContext db, ILogger<ChoseSumotOfTheDa
 
             if (candidate is null)
             {
-                logger.LogNoSumotPossible(today);
+                _logger.LogNoSumotPossible(today);
                 return;
             }
         }
 
         candidate.Day = today;
-        await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        await _db.SaveChangesAsync(ct).ConfigureAwait(false);
+        _cacheService.RemoveByPrefix("sumots:");
 
-        logger.LogSumotChosen(candidate.Word, today);
+        _logger.LogSumotChosen(candidate.Word, today);
     }
 
     private async Task<Sumot?> PickRandomCandidateAsync(int sumotLength, CancellationToken ct)
     {
-        var count = await db.Sumots
+        var count = await _db.Sumots
             .Where(s => s.Day == null && !s.IsDifficult && s.Word.Length == sumotLength)
             .CountAsync(ct)
             .ConfigureAwait(false);
@@ -63,7 +69,7 @@ public sealed class ChoseSumotOfTheDay(QuizContext db, ILogger<ChoseSumotOfTheDa
 
         int randomIndex = RandomNumberGenerator.GetInt32(count);
 
-        return await db.Sumots
+        return await _db.Sumots
             .Where(s => s.Day == null && !s.IsDifficult && s.Word.Length == sumotLength)
             .Skip(randomIndex)
             .FirstOrDefaultAsync(ct)
