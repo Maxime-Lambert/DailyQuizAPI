@@ -28,12 +28,14 @@ builder.Services
     .AddSmtpEmail(builder.Configuration)
     .AddProblemDetails()
     .AddMemoryCache()
+    .AddBrotliCompression()
     .AddCustomMiddlewares();
 
 var app = builder.Build();
 
 app.UseCustomCors();
 app.UseHttpsRedirection();
+app.UseBrotliCompression();
 app.UseCustomMiddlewares();
 app.UseStaticFiles();
 app.UseRouting();

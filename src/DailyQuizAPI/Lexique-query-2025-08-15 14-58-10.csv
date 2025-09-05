@@ -2878,7 +2878,6 @@ hertz;ERts;hertz;NOM;0,09;0,09;1;5;5;3;1;NOM
 heure;9R;heure;NOM;709,79;415,4;1;5;5;2;1;NOM
 heurs;9R;heur;NOM;0,28;0,01;0;5;0;2;1;NOM
 heurt;9R;heurt;NOM;0,49;0,29;1;5;5;2;1;NOM
-hi-fi;ifi;hi-fi;NOM;0,87;0,87;1;5;4;3;2;NOM
 hibou;ibu;hibou;NOM;5,01;4,08;1;5;4;3;2;NOM
 hindi;indi;hindi;NOM;0,14;0,14;1;5;5;4;2;NOM
 hippo;ipo;hippo;NOM;0,41;0,41;1;5;5;3;2;NOM
@@ -3205,7 +3204,6 @@ juste;Zyst;juste;NOM;18,73;17,36;1;5;5;4;1;ADJ,ADV,NOM
 juter;Zyte;juter;VER;0,03;0,03;1;5;5;4;2;VER
 jèzes;ZEz;jèze;NOM;0;0;0;5;0;3;1;NOM
 jésus;Zezy;jésus;NOM;8,19;8,19;1;5;5;4;2;NOM
-k-way;kawe;k-way;NOM;0,06;0,06;1;5;3;4;2;NOM
 kacha;kaSa;kacha;NOM;0;0;1;5;5;4;2;NOM
 kafir;kafiR;kafir;NOM;0,05;0,05;1;5;4;4;2;NOM
 kakis;kaki;kaki;NOM;0,68;0,29;0;5;0;4;2;NOM
@@ -6812,13 +6810,11 @@ yacks;jak;yack;NOM;3,15;2,69;0;5;0;3;1;NOM
 yalis;jali;yali;NOM;0;0;0;5;0;3;2;NOM
 yards;jaR;yard;NOM;2,1;1,64;0;5;0;3;1;NOM
 yeuse;j2z;yeuse;NOM;0,12;0,02;1;5;3;2;1;NOM
-yo-yo;jojo;yo-yo;NOM;1,03;1,03;1;5;3;3;2;NOM
 yogis;jogi;yogi;NOM;0,57;0,05;0;5;0;4;2;NOM
 youpi;jupi;youpi;ONO;1,12;1,12;1;5;5;4;2;ONO
 yoyos;jojo;yoyo;NOM;0,64;0,05;0;5;0;3;2;NOM
 yuans;jyan;yuan;NOM;4,69;4,19;0;5;0;3;2;NOM
 yucca;juka;yucca;NOM;0,31;0,24;1;5;3;3;2;NOM
-yé-yé;jeje;yé-yé;NOM;0;0;1;5;3;3;2;NOM
 yéyés;jeje;yéyé;NOM;0,41;0;0;5;0;3;2;NOM
 zanzi;z@zi;zanzi;NOM;0,02;0,02;1;5;5;4;2;NOM
 zappe;zap;zapper;VER;2,73;1,04;0;5;0;0;1;VER
@@ -6853,7 +6849,6 @@ zébus;zeby;zébu;NOM;0,06;0;0;5;0;4;2;NOM
 zélée;zele;zélé;ADJ;1,19;0,11;0;5;0;4;2;ADJ
 zélés;zele;zélé;ADJ;1,19;0,39;0;5;0;4;2;ADJ
 zéros;zeRo;zéro;NOM;32,85;2,41;0;5;0;3;2;NOM
-à-pic;apik;à-pic;NOM;0;0;1;5;4;4;2;NOM
 âcres;akR;âcre;ADJ;0,47;0,01;0;5;0;3;1;ADJ
 âgées;aZe;âgé;ADJ;19,81;1,91;0;5;0;3;2;ADJ
 ânier;anje;ânier;NOM;0;0;1;5;3;4;2;NOM
@@ -7673,7 +7668,6 @@ anodin;anod5;anodin;ADJ;1,03;0,38;1;6;6;4;3;ADJ
 anorak;anoRak;anorak;NOM;0,49;0,25;1;6;5;5;3;NOM
 anoxie;anOksi;anoxie;NOM;0,09;0,09;1;6;4;4;3;NOM
 ansées;@se;ansé;ADJ;0,02;0,01;0;6;0;0;2;ADJ
-anti-g;@tiZe;anti-g;ADJ;0,01;0,01;1;6;6;5;3;ADJ
 antres;@tR;antre;NOM;2,96;0,01;0;6;0;3;1;NOM
 anuité;an8ite;anuiter;VER;0;0;0;6;0;0;3;VER
 anémie;anemi;anémie;NOM;1,31;1,31;1;6;6;5;3;NOM,VER
@@ -8289,7 +8283,6 @@ bayons;baj§;bayer;VER;0,05;0,01;0;6;0;4;2;VER
 bayous;baju;bayou;NOM;0,81;0,05;0;6;0;4;2;NOM
 bazard;bazaR;bazard;NOM;0,2;0,2;1;6;6;5;2;NOM
 bazars;bazaR;bazar;NOM;8,36;0,17;0;6;0;5;2;NOM
-be-bop;bibOp;be-bop;NOM;0,31;0,31;1;6;3;4;2;NOM
 beagle;big9l;beagle;NOM;0,15;0,08;1;6;4;4;2;NOM
 beaufs;bof;beauf;NOM;1,07;0,11;0;6;0;3;1;NOM
 beauté;bote;beauté;NOM;72,56;68,57;1;6;5;4;2;NOM
@@ -9584,7 +9577,6 @@ chômer;Some;chômer;VER;1,05;0,37;1;6;6;4;2;VER
 chômez;Some;chômer;VER;1,05;0,12;0;6;0;4;2;VER
 chômée;Some;chômé;ADJ;0,02;0,01;0;6;0;4;2;ADJ
 chômés;Some;chômé;ADJ;0,02;0;0;6;0;4;2;ADJ
-ci-gît;siZi;ci-gît;ADV;0,7;0,7;1;6;4;4;2;ADV
 cibler;sible;cibler;VER;1,9;0,76;1;6;6;5;2;VER
 cibles;sibl;cible;NOM;33,55;4,86;0;6;0;4;1;NOM
 ciblez;sible;cibler;VER;1,9;0,12;0;6;0;5;2;VER
@@ -11095,7 +11087,6 @@ dîneur;din9R;dîneur;NOM;0,01;0,01;1;6;5;4;2;NOM
 dîniez;dinje;dîner;VER;79,3;0,2;0;6;0;0;2;VER
 dînons;din§;dîner;VER;79,3;1,95;0;6;0;0;2;VER
 dûment;dym@;dûment;ADV;0,55;0,55;1;6;3;3;2;ADV
-e-mail;imEjl;e-mail;NOM;6,47;4,16;1;6;3;4;2;NOM
 eczéma;Egzema;eczéma;NOM;0,64;0,64;1;6;6;6;3;NOM
 efface;efas;effacer;VER;29,02;6,19;0;6;0;0;2;VER
 effacé;efase;effacer;VER;29,02;5,24;0;6;6;5;3;VER,ADJ
@@ -11171,8 +11162,6 @@ empâta;@pata;empâter;VER;0,11;0;0;6;0;0;3;VER
 empâte;@pat;empâter;VER;0,11;0,06;0;6;0;0;2;VER
 empâté;@pate;empâter;VER;0,11;0,01;0;6;6;5;3;VER,ADJ
 empâté;@pate;empâté;ADJ;0,04;0,01;1;6;6;5;3;VER,ADJ
-en-but;@byt;en-but;NOM;0,32;0,32;1;6;4;4;2;NOM
-en-cas;@ka;en-cas;NOM;1,44;1,44;1;6;5;3;2;NOM
 encagé;@kaZe;encager;VER;0,13;0,11;0;6;6;4;3;VER,ADJ
 encagé;@kaZe;encagé;ADJ;0,02;0,02;1;6;6;4;3;VER,ADJ
 encart;@kaR;encart;NOM;0,09;0,05;1;6;6;4;2;NOM
@@ -11383,7 +11372,6 @@ essuie;Es8i;essuie;NOM;0,25;0,12;1;6;6;4;2;NOM,VER
 essuie;Es8i;essuyer;VER;11,82;3,98;0;6;6;4;2;NOM,VER
 essuya;Es8ija;essuyer;VER;11,82;0,14;0;6;0;0;3;VER
 essuyé;es8ije;essuyer;VER;11,82;1,68;0;6;0;6;3;VER
-est-ce;Es°;est-ce;ADV;0,05;0,05;1;6;6;3;2;ADV
 estima;Estima;estimer;VER;21,41;0,14;0;6;0;0;3;VER
 estime;Estim;estime;NOM;5,49;5,35;1;6;6;5;2;NOM,VER
 estime;Estim;estimer;VER;21,41;8,02;0;6;6;5;2;NOM,VER
@@ -11398,9 +11386,6 @@ eurent;yR;avoir;VER;13572,4;1,42;0;6;0;2;1;AUX,VER
 eurêka;2REka;eurêka;ONO;0;0;1;6;4;3;3;ONO
 eusses;ys;avoir;AUX;18559,22;0;0;6;0;2;1;AUX,VER
 eusses;ys;avoir;VER;13572,4;0;0;6;0;2;1;AUX,VER
-ex-kid;Ekskid;ex-kid;NOM;0;0;1;6;4;6;2;NOM
-ex-lit;Eksli;ex-lit;NOM;0;0;1;6;6;5;2;NOM
-ex-roi;EksRwa;ex-roi;NOM;0,01;0,01;1;6;5;5;2;NOM
 exacte;Egzakt;exact;ADJ;86,8;7,55;0;6;0;6;2;ADJ
 exacts;Egzakt;exact;ADJ;86,8;1,51;0;6;0;6;2;ADJ
 exalta;Egzalta;exalter;VER;1,86;0;0;6;0;0;3;VER
@@ -13008,8 +12993,6 @@ heurte;9Rt;heurter;VER;9,79;1,15;0;6;0;0;1;VER
 heurts;9R;heurt;NOM;0,49;0,2;0;6;0;2;1;NOM
 heurté;9Rte;heurter;VER;9,79;4,92;0;6;6;4;2;VER,ADJ
 heurté;9Rte;heurté;ADJ;0,05;0,01;1;6;6;4;2;VER,ADJ
-hi-han;i@;hi-han;NOM;0,04;0,04;1;6;4;2;2;NOM,ONO
-hi-han;i@;hi-han;ONO;0,2;0,2;1;6;4;2;2;NOM,ONO
 hiatus;jatys;hiatus;NOM;0,04;0,04;1;6;5;4;2;NOM
 hiboux;ibu;hibou;NOM;5,01;0,94;0;6;0;3;2;NOM
 hideur;id9R;hideur;NOM;0;0;1;6;6;3;2;NOM
@@ -13616,7 +13599,6 @@ kystes;kist;kyste;NOM;0,57;0,06;0;6;0;4;1;NOM
 kébour;kebuR;kébour;NOM;0;0;1;6;3;4;2;NOM
 kéfirs;kefiR;kéfir;NOM;0;0;0;6;0;4;2;NOM
 kényan;kenj@;kényan;ADJ;0,02;0,02;1;6;3;3;2;ADJ
-l-dopa;Eldopa;l-dopa;NOM;0,05;0,05;1;6;2;5;3;NOM
 labbes;lab;labbe;NOM;0;0;0;6;0;3;1;NOM
 labels;labEl;label;NOM;1,59;0,29;0;6;0;4;2;NOM
 labeur;lab9R;labeur;NOM;3,73;3,71;1;6;5;4;2;NOM
@@ -14084,7 +14066,6 @@ lycées;lise;lycée;NOM;42,56;0,59;0;6;0;4;2;NOM
 lymphe;l5f;lymphe;NOM;0,2;0,2;1;6;6;3;1;NOM
 lynché;l5Se;lyncher;VER;1,04;0,33;0;6;0;4;2;VER
 lysine;lizin;lysine;NOM;0,04;0,04;1;6;5;5;2;NOM
-là-bas;laba;là-bas;ADV;263,15;263,15;1;6;4;4;2;ADV
 lâchai;laSE;lâcher;VER;171,08;0,03;0;6;0;0;2;VER
 lâcher;laSe;lâcher;NOM;0,95;0,94;1;6;6;4;2;NOM,VER
 lâcher;laSe;lâcher;VER;171,08;19,41;1;6;6;4;2;NOM,VER
@@ -14470,13 +14451,6 @@ meutes;m2t;meute;NOM;2,45;0,2;0;6;0;3;1;NOM
 mexico;mEksiko;mexico;ADV;0,54;0,54;1;6;6;7;3;ADV
 mezcal;mezkal;mezcal;NOM;0,13;0,13;1;6;4;4;2;NOM
 mezzos;mEdzo;mezzo;NOM;0,03;0;0;6;0;5;2;NOM
-mi-bas;miba;mi-bas;NOM;0,14;0,14;1;6;6;4;2;NOM
-mi-mai;mimE;mi-mai;NOM;0,01;0,01;1;6;6;4;2;NOM
-mi-mao;mimao;mi-mao;NOM;0;0;1;6;6;5;3;NOM
-mi-mot;mimo;mi-mot;NOM;0,03;0,03;1;6;6;4;2;NOM
-mi-sel;misEl;mi-sel;NOM;0;0;1;6;6;5;2;NOM
-mi-vie;mivi;mi-vie;NOM;0;0;1;6;5;4;2;NOM
-mi-été;miete;mi-été;NOM;0;0;1;6;6;5;3;NOM
 miaous;mjau;miaou;NOM;0,46;0,01;0;6;0;4;2;NOM
 miasme;mjasm;miasme;NOM;0,06;0,01;1;6;4;5;1;NOM
 miaula;mjola;miauler;VER;1,15;0;0;6;0;0;2;VER
@@ -15289,7 +15263,6 @@ omerta;omERta;omerta;NOM;0,14;0,14;1;6;4;4;3;NOM
 omette;omEt;omettre;VER;2,73;0;0;6;0;0;2;VER
 omises;omiz;omettre;VER;2,73;0,03;0;6;0;0;2;VER
 omnium;OmnjOm;omnium;NOM;0;0;1;6;5;4;2;NOM
-on-dit;§di;on-dit;NOM;0,14;0,14;1;6;4;3;2;NOM
 onagre;onagR;onagre;NOM;0;0;1;6;4;4;2;NOM
 oncles;§kl;oncle;NOM;126,71;2,6;0;6;0;3;1;NOM
 ondine;§din;ondine;NOM;0,21;0,2;1;6;6;4;2;NOM
@@ -15404,7 +15377,6 @@ oublie;ubli;oublier;VER;486,96;104,78;0;6;6;4;2;NOM,VER
 oublis;ubli;oubli;NOM;8,02;0,2;0;6;0;4;2;NOM
 oublié;ublije;oublier;VER;486,96;154,09;0;6;6;6;3;VER,ADJ
 oublié;ublije;oublié;ADJ;6,79;4,03;1;6;6;6;3;VER,ADJ
-oui-da;wida;oui-da;ONO;0,27;0,27;1;6;4;4;2;ONO
 ouiche;wiS;ouiche;ONO;0,02;0,02;1;6;4;3;1;ONO
 ouille;uj;ouille;ONO;0,79;0,79;1;6;6;2;1;ONO,VER
 ouille;uj;ouiller;VER;0,14;0,14;0;6;6;2;1;ONO,VER
@@ -15538,7 +15510,6 @@ papoté;papote;papoter;VER;1,77;0,13;0;6;0;6;3;VER
 papous;papu;papou;NOM;0,04;0,02;0;6;0;4;2;NOM
 paqson;paks§;paqson;NOM;0,01;0,01;1;6;4;5;2;NOM
 paquet;pakE;paquet;NOM;44,96;36,9;1;6;6;4;2;NOM
-par-ci;paRsi;par-ci;ADV;3,1;3,1;1;6;5;5;2;ADV
 parada;paRada;parader;VER;1,48;0,04;0;6;0;0;3;VER
 parade;paRad;parade;NOM;5,1;4,79;1;6;6;5;2;NOM,VER
 parade;paRad;parader;VER;1,48;0,32;0;6;6;5;2;NOM,VER
@@ -15605,7 +15576,6 @@ parvis;paRvi;parvis;NOM;0,19;0,19;1;6;5;5;2;NOM
 parées;paRe;parer;VER;30,5;0,19;0;6;0;4;2;VER,ADJ
 parées;paRe;paré;ADJ;2,11;0,11;0;6;0;4;2;VER,ADJ
 paréos;paReo;paréo;NOM;0,01;0;0;6;0;5;3;NOM
-pas-je;paZ2;pas-je;ADV;0,01;0,01;1;6;5;4;2;ADV
 pascal;paskal;pascal;ADJ;0,79;0,23;1;6;6;6;2;ADJ,NOM
 pascal;paskal;pascal;NOM;0;0;1;6;6;6;2;ADJ,NOM
 pasque;pask;pasque;ADV;0,03;0,03;1;6;6;4;1;ADV,CON
@@ -15913,7 +15883,6 @@ pilées;pile;piler;VER;3,34;0;0;6;0;4;2;VER,NOM
 pilées;pile;pilée;NOM;0,01;0;0;6;0;4;2;VER,NOM
 piment;pim@;piment;NOM;4,76;2,94;1;6;6;4;2;NOM
 pimpon;p5p§;pimpon;NOM;0,01;0;1;6;5;4;2;NOM
-pin-up;pin9p;pin-up;NOM;0,71;0,71;1;6;5;5;2;NOM
 pinard;pinaR;pinard;NOM;0,39;0,39;1;6;6;5;2;NOM
 pincer;p5se;pincer;VER;10,84;4,06;1;6;6;4;2;VER
 pincer;p5se;pouvoir;VER;5524,47;0,01;0;6;6;4;2;VER
@@ -16913,10 +16882,6 @@ rayure;RejyR;rayure;NOM;2,82;0,36;1;6;4;4;2;NOM
 rayées;Reje;rayer;VER;7,42;0,2;0;6;0;4;2;VER,ADJ
 rayées;Reje;rayé;ADJ;2,02;0,05;0;6;0;4;2;VER,ADJ
 razzia;Radzja;razzia;NOM;0,55;0,45;1;6;6;6;2;NOM
-re-cul;R°ky;recul;NOM;3,59;0;0;6;0;0;2;NOM
-re-nés;R°ne;rené;ADJ;0,01;0,01;0;6;0;0;2;ADJ
-re-vie;R°vi;revie;NOM;0;0;0;6;0;0;2;NOM
-re-vit;R°vi;revivre;VER;10,37;0;0;6;0;0;2;VER
 reader;Rid9R;reader;NOM;0,11;0,11;1;6;5;4;2;NOM
 rebats;R°ba;rebattre;VER;0,22;0,02;0;6;0;0;2;VER
 rebois;R°bwa;reboire;VER;0,4;0;0;6;0;0;2;VER
@@ -18116,7 +18081,6 @@ sirota;siRota;siroter;VER;1,59;0;0;6;0;0;3;VER
 sirote;siROt;siroter;VER;1,59;0,12;0;6;0;0;2;VER
 siroté;siRote;siroter;VER;1,59;0,02;0;6;0;6;3;VER
 sirène;siREn;sirène;NOM;11,35;8,06;1;6;4;4;2;NOM
-sit-in;sitin;sit-in;NOM;0,3;0,3;1;6;4;5;2;NOM
 sitcom;sitkOm;sitcom;ADV;0,03;0,03;1;6;4;4;2;ADV,NOM
 sitcom;sitkOm;sitcom;NOM;0,85;0,63;1;6;4;4;2;ADV,NOM
 situer;sit8e;situer;VER;10,44;1,16;1;6;5;5;2;VER
@@ -19917,11 +19881,6 @@ zénith;zenit;zénith;NOM;0,63;0,63;1;6;6;4;2;NOM
 zéphyr;zefiR;zéphyr;NOM;0,09;0,04;1;6;5;3;2;NOM
 zézaie;zezE;zézayer;VER;0,02;0,01;0;6;0;0;2;VER
 zézaye;zezej;zézayer;VER;0,02;0;0;6;0;0;2;VER
-à jeun;aZ1;à jeun;ADV;1,45;1,27;1;6;3;3;2;ADV
-à-coup;aku;à-coup;NOM;0;0;1;6;4;3;2;NOM
-à-côté;akote;à-côté;NOM;0;0;1;6;4;4;3;NOM
-à-pics;apik;à-pic;NOM;0;0;0;6;0;4;2;NOM
-à-plat;apla;à-plat;NOM;0;0;1;6;4;4;2;NOM
 âcreté;akR°te;âcreté;NOM;0,11;0,11;1;6;5;5;3;NOM
 âgisme;aZism;âgisme;NOM;0,02;0,02;1;6;3;5;2;NOM
 ânerie;an°Ri;ânerie;NOM;1,96;0,32;1;6;4;4;3;NOM

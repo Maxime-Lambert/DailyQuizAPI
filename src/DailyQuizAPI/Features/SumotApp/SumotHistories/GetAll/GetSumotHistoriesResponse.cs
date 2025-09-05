@@ -5,5 +5,5 @@ public sealed record GetSumotHistoriesResponse(
     string Word,
     IReadOnlyCollection<string> Tries,
     bool Won,
-    string Username
+    string UserName
 );

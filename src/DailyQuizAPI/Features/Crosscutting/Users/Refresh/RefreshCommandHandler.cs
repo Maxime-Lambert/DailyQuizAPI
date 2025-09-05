@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Exceptions;
-using DailyQuizAPI.Middlewares.Authentication.Options;
+﻿using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -59,6 +58,6 @@ public sealed class RefreshCommandHandler(UserManager<User> userManager, IOption
         );
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-        return new RefreshResponse(jwt, newRefreshToken.Token);
+        return new RefreshResponse(jwt, newRefreshToken.Token, newRefreshToken.ExpiresAt);
     }
 }

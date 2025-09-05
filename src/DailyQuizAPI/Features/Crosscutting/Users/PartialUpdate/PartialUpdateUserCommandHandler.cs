@@ -4,6 +4,7 @@ using DailyQuizAPI.Middlewares.Authentication.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -25,8 +26,12 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
         var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false)
             ?? throw new InvalidOperationException("Connexion invalide");
 
-        if (!string.IsNullOrWhiteSpace(command.Username))
-            user.UserName = command.Username;
+        if (!string.IsNullOrWhiteSpace(command.UserName))
+        {
+            if (command.UserName.Length > 19)
+                throw new InvalidOperationException("Les pseudos ne peuvent pas dépasser 19 caractères");
+            user.UserName = command.UserName;
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -84,6 +89,14 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
             var passwordCheck = await _userManager.CheckPasswordAsync(user, command.LastPassword).ConfigureAwait(false);
             if (!passwordCheck)
                 throw new InvalidOperationException("L'ancien mot de passe est incorrect");
+            if (command.NewPassword.Length > 20)
+            {
+                throw new InvalidOperationException("Les mots de passe ne peuvent pas dépasser 20 caractères");
+            }
+            if (command.NewPassword.Length < 8)
+            {
+                throw new InvalidOperationException("Les mots de passe ne peuvent pas faire moins de 8 caractères");
+            }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
             await _userManager.ResetPasswordAsync(user, token, command.NewPassword).ConfigureAwait(false);
             needsRollbackEmail = true;

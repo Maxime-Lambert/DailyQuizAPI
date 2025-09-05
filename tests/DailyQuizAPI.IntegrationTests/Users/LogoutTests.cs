@@ -16,8 +16,8 @@ public sealed class LogoutTests(ApiTestFixture fixture) : IClassFixture<ApiTestF
     {
         // Arrange
         var unique = Guid.NewGuid().ToString("N")[..8];
-        var (_, refreshToken) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
-
+        var (token, refreshToken) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
+        Client.DefaultRequestHeaders.Authorization = new("Bearer", token);
         // Act
         LogoutCommand command = new(refreshToken);
         var response = await Client.PostAsJsonAsync("/users/logout", command);
@@ -31,13 +31,13 @@ public sealed class LogoutTests(ApiTestFixture fixture) : IClassFixture<ApiTestF
     {
         // Arrange
         var unique = Guid.NewGuid().ToString("N")[..8];
-        var (_, refreshToken) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
+        var (token, refreshToken) = await fixture.RegisterAndLoginAsync($"user_{unique}", $"user_{unique}@example.com", "Test123!");
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/users/logout");
         request.Headers.Add("X-Client-Type", "SPA");
 
-        // ajoute le cookie refreshToken
         Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
+        Client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
         // Act
         var response = await Client.SendAsync(request);

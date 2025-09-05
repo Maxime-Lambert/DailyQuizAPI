@@ -105,12 +105,12 @@ public class ApiTestFixture : IAsyncLifetime
         return (body!.Token, body.RefreshToken);
     }
 
-    public async Task<string> GetUserIdByUsernameAsync(string username)
+    public async Task<string> GetUserIdByUsernameAsync(string userName)
     {
         if (_factory is null) throw new InvalidOperationException("Fixture not initialized.");
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<QuizContext>();
-        var user = await context.Users.FirstAsync(u => u.UserName == username);
+        var user = await context.Users.FirstAsync(u => u.UserName == userName);
         return user.Id;
     }
 }

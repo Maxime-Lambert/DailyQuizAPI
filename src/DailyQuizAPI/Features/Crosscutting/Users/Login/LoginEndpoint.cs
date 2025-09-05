@@ -10,7 +10,7 @@ public static class LoginEndpoint
     private const string NAME = "Login";
     private const string TAG = "Users";
     private const string SUMMARY = "Authentifier un utilisateur";
-    private const string DESCRIPTION = "Retourne un JWT si les identifiants sont valides et un refreshToken sous forme de Cookie si la requête à un Header X-Client-Type qui vaut SPA sinon, il fait égalemnt partie du body.";
+    private const string DESCRIPTION = "Retourne un JWT si les identifiants sont valides et un refreshToken sous forme de Cookie si la requête à un Header X-Client-Type qui vaut SPA sinon, il fait également partie du body.";
     private const string OPERATION_ID = "Users_Login";
     private const string SUCCESS_DESCRIPTION = "Connexion réussie.";
 
@@ -32,10 +32,10 @@ public static class LoginEndpoint
                         HttpOnly = true,
                         Secure = true,
                         SameSite = SameSiteMode.None,
-                        Expires = DateTimeOffset.UtcNow.AddDays(7)
+                        Expires = DateTimeOffset.UtcNow.AddDays(90)
                     });
 
-                    return Results.Ok(new LoginResponse(result.Token, ""));
+                    return Results.Ok(new LoginResponse(result.Token, "", DateTime.UtcNow.AddDays(90)));
                 }
 
                 return Results.Ok(result);
