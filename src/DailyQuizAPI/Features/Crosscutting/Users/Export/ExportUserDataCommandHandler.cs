@@ -18,13 +18,14 @@ public sealed class ExportUserDataCommandHandler(QuizContext quizContext)
 
         var user = await _quizContext.Users
             .Include(u => u.SumotHistories)
+            .ThenInclude(h => h.Tries)
             .FirstOrDefaultAsync(u => u.Id == userId)
             .ConfigureAwait(false)
             ?? throw new InvalidOperationException("Connexion invalide");
 
         var exportObject = new
         {
-            user.Id,
+            userId,
             user.UserName,
             user.Email,
             user.KeyboardLayout,
@@ -32,7 +33,13 @@ public sealed class ExportUserDataCommandHandler(QuizContext quizContext)
             user.SmartKeyboardType,
             user.PlaysWithDifficultWords,
             user.LastLogin,
-            user.SumotHistories
+            SumotHistories = user.SumotHistories.Select(h => new
+            {
+                h.Id,
+                h.Word,
+                h.Won,
+                Tries = h.Tries.Select(t => t.Value).ToList()
+            })
         };
 
         var json = JsonSerializer.Serialize(exportObject, CACHED_JSON_SERIALIZER_OPTIONS);

@@ -18,9 +18,19 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
 
     public async Task Handle(CreateUserCommand request)
     {
-        if (request.UserName.Length > 19)
+        if (request.UserName.Length > 20)
         {
-            throw new InvalidOperationException("Les pseudos ne peuvent pas dépasser 15 caractères");
+            throw new InvalidOperationException("Les pseudos ne peuvent pas dépasser 20 caractères");
+        }
+
+        if (request.Password.Length > 20)
+        {
+            throw new InvalidOperationException("Les mots de passe ne peuvent pas dépasser 20 caractères");
+        }
+
+        if (request.Password.Length < 8)
+        {
+            throw new InvalidOperationException("Les mots de passe ne peuvent pas faire moins de 8 caractères");
         }
 
         var user = new User
@@ -29,8 +39,8 @@ public class CreateUserCommandHandler(IOptions<AuthenticationOptions> options, U
             EmailConfirmed = false
         };
 
-        var usernameExists = await _userManager.FindByNameAsync(request.UserName).ConfigureAwait(false);
-        if (usernameExists != null)
+        var userNameExists = await _userManager.FindByNameAsync(request.UserName).ConfigureAwait(false);
+        if (userNameExists != null)
         {
             throw new InvalidOperationException($"Le nom d'utilisateur '{request.UserName}' existe déjà");
         }

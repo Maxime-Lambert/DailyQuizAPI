@@ -3,6 +3,7 @@ using System;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DailyQuizAPI.Migrations
 {
     [DbContext(typeof(QuizContext))]
-    partial class QuizContextModelSnapshot : ModelSnapshot
+    [Migration("20250905173516_IndexesForComparisons")]
+    partial class IndexesForComparisons
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +36,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasKey("Key");
 
-                    b.ToTable("AppSettings", (string)null);
+                    b.ToTable("AppSettings");
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.FriendRequests.FriendRequest", b =>
@@ -70,7 +73,7 @@ namespace DailyQuizAPI.Migrations
                     b.HasIndex("RequesterId", "ReceiverId")
                         .IsUnique();
 
-                    b.ToTable("FriendRequests", (string)null);
+                    b.ToTable("FriendRequests");
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.Users.RefreshToken", b =>
@@ -102,7 +105,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshToken", (string)null);
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.Crosscutting.Users.User", b =>
@@ -212,7 +215,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasIndex("Word");
 
-                    b.ToTable("SumotHistories", (string)null);
+                    b.ToTable("SumotHistories");
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.SumotHistories.SumotTry", b =>
@@ -234,7 +237,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasIndex("SumotHistoryId");
 
-                    b.ToTable("SumotTry", (string)null);
+                    b.ToTable("SumotTry");
                 });
 
             modelBuilder.Entity("DailyQuizAPI.Features.SumotApp.Sumots.Sumot", b =>
@@ -269,7 +272,7 @@ namespace DailyQuizAPI.Migrations
 
                     b.HasIndex("Word");
 
-                    b.ToTable("Sumots", (string)null);
+                    b.ToTable("Sumots");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

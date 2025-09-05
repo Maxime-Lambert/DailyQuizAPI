@@ -7,11 +7,11 @@ using System.Globalization;
 public static class ForgotUsernameEndpoint
 {
     private const string ROUTE = "/users/forgotusername";
-    private const string NAME = "ForgotUsername";
+    private const string NAME = "ForgotUserName";
     private const string TAG = "Users";
     private const string SUMMARY = "Pour récupérer un nom d'utilisateur";
     private const string DESCRIPTION = "Envoie un mail avec le nom d'utilsateur lié à l'email.";
-    private const string OPERATION_ID = "Users_ForgotUsername";
+    private const string OPERATION_ID = "Users_ForgotUserName";
     private const string SUCCESS_DESCRIPTION = "Mail envoyé.";
 
     public static void MapForgotUsernameEndpoint(this IEndpointRouteBuilder app)

@@ -102,6 +102,6 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
                 .ConfigureAwait(false);
 
             return new GetSumotsResponseList(new ReadOnlyCollection<GetSumotsResponse>(byDay), version, today);
-        }, TimeSpan.FromMinutes(10)).ConfigureAwait(false);
+        }, TimeSpan.FromHours(24)).ConfigureAwait(false);
     }
 }

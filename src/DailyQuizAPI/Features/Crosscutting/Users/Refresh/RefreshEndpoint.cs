@@ -38,9 +38,9 @@ public static class RefreshEndpoint
                         HttpOnly = true,
                         Secure = true,
                         SameSite = SameSiteMode.None,
-                        Expires = DateTimeOffset.UtcNow.AddDays(7)
+                        Expires = DateTimeOffset.UtcNow.AddDays(90)
                     });
-                    return Results.Ok(new { accessToken = resultFromCookie.Token });
+                    return Results.Ok(resultFromCookie);
                 }
                 var result = await handler.Handle(command, ct).ConfigureAwait(false);
                 return Results.Ok(result);

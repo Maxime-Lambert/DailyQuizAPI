@@ -1,9 +1,9 @@
 ﻿using DailyQuizAPI.Features.Crosscutting.AppSettings.Create;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Accept;
+using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Delete;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.GetAll;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.RemoveFriend;
-using DailyQuizAPI.Features.Crosscutting.FriendRequests.Send;
 using DailyQuizAPI.Features.Crosscutting.Healthchecks.GetAll;
 using DailyQuizAPI.Features.Crosscutting.Users.ConfirmEmail;
 using DailyQuizAPI.Features.Crosscutting.Users.Create;
@@ -21,6 +21,7 @@ using DailyQuizAPI.Features.Crosscutting.Users.ResetPassword;
 using DailyQuizAPI.Features.Crosscutting.Users.Rollback;
 using DailyQuizAPI.Features.SumotApp.SumotHistories.GetAll;
 using DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
+using DailyQuizAPI.Features.SumotApp.Sumots.Extract;
 using DailyQuizAPI.Features.SumotApp.Sumots.GetAll;
 
 namespace DailyQuizAPI.Features;
@@ -41,6 +42,7 @@ public static class FeaturesSetup
         services.AddScoped<UpdateSumotHistoriesCommandHandler>();
 
         services.AddScoped<GetSumotsQueryHandler>();
+        services.AddScoped<ExtractSumotsCommandHandler>();
 
         services.AddScoped<ConfirmEmailCommandHandler>();
         services.AddScoped<CreateUserCommandHandler>();
@@ -76,6 +78,7 @@ public static class FeaturesSetup
         app.MapUpdateSumotHistoriesEndpoint();
 
         app.MapGetSumotsEndpoint();
+        app.MapExtractSumotsEndpoint();
 
         app.MapConfirmEmailEndpoint();
         app.MapCreateUserEndpoint();

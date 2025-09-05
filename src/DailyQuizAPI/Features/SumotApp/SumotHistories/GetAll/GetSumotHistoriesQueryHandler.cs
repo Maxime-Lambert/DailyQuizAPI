@@ -51,6 +51,6 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
                     history.Won,
                     user.UserName!
                 )).ToListAsync(ct).ConfigureAwait(false);
-        }, TimeSpan.FromMinutes(10)).ConfigureAwait(false);
+        }, TimeSpan.FromMinutes(60)).ConfigureAwait(false);
     }
 }
