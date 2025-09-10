@@ -23,7 +23,8 @@ public sealed class GetSumotsQueryHandler(QuizContext quizContext, ICacheService
 
         return await _cacheService.GetOrCreateAsync(cacheKey, async () =>
         {
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var parisTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
+            var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, parisTz));
 
             var databaseVersion = await _quizContext.AppSettings
                 .FirstOrDefaultAsync(a => a.Key == "DatabaseVersion", cancellationToken)
