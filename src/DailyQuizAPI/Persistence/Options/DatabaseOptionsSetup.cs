@@ -1,19 +1,18 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace DailyQuizAPI.Persistence.Options
+namespace DailyQuizAPI.Persistence.Options;
+
+public sealed class DatabaseOptionsSetup(IConfiguration configuration) : IConfigureOptions<DatabaseOptions>
 {
-    public sealed class DatabaseOptionsSetup(IConfiguration configuration) : IConfigureOptions<DatabaseOptions>
+    private const string _configurationSection = "DatabaseOptions";
+    private readonly IConfiguration _configuration = configuration;
+
+    public void Configure(DatabaseOptions options)
     {
-        private const string _configurationSection = "DatabaseOptions";
-        private readonly IConfiguration _configuration = configuration;
+        var connectionString = _configuration.GetConnectionString("Database");
 
-        public void Configure(DatabaseOptions options)
-        {
-            var connectionString = _configuration.GetConnectionString("Database");
+        options.ConnectionString = connectionString!;
 
-            options.ConnectionString = connectionString!;
-
-            _configuration.GetSection(_configurationSection).Bind(options);
-        }
+        _configuration.GetSection(_configurationSection).Bind(options);
     }
 }
