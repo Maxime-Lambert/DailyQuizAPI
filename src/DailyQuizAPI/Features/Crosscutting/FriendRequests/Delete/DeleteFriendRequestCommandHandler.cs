@@ -3,6 +3,7 @@ using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DailyQuizAPI.Features.Crosscutting.FriendRequests.Delete;
 
@@ -31,5 +32,7 @@ public sealed class DeleteFriendRequestCommandHandler(QuizContext quizContext, I
 
         _cacheService.RemoveByPrefix($"friendRequests:{userId}");
         _cacheService.RemoveByPrefix($"friendRequests:{targetId}");
+        _cacheService.RemoveByPrefix($"sumotHistories:{userId}");
+        _cacheService.RemoveByPrefix($"sumotHistories:{targetId}");
     }
 }

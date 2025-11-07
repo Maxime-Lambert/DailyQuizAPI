@@ -26,7 +26,7 @@ public sealed class GetSumotHistoriesTests(ApiTestFixture fixture) : IClassFixtu
 
         var parisTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
         var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, parisTz));
-        var uri = $"/sumothistories?MinDate={today:yyyy-MM-dd}&MaxDate={today:yyyy-MM-dd}";
+        var uri = $"/sumothistories?StartDate={today:yyyy-MM-dd}&EndDate={today:yyyy-MM-dd}";
         var response = await Client.GetAsync(uri);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
