@@ -44,4 +44,12 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Development\source\Maxime-Lambert\DailyQuiz\src\DailyQuizAPI\Migrations\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Development\source\Maxime-Lambert\DailyQuiz\src\DailyQuizAPI\Migrations\.editorconfig" />
+  </ItemGroup>
+
 </Project>
