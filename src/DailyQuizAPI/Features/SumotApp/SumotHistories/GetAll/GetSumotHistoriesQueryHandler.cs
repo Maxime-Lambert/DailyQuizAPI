@@ -15,10 +15,10 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier)
             ?? throw new InvalidOperationException("Connexion invalide");
 
-        if ((query.MaxDate.ToDateTime(TimeOnly.MinValue) - query.MinDate.ToDateTime(TimeOnly.MinValue)) > TimeSpan.FromDays(30))
-            throw new InvalidOperationException("La plage de dates ne peut pas dépasser 30 jours");
+        if ((query.EndDate.ToDateTime(TimeOnly.MinValue) - query.StartDate.ToDateTime(TimeOnly.MinValue)) > TimeSpan.FromDays(31))
+            throw new InvalidOperationException("La plage de dates ne peut pas dépasser 1 mois (31 jours)");
 
-        var cacheKey = $"sumotHistories:{userId}:minDate:{query.MinDate}:maxDate:{query.MaxDate}";
+        var cacheKey = $"sumotHistories:{userId}:startDate:{query.StartDate}:endDate:{query.EndDate}";
 
         return await _cacheService.GetOrCreateAsync(cacheKey, async () =>
         {
@@ -37,8 +37,8 @@ public class GetSumotHistoriesQueryHandler(QuizContext quizContext, ICacheServic
                 join user in _quizContext.Users
                     on history.UserId equals user.Id
                 where friendIds.Contains(history.UserId)
-                   && sumot.Day >= query.MinDate
-                   && sumot.Day <= query.MaxDate
+                   && sumot.Day >= query.StartDate
+                   && sumot.Day <= query.EndDate
                 orderby sumot.Day descending,
                  history.Tries.Count ascending,
                  history.Won descending

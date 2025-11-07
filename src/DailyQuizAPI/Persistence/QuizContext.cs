@@ -3,6 +3,7 @@ using DailyQuizAPI.Features.Crosscutting.FriendRequests;
 using DailyQuizAPI.Features.Crosscutting.Users;
 using DailyQuizAPI.Features.SumotApp.SumotHistories;
 using DailyQuizAPI.Features.SumotApp.Sumots;
+using DailyQuizAPI.Features.SumotApp.SumotStats;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ public sealed class QuizContext(DbContextOptions<QuizContext> options) : Identit
     public DbSet<FriendRequest> FriendRequests { get; set; }
 
     public DbSet<SumotHistory> SumotHistories { get; set; }
+    public DbSet<SumotStat> SumotStats { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
