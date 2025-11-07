@@ -25,9 +25,9 @@
     <PackageReference Include="MailKit" />
     <PackageReference Include="HtmlAgilityPack" />
   </ItemGroup>
-    
+
     <ItemGroup>
-        <Compile Include="Migrations\**\*.cs">
+        <Compile Update="Migrations\**\*.cs">
             <NoWarn>$(NoWarn);IDE0161;IDE0051;CS1591</NoWarn>
         </Compile>
     </ItemGroup>
