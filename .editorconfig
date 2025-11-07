@@ -17,9 +17,14 @@ dotnet_style_namespace_match_folder = true:suggestion
 [*.xml]
 indent_size = 2
 
+[*/Migrations/*.cs]
+dotnet_analyzer_diagnostic.severity = none
+dotnet_diagnostic.IDE0161.severity = none
+dotnet_diagnostic.IDE0051.severity = none
+dotnet_diagnostic.CS1591.severity = none
+
 [*.cs]
 #### Styles de nommage ####
-
 # Règles de nommage
 
 dotnet_naming_rule.interface_should_be_begins_with_i.severity = suggestion

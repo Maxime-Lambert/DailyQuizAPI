@@ -25,11 +25,13 @@
     <PackageReference Include="MailKit" />
     <PackageReference Include="HtmlAgilityPack" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Migrations\**\*.cs" />
-  </ItemGroup>
-
+    
+    <ItemGroup>
+        <Compile Include="Migrations\**\*.cs">
+            <NoWarn>$(NoWarn);IDE0161;IDE0051;CS1591</NoWarn>
+        </Compile>
+    </ItemGroup>
+    
   <ItemGroup>
     <Content Update="wwwroot\swagger-ui\SwaggerDark.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
