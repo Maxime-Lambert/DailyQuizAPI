@@ -1,6 +1,5 @@
 ﻿using DailyQuizAPI.Features.Crosscutting.FriendRequests.Accept;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
-using DailyQuizAPI.Features.Crosscutting.FriendRequests.RemoveFriend;
 using DailyQuizAPI.IntegrationTests.Fixtures;
 using FluentAssertions;
 using System.Net;
@@ -28,8 +27,8 @@ public sealed class RemoveFriendTests(ApiTestFixture fixture) : IClassFixture<Ap
         Client.DefaultRequestHeaders.Authorization = new("Bearer", tokenReceiver);
         await Client.PostAsJsonAsync("/friendrequests/accept", new AcceptFriendRequestCommand(senderId));
 
-        var response = await Client.PostAsJsonAsync("/friendrequests/removefriend", new RemoveFriendCommand(senderId));
+        var response = await Client.DeleteAsync($"/friendrequests/{senderId}");
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 }

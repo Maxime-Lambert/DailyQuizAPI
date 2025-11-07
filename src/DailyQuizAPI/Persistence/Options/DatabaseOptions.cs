@@ -1,15 +1,14 @@
-﻿namespace DailyQuizAPI.Persistence.Options
+﻿namespace DailyQuizAPI.Persistence.Options;
+
+public sealed class DatabaseOptions
 {
-    public sealed class DatabaseOptions
-    {
-        public string? ConnectionString { get; set; }
+    public string? ConnectionString { get; set; }
 
-        public int MaxRetryCount { get; set; }
+    public int MaxRetryCount { get; set; }
 
-        public int CommandTimeout { get; set; }
+    public int CommandTimeout { get; set; }
 
-        public bool EnableDetailedErrors { get; set; }
+    public bool EnableDetailedErrors { get; set; }
 
-        public bool EnableSensitiveDataLogging { get; set; }
-    }
+    public bool EnableSensitiveDataLogging { get; set; }
 }

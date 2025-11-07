@@ -26,10 +26,12 @@
     <PackageReference Include="HtmlAgilityPack" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="Migrations\**\*.cs" />
-  </ItemGroup>
-
+    <ItemGroup>
+        <Compile Update="Migrations\**\*.cs">
+            <NoWarn>$(NoWarn);IDE0161;IDE0051;CS1591</NoWarn>
+        </Compile>
+    </ItemGroup>
+    
   <ItemGroup>
     <Content Update="wwwroot\swagger-ui\SwaggerDark.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -40,6 +42,14 @@
     <None Update="Lexique-query-2025-08-15 14-58-10.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Development\source\Maxime-Lambert\DailyQuiz\src\DailyQuizAPI\Migrations\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Development\source\Maxime-Lambert\DailyQuiz\src\DailyQuizAPI\Migrations\.editorconfig" />
   </ItemGroup>
 
 </Project>

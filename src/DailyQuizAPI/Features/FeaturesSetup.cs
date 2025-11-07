@@ -3,7 +3,6 @@ using DailyQuizAPI.Features.Crosscutting.FriendRequests.Accept;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Delete;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.GetAll;
-using DailyQuizAPI.Features.Crosscutting.FriendRequests.RemoveFriend;
 using DailyQuizAPI.Features.Crosscutting.Healthchecks.GetAll;
 using DailyQuizAPI.Features.Crosscutting.Users.ConfirmEmail;
 using DailyQuizAPI.Features.Crosscutting.Users.Create;
@@ -23,6 +22,9 @@ using DailyQuizAPI.Features.SumotApp.SumotHistories.GetAll;
 using DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
 using DailyQuizAPI.Features.SumotApp.Sumots.Extract;
 using DailyQuizAPI.Features.SumotApp.Sumots.GetAll;
+using DailyQuizAPI.Features.SumotApp.SumotStats.AddAttempt;
+using DailyQuizAPI.Features.SumotApp.SumotStats.AddFinish;
+using DailyQuizAPI.Features.SumotApp.SumotStats.AddVisit;
 
 namespace DailyQuizAPI.Features;
 
@@ -35,7 +37,6 @@ public static class FeaturesSetup
         services.AddScoped<AcceptFriendRequestCommandHandler>();
         services.AddScoped<DeleteFriendRequestCommandHandler>();
         services.AddScoped<GetFriendRequestsQueryHandler>();
-        services.AddScoped<RemoveFriendCommandHandler>();
         services.AddScoped<CreateFriendRequestCommandHandler>();
 
         services.AddScoped<GetSumotHistoriesQueryHandler>();
@@ -59,6 +60,10 @@ public static class FeaturesSetup
         services.AddScoped<ResendConfirmationCommandHandler>();
         services.AddScoped<RollbackCommandHandler>();
 
+        services.AddScoped<AddVisitCommandHandler>();
+        services.AddScoped<AddFinishCommandHandler>();
+        services.AddScoped<AddAttemptCommandHandler>();
+
         return services;
     }
 
@@ -69,7 +74,6 @@ public static class FeaturesSetup
         app.MapAcceptFriendRequestEndpoint();
         app.MapDeleteFriendRequestEndpoint();
         app.MapGetFriendRequestsEndpoint();
-        app.MapRemoveFriendEndpoint();
         app.MapSendFriendRequestEndpoint();
 
         app.MapGetHealthchecks();
@@ -94,6 +98,10 @@ public static class FeaturesSetup
         app.MapResetPasswordEndpoint();
         app.MapResendConfirmationEndpoint();
         app.MapRollbackEndpoint();
+
+        app.MapAddVisitEndpoint();
+        app.MapAddFinishEndpoint();
+        app.MapAddAttemptEndpoint();
 
         return app;
     }

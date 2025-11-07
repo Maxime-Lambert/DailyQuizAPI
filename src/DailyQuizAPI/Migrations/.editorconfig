@@ -1,0 +1,7 @@
+# src/DailyQuizAPI/Migrations/.editorconfig
+root = false
+
+# Désactive les règles de code style dans ce dossier
+[*.cs]
+dotnet_analyzer_diagnostic.category-Style.severity = none
+dotnet_analyzer_diagnostic.category-Formatting.severity = none
