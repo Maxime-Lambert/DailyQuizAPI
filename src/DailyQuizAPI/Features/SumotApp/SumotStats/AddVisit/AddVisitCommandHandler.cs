@@ -6,16 +6,18 @@ namespace DailyQuizAPI.Features.SumotApp.SumotStats.AddVisit;
 public sealed class AddVisitCommandHandler(QuizContext quizContext)
 {
     private readonly QuizContext _quizContext = quizContext;
+
     public async Task Handle(AddVisitCommand command, CancellationToken cancellationToken)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var stat = await _quizContext.SumotStats
-            .FirstOrDefaultAsync(s => s.Date == command.Date && s.IsMobile == command.IsMobile, cancellationToken)
+            .FirstOrDefaultAsync(s => s.Date == today && s.IsMobile == command.IsMobile, cancellationToken)
             .ConfigureAwait(false);
         if (stat is null)
         {
             stat = new SumotStat
             {
-                Date = command.Date,
+                Date = today,
                 IsMobile = command.IsMobile,
                 Visits = 1,
                 Attempts = 0,
