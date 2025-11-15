@@ -10,7 +10,7 @@ public static class AddVisitEndpoint
     private const string NAME = "AddVisit";
     private const string TAG = "SumotStats";
     private const string SUMMARY = "Ajouter une visite pour le jour";
-    private const string DESCRIPTION = "En fonction du header, ajoute une visite pour le jour fourni en mobile ou web";
+    private const string DESCRIPTION = "En fonction du header, ajoute une visite pour aujourd'hui en mobile ou web";
     private const string OPERATION_ID = "SumotStats_AddVisit";
     private const string SUCCESS_DESCRIPTION = "Statistiques mises à jour.";
 
