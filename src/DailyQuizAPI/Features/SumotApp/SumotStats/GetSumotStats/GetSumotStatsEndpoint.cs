@@ -20,8 +20,8 @@ public static class GetSumotStatsEndpoint
             async ([FromServices] GetSumotStatsQueryHandler handler,
                    CancellationToken ct) =>
             {
-                await handler.Handle(ct).ConfigureAwait(false);
-                return Results.NoContent();
+                var result = await handler.Handle(ct).ConfigureAwait(false);
+                return Results.Ok(result);
             })
         .WithName(NAME)
         .Produces(StatusCodes.Status200OK)
