@@ -1,5 +1,4 @@
-﻿using DailyQuizAPI.Features.SumotApp.SumotStats.AddVisit;
-using DailyQuizAPI.Persistence;
+﻿using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace DailyQuizAPI.Features.SumotApp.SumotStats.AddFinish;
