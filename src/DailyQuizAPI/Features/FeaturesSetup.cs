@@ -25,6 +25,7 @@ using DailyQuizAPI.Features.SumotApp.Sumots.GetAll;
 using DailyQuizAPI.Features.SumotApp.SumotStats.AddAttempt;
 using DailyQuizAPI.Features.SumotApp.SumotStats.AddFinish;
 using DailyQuizAPI.Features.SumotApp.SumotStats.AddVisit;
+using DailyQuizAPI.Features.SumotApp.SumotStats.GetSumotStats;
 
 namespace DailyQuizAPI.Features;
 
@@ -63,6 +64,7 @@ public static class FeaturesSetup
         services.AddScoped<AddVisitCommandHandler>();
         services.AddScoped<AddFinishCommandHandler>();
         services.AddScoped<AddAttemptCommandHandler>();
+        services.AddScoped<GetSumotHistoriesQueryHandler>();
 
         return services;
     }
@@ -102,6 +104,7 @@ public static class FeaturesSetup
         app.MapAddVisitEndpoint();
         app.MapAddFinishEndpoint();
         app.MapAddAttemptEndpoint();
+        app.MapGetSumotStatsEndpoint();
 
         return app;
     }
