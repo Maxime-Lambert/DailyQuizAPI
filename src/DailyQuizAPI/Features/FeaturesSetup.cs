@@ -64,7 +64,7 @@ public static class FeaturesSetup
         services.AddScoped<AddVisitCommandHandler>();
         services.AddScoped<AddFinishCommandHandler>();
         services.AddScoped<AddAttemptCommandHandler>();
-        services.AddScoped<GetSumotHistoriesQueryHandler>();
+        services.AddScoped<GetSumotStatsQueryHandler>();
 
         return services;
     }
