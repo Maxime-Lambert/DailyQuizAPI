@@ -16,7 +16,7 @@ public static class GetSumotStatsEndpoint
 
     public static void MapGetSumotStatsEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost(ROUTE,
+        app.MapGet(ROUTE,
             async ([FromServices] GetSumotStatsQueryHandler handler,
                    CancellationToken ct) =>
             {
