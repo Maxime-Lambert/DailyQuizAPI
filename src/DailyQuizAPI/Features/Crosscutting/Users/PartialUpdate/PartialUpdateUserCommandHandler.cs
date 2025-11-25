@@ -36,13 +36,13 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var needsRollbackEmail = false;
+        var previousEmail = user.Email;
 
         if (command.Email is not null)
         {
             user.EmailConfirmed = false;
             user.Email = command.Email;
-
-            if (user.Email.Length > 0)
+            if(!string.IsNullOrWhiteSpace(command.Email))
             {
                 var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
                 var encodedToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(confirmationToken));
@@ -63,6 +63,9 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
                 var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
                 var confirmationLink = $"{FrontEndOrigins.SUMOT}/confirmemail?token={Uri.EscapeDataString(jwtToken)}";
                 await _emailService.SendConfirmationLinkAsync(user, user.Email, confirmationLink, command.FrontEndName).ConfigureAwait(false);
+            }
+            if (!string.IsNullOrEmpty(previousEmail))
+            {
                 needsRollbackEmail = true;
             }
         }
@@ -98,7 +101,11 @@ public sealed class PartialUpdateUserCommandHandler(IOptions<AuthenticationOptio
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
             await _userManager.ResetPasswordAsync(user, token, command.NewPassword).ConfigureAwait(false);
-            needsRollbackEmail = true;
+
+            if (!string.IsNullOrEmpty(previousEmail))
+            {
+                needsRollbackEmail = true;
+            }
         }
 
         if (needsRollbackEmail)

@@ -1,5 +1,6 @@
 ﻿namespace DailyQuizAPI.Features.Crosscutting.Users.Delete;
 
+using DailyQuizAPI.Middlewares;
 using DailyQuizAPI.OpenApi;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -26,6 +27,7 @@ public static class DeleteUserEndpoint
                 return Results.NoContent();
             })
         .WithName(NAME)
+        .RequireAuthorization(SecurityPolicies.PLAYER)
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status401Unauthorized)
