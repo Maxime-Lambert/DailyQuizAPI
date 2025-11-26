@@ -29,7 +29,11 @@ public static class LogoutEndpoint
                 if (clientType == "SPA")
                 {
                     var refreshToken = request.Cookies["refreshToken"];
-                    var commandSpa = new LogoutCommand(refreshToken!);
+                    if (refreshToken is null)
+                    {
+                        return Results.NoContent();
+                    }
+                    var commandSpa = new LogoutCommand(refreshToken);
                     response.Cookies.Append("refreshToken", "", new CookieOptions
                     {
                         HttpOnly = true,
