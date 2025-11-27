@@ -2,4 +2,4 @@
 
 namespace DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
 
-public sealed record UpdateSumotHistoriesCommand(Collection<UpdateSumotHistoryCommand> Histories);
+public sealed record UpdateSumotHistoriesCommand(Collection<UpdateSumotHistoryCommand> Histories, bool? Overwrite);

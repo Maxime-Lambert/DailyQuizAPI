@@ -22,11 +22,14 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
                 .FirstOrDefaultAsync(h => h.UserId == userId && h.Word == history.Word, ct)
                 .ConfigureAwait(false);
 
-            if (currentHistory != null)
+            if (currentHistory is not null)
             {
-                currentHistory.ReplaceTries(history.Tries);
-                currentHistory.Won = history.Won;
-                _quizContext.SumotHistories.Update(currentHistory);
+                if(!command.Overwrite.HasValue || command.Overwrite!.Value)
+                {
+                    currentHistory.ReplaceTries(history.Tries);
+                    currentHistory.Won = history.Won;
+                    _quizContext.SumotHistories.Update(currentHistory);
+                }
             }
             else
             {
