@@ -10,26 +10,12 @@ public sealed class AddVisitCommandHandler(QuizContext quizContext)
     public async Task Handle(AddVisitCommand command, CancellationToken cancellationToken)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var stat = await _quizContext.SumotStats
-            .FirstOrDefaultAsync(s => s.Date == today && s.IsMobile == command.IsMobile, cancellationToken)
-            .ConfigureAwait(false);
-        if (stat is null)
-        {
-            stat = new SumotStat
-            {
-                Date = today,
-                IsMobile = command.IsMobile,
-                Visits = 1,
-                Attempts = 0,
-                Finishes = 0
-            };
-            await _quizContext.SumotStats.AddAsync(stat, cancellationToken).ConfigureAwait(false);
-        }
-        else
-        {
-            stat.Visits += 1;
-            _quizContext.SumotStats.Update(stat);
-        }
-        await _quizContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        await _quizContext.Database.ExecuteSqlInterpolatedAsync($@"
+            INSERT INTO ""SumotStats"" (""Date"", ""IsMobile"", ""Visits"", ""Attempts"", ""Finishes"")
+            VALUES ({today}, {command.IsMobile}, 1, 0, 0)
+            ON CONFLICT (""Date"", ""IsMobile"")
+            DO UPDATE SET ""Visits"" = ""SumotStats"".""Visits"" + 1;
+            ", cancellationToken).ConfigureAwait(false);
     }
 }
