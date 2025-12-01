@@ -20,8 +20,28 @@ jobs:
     permissions:
       contents: read
 
+    env:
+      TESTCONTAINERS_RYUK_DISABLED: true
+      DOCKER_HOST: tcp://localhost:2375
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Start Docker in Docker
+        run: |
+          docker run -d --privileged \
+            --name dind \
+            -p 2375:2375 \
+            -e DOCKER_TLS_CERTDIR= \
+            docker:27-dind \
+            --host=tcp://0.0.0.0:2375
+
+          # attendre que Docker soit prêt
+          for i in {1..30}; do
+            docker -H tcp://localhost:2375 info >/dev/null 2>&1 && break
+            echo "Waiting for Docker..."
+            sleep 1
+          done
 
       - name: Cache NuGet packages
         uses: actions/cache@v4
@@ -80,3 +100,4 @@ jobs:
           package: ./publish
 
           
+
