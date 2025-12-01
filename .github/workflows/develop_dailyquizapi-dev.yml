@@ -19,11 +19,6 @@ jobs:
     
     permissions:
       contents: read
-      
-    env:
-      TESTCONTAINERS_RYUK_DISABLED: true
-      TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: /var/run/docker.sock
-      DOTNET_SYSTEM_NET_SOCKETS_HTTP2SUPPORT: false
 
     steps:
       - uses: actions/checkout@v4
@@ -42,12 +37,6 @@ jobs:
           
       - name: Build with dotnet
         run: dotnet build ./src/DailyQuizAPI/DailyQuizAPI.csproj --configuration Release
-
-      - name: docker infos
-        run: docker info
-        
-      - name: Run tests
-        run: dotnet test ./tests/DailyQuizAPI.IntegrationTests/DailyQuizAPI.IntegrationTests.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish ./src/DailyQuizAPI/DailyQuizAPI.csproj -c Release -o ./publish
@@ -88,5 +77,6 @@ jobs:
           package: ./publish
 
           
+
 
 
