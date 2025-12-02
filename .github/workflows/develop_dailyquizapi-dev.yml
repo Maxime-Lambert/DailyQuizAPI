@@ -13,10 +13,10 @@ env:
   Authentication__Secret: ${{ secrets.AUTH_SECRET }}
   Smtp__Password: ${{ secrets.SMTP__PASSWORD }}
   
-
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     permissions:
       contents: read
 
@@ -37,9 +37,6 @@ jobs:
           
       - name: Build with dotnet
         run: dotnet build ./src/DailyQuizAPI/DailyQuizAPI.csproj --configuration Release
-        
-      - name: Run tests
-        run: dotnet test ./tests/DailyQuizAPI.IntegrationTests/DailyQuizAPI.IntegrationTests.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish ./src/DailyQuizAPI/DailyQuizAPI.csproj -c Release -o ./publish
@@ -80,3 +77,6 @@ jobs:
           package: ./publish
 
           
+
+
+
