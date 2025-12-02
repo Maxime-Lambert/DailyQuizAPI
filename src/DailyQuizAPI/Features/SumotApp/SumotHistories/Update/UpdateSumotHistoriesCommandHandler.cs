@@ -1,7 +1,7 @@
 ﻿using DailyQuizAPI.Features.Crosscutting.Caching;
 using DailyQuizAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
+using Newtonsoft.Json;
 using System.Security.Claims;
 
 namespace DailyQuizAPI.Features.SumotApp.SumotHistories.Update;
@@ -18,35 +18,14 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
 
         foreach (var history in command.Histories)
         {
-            var newHistory = new SumotHistory
-            {
-                UserId = userId,
-                Word = history.Word,
-                Won = history.Won
-            };
-            newHistory.ReplaceTries(history.Tries);
-
-            await _quizContext.SumotHistories.AddAsync(newHistory, ct).ConfigureAwait(false);
-
-            try
-            {
-                await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
-            }
-            catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex))
-            {
-                var existing = await _quizContext.SumotHistories
-                    .Include(h => h.Tries)
-                    .FirstAsync(h => h.UserId == userId && h.Word == history.Word, ct)
-                    .ConfigureAwait(false);
-
-                if ((!command.Overwrite.HasValue || command.Overwrite.Value) && existing.Tries.Count < history.Tries.Count)
-                {
-                    existing.ReplaceTries(history.Tries);
-                    existing.Won = history.Won;
-                }
-
-                await _quizContext.SaveChangesAsync(ct).ConfigureAwait(false);
-            }
+            await _quizContext.Database.ExecuteSqlAsync($@"
+                insert into ""SumotHistories"" (""UserId"", ""Word"", ""Won"", ""Tries"")
+                values ({userId}, {history.Word}, {history.Won}, {JsonConvert.SerializeObject(history.Tries)})
+                on conflict (""UserId"", ""Word"")
+                do update set 
+                    ""Won"" = EXCLUDED.""Won"",
+                    ""Tries"" = EXCLUDED.""Tries"";
+                ", ct).ConfigureAwait(false);
         }
 
         var friendIds = await _quizContext.FriendRequests
@@ -61,11 +40,5 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
         {
             _cacheService.RemoveByPrefix($"sumotHistories:{id}");
         }
-    }
-
-    private static bool IsUniqueConstraintViolation(DbUpdateException ex)
-    {
-        return ex.InnerException is PostgresException pg
-               && pg.SqlState == PostgresErrorCodes.UniqueViolation;
     }
 }
