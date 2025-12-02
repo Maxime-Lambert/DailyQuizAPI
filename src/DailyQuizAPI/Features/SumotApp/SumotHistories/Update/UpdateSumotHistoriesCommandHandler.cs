@@ -15,7 +15,7 @@ public sealed class UpdateSumotHistoriesCommandHandler(QuizContext quizContext, 
         var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)
             ?? throw new InvalidOperationException("Connexion invalide");
 
-        bool overwrite = command.Overwrite ?? false;
+        bool overwrite = command.Overwrite ?? true;
 
         foreach (var h in command.Histories)
         {
