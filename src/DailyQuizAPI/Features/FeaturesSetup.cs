@@ -1,4 +1,5 @@
 ﻿using DailyQuizAPI.Features.Crosscutting.AppSettings.Create;
+using DailyQuizAPI.Features.Crosscutting.Caching.ClearAllCache;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Accept;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Create;
 using DailyQuizAPI.Features.Crosscutting.FriendRequests.Delete;
@@ -45,6 +46,7 @@ public static class FeaturesSetup
 
         services.AddScoped<GetSumotsQueryHandler>();
         services.AddScoped<ExtractSumotsCommandHandler>();
+        services.AddScoped<ClearAllCacheCommandHandler>();
 
         services.AddScoped<ConfirmEmailCommandHandler>();
         services.AddScoped<CreateUserCommandHandler>();
@@ -79,6 +81,7 @@ public static class FeaturesSetup
         app.MapSendFriendRequestEndpoint();
 
         app.MapGetHealthchecks();
+        app.MapClearAllCacheEndpoint();
 
         app.MapGetSumotHistoriesEndpoint();
         app.MapUpdateSumotHistoriesEndpoint();
