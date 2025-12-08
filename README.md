@@ -1,21 +1,18 @@
+
 # DailyQuizAPI
 
-**DailyQuizAPI** est une API REST développée avec **.NET 8**, conçue pour alimenter un jeu de type Wordle nommé **Sumot**.  
-Ce projet personnel a pour objectif de renforcer mes compétences fullstack en **.NET / EF Core / PostgreSQL / Azure** et démontre une architecture scalable, moderne et maintenable.
-
----
+**DailyQuizAPI** est une API REST développée avec **.NET 8**, conçue pour alimenter un jeu de type Wordle nommé **Sumot**.  Je pensais faire une seule API pour plusieurs applications de jeux, d'où le nom et certaines fonctionnalités générales qui au final ne servent pas.
+Ce projet personnel a pour objectif de renforcer mes compétences en **.NET / EF Core / PostgreSQL / Azure** et démontre une architecture scalable, moderne et maintenable.
 
 ## 🧠 Objectif
 
 Ce projet permet de :
 
-- Obtenir le/les **mot/s du jour** (sumot)
+- Obtenir les **mots du jour** (qu'on appelle Sumot)
 - Gérer l'**authentification** via Identity (JWT)
 - Maintenir un **historique de parties**
 - Gérer une **liste d'amis**
 - Exécuter des **tâches planifiées** avec Hangfire (ex. : choix du mot du jour, nettoyage des utilisateurs inactifs)
-
----
 
 ## ⚙️ Stack technique
 
@@ -47,16 +44,14 @@ Auth via JWT
 
 Middleware custom .UseAuthentication() pour valider le token
 
-Décodage du token et enregistrement du UserId dans le HttpContext
-
 ---
 
 ⏱️ Jobs Hangfire
 
 Deux jobs récurrents sont définis :
-Nom du job	Heure (Europe/Paris)	Description
-daily-sumot	02:00	Sélection d'un mot pour le jour
-daily-inactive-check	04:00	Suppression des comptes inactifs
+
+- daily-sumot	02:00	Sélection d'un mot pour le jour
+- daily-inactive-check	04:00	Suppression des comptes inactifs
 
 Hangfire utilise la même base PostgreSQL.
 
@@ -87,7 +82,7 @@ CI/CD avec Github Actions
 👤 Auteur
 
 Maxime Lambert
-Développeur fullstack .NET / React
+Développeur full stack
 📧 lambert.maxime@protonmail.com
 🌐 [LinkedIn](https://www.linkedin.com/in/maximelambert35/)
 
